@@ -15,6 +15,8 @@
 - 未完成名单
 
 # API基本设计
+// TODO: Redesign API, following is just a demo for querying data.
+// We need to design all of the CRUD.
 ## 1. Visiting home page
 ### 1.1 getting groups
 ```
