@@ -51,13 +51,18 @@ DELIMITER ;
 # contents would be stored in other db
 # assert(user publisher_id in group group_id)
 # assert(start_date <= end_date)
+# trigger a separate work for each one TODO
 CREATE TABLE `task` (
     `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `group_id` BIGINT(20) NOT NULL,
     `name` VARCHAR(20) DEFAULT "",
     `publisher_id` BIGINT(20) NOT NULL,
+    # only for group work, can be null
+    `leader_id` BIGINT(20),
     `start_date` DATE DEFAULT NULL,
     `end_date` DATE DEFAULT NULL,
+    # if readonly, only the publisher can revise the task
+    `readonly` BOOL DEFAULT FALSE NOT NULL,
     `type` ENUM('GROUP', 'INDIVIDUAL') DEFAULT 'GROUP',
     `description` TEXT,
     CHECK (end_date >= start_date),
@@ -68,7 +73,9 @@ CREATE TABLE `task` (
     # today is the ddl!
     INDEX (`end_date`),
     FOREIGN KEY (`publisher_id`, `group_id`) REFERENCES `user_group`(`user_id`, `group_id`) ON DELETE CASCADE,
-    FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`leader_id`) references `user`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`publisher_id`) references `user`(`id`) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE `task_user` (

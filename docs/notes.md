@@ -10,5 +10,8 @@ HASH USER ID, password
 2. directory structure
 3. write basic service
 4. deploy
-5. add handlers and form microservice
-6. docker swarm
+5. CI/CD
+6. add handlers and form microservice
+7. docker swarm
+##
+1. advanced functionality
