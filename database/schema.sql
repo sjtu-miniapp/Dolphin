@@ -1,4 +1,3 @@
-// TODO: ADD TRIGGERS
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP DATABASE IF EXISTS `test`;
@@ -11,12 +10,13 @@ CREATE TABLE `user` (
     `id`  BIGINT(20) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(10) NOT NULL,
     `password` VARCHAR(20) NOT NULL,
-    `self_group_id` DEFAULT NULL,
-    PRIMARY KEY (`id`)
+    `self_group_id` BIGINT(20) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`self_group_id`) REFERENCES `group`(`id`) ON DELETE SET NULL
 ) DEFAULT CHARSET=utf8;
 
+
 # every user starts with his own group
-# trigger insert update user_cnt of group
 CREATE TABLE `user_group` (
     `user_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `group_id` BIGINT(20) NOT NULL,
@@ -32,8 +32,21 @@ CREATE TABLE `group` (
     `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(10) DEFAULT "",
     PRIMARY KEY (`id`, `name`),
-    INDEX (`name`)
+    INDEX (`name`),
+    INDEX (`id`)
 ) DEFAULT CHARSET=utf8;
+
+DELIMITER $$
+CREATE TRIGGER add_self_group
+BEFORE INSERT ON `user`
+FOR EACH ROW
+BEGIN
+  INSERT INTO `group`() VALUES();
+  SET NEW.self_group_id = LAST_INSERT_ID();
+  INSERT INTO `user_group`(`user_id`, `group_id`) VALUES(NEW.id, NEW.self_group_id);
+END$$
+DELIMITER ;
+
 
 # contents would be stored in other db
 # assert(user publisher_id in group group_id)
@@ -52,11 +65,10 @@ CREATE TABLE `task` (
     UNIQUE INDEX (`group_id`, `name`),
     INDEX (`group_id`),
     INDEX (`publisher_id`),
-    INDEX (`start_date`, `end_date`),
-    INDEX (`done`),
-    FOREIGN KEY (`publisher_id`, `group_id`) references `user_group`(`user_id`, `group_id`) ON DELETE CASCADE
-    CHECK (`done_cnt` >= 0)
-    CHECK (`user_cnt` >= 1)
+    # today is the ddl!
+    INDEX (`end_date`),
+    FOREIGN KEY (`publisher_id`, `group_id`) REFERENCES `user_group`(`user_id`, `group_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE `task_user` (
