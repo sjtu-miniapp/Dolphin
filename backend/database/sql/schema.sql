@@ -1,8 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP DATABASE IF EXISTS `test`;
-CREATE DATABASE `test`;
-USE `test`;
+DROP DATABASE IF EXISTS `dolphin`;
+CREATE DATABASE `dolphin``;
+USE `dolphin`;
 
 # password not necessary
 # trigger insert after insert self group
