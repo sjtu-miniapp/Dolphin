@@ -4,4 +4,6 @@ build
 *~
 .DS*
 .serverinfo
+.env
+passwd.pkl
 __pycache__
