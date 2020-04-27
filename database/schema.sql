@@ -51,7 +51,7 @@ DELIMITER ;
 # contents would be stored in other db
 # assert(user publisher_id in group group_id)
 # assert(start_date <= end_date)
-# trigger a separate work for each one TODO
+# assert(leader_id in task worker)
 CREATE TABLE `task` (
     `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `group_id` BIGINT(20) NOT NULL,
@@ -90,4 +90,14 @@ CREATE TABLE `task_user` (
     INDEX (`task_id`)
 );
 
+DELIMITER $$
+CREATE TRIGGER add_individual_work
+BEFORE INSERT ON `user`
+FOR EACH ROW
+BEGIN
+  INSERT INTO `group`() VALUES();
+  SET NEW.self_group_id = LAST_INSERT_ID();
+  INSERT INTO `user_group`(`user_id`, `group_id`) VALUES(NEW.id, NEW.self_group_id);
+END$$
+DELIMITER ;
 SET FOREIGN_KEY_CHECKS = 1;
