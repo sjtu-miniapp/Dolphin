@@ -1,0 +1,40 @@
+.group {
+  width: 750px;
+  height: auto;
+  overflow: hidden;
+}
+
+.item {
+  border-top: 1px solid #cfe0f7;
+  margin: 0 20px;
+  height: 264px;
+  width: 710px;
+}
+
+.right {
+  float: left;
+  height: 264px;
+  width: 456px;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.text {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  height: 264px;
+  width: 456px;
+  margin-left: 5px;
+}
+
+.name {
+  width: 456px;
+  display: block;
+  line-height: 50px;
+  font-size: 44px;
+  color: #425d8a;
+}
