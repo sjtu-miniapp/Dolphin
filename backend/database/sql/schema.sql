@@ -1,7 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP DATABASE IF EXISTS `dolphin`;
-CREATE DATABASE `dolphin``;
+CREATE DATABASE `dolphin`;
 USE `dolphin`;
 
 # password not necessary
