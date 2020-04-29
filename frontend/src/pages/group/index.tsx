@@ -1,9 +1,14 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Navigator } from '@tarojs/components'
+import { View, Text, Navigator, Image } from '@tarojs/components'
 import './index.scss'
+
+const GENERAL_URL = 'https://pic.downk.cc/item/5ea99a46c2a9a83be5804922.png';
 
 interface Group {
   name: string;
+  taskNumber: number;
+  updateTime: Date;
+  picUrl?: string;
 }
 
 interface GroupProps { }
@@ -19,9 +24,9 @@ export class Index extends Component<GroupProps, GroupState> {
 
     this.state = {
       groups: [
-        { name: '商业模式分析' },
-        { name: '宏观经济学' },
-        { name: '职业发展规划' },
+        { name: '商业模式分析', taskNumber: 10, updateTime: new Date() },
+        { name: '宏观经济学', taskNumber: 1, updateTime: new Date() },
+        { name: '职业发展规划', taskNumber: 0, updateTime: new Date() },
       ],
     };
   }
@@ -57,12 +62,19 @@ export class Index extends Component<GroupProps, GroupState> {
             groups.map(item => (
               <View className='item'>
                 <Navigator url={'/'}>
-                  {/* <Image className='img' src={item.picUrl}></Image> */}
-                  <View className='right'>
+                  <View className='left'>
                     <View className='text'>
                       <Text className='name'>{item.name}</Text>
+                      <Text className='count'>任务数: {item.taskNumber}</Text>
+                      <Text className='update'>上次更新: {item.updateTime.toLocaleDateString()}</Text>
                     </View>
                   </View>
+                  <Image
+                    className='right'
+                    src={item.picUrl ? item.picUrl : GENERAL_URL}
+                    mode='scaleToFill'
+                    style={{ width: '132px', height: '99px', float: 'right', marginTop: '10px' }}
+                  ></Image>
                 </Navigator>
               </View>
             ))

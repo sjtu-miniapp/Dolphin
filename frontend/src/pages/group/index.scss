@@ -5,20 +5,27 @@
 }
 
 .item {
-  border-top: 1px solid #cfe0f7;
-  margin: 0 20px;
+  border: 2px solid #cfe0f7;
+  border-radius: 20px;
+  box-shadow: 15px 15px 15px #abbcda;
+  margin: 30px 20px;
   height: 264px;
   width: 710px;
 }
 
-.right {
+.left {
   float: left;
   height: 264px;
-  width: 456px;
+  width: 360px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
 }
+
+// .right {
+//   float: right;
+//   margin-top: 30px;
+// }
 
 .text {
   display: flex;
@@ -27,14 +34,33 @@
   justify-content: center;
   overflow: hidden;
   height: 264px;
-  width: 456px;
-  margin-left: 5px;
+  width: 360px;
+  margin-left: 30px;
 }
 
 .name {
-  width: 456px;
+  width: 360px;
   display: block;
   line-height: 50px;
   font-size: 44px;
   color: #425d8a;
+}
+
+.count {
+  width: 160px;
+  margin-top: 20px;
+  font-size: 30px;
+  line-height: 50px;
+  font-weight: 500;
+  color: #abbcda;
+  padding-left: 2px;
+}
+
+.update {
+  width: 360px;
+  font-size: 30px;
+  line-height: 50px;
+  font-weight: 500;
+  color: #abbcda;
+  padding-left: 2px;
 }
