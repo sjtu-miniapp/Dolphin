@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/sjtu-miniapp/dolphin/user/service"
+	"log"
 )
 
 type HelloRequest struct {
@@ -11,7 +12,7 @@ type HelloRequest struct {
 }
 
 type HelloResponse struct {
-	Message string
+	Message string `json:"message"`
 }
 
 func MakeHelloEndpoint(srv service.Service) endpoint.Endpoint {
@@ -23,4 +24,18 @@ func MakeHelloEndpoint(srv service.Service) endpoint.Endpoint {
 		}
 		return HelloResponse{Message: message}, nil
 	}
+}
+
+func (e Endpoints) Hello(ctx context.Context, name string) (string, error) {
+	log.Print("endp.hello")
+	req := HelloRequest{
+		Name: name,
+	}
+	resp, err := e.HelloEndpoint(ctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	helloResp := resp.(HelloResponse)
+	return helloResp.Message, nil
 }

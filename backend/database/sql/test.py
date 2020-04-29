@@ -3,7 +3,6 @@ import mysql.connector
 from mysql.connector import Error
 import unittest
 
-
 # from dotenv import load_dotenv
 # from ...utils.encryption.encrypt import decrypt
 
@@ -15,8 +14,6 @@ def connect():
     database = os.getenv("SQL_DATABASE")
     user = os.getenv("SQL_USER")
     password = os.getenv("SQL_PASSWORD")
-
-
 
     """ Connect to MySQL database """
     conn = None
