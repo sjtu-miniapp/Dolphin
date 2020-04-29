@@ -17,6 +17,8 @@ case "$1" in
       ;;
     server)
       echo 1
+#      ../backend/build/......?
+#     docker
       ;;
     sql)
       docker pull nihplod/mysql
