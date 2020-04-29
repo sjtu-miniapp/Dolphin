@@ -2,6 +2,8 @@ import sys
 import mysql.connector
 from mysql.connector import Error
 import unittest
+
+
 # from dotenv import load_dotenv
 # from ...utils.encryption.encrypt import decrypt
 
@@ -28,6 +30,8 @@ def connect():
 
 
 class TestCase(unittest.TestCase):
+    conn: mysql.connector.MySQLConnection
+
     def setUp(self):
         self.conn = connect()
         if not self.conn.is_connected():
@@ -37,8 +41,10 @@ class TestCase(unittest.TestCase):
     # TODO: test the database
     def test_user(self):
         pass
+
     def test_group(self):
         pass
+
     # add more tests
 
     def tearDown(self):
