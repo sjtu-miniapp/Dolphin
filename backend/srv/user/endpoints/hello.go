@@ -18,7 +18,6 @@ func MakeHelloEndpoint(srv service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(HelloRequest)
 		message, err := srv.Hello(ctx, req.Name)
-
 		if err != nil {
 			return nil, err
 		}
