@@ -90,14 +90,5 @@ CREATE TABLE `task_user` (
     INDEX (`task_id`)
 );
 
-DELIMITER $$
-CREATE TRIGGER add_individual_work
-BEFORE INSERT ON `user`
-FOR EACH ROW
-BEGIN
-  INSERT INTO `group`() VALUES();
-  SET NEW.self_group_id = LAST_INSERT_ID();
-  INSERT INTO `user_group`(`user_id`, `group_id`) VALUES(NEW.id, NEW.self_group_id);
-END$$
-DELIMITER ;
+
 SET FOREIGN_KEY_CHECKS = 1;
