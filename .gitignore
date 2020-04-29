@@ -4,5 +4,6 @@ build
 *~
 .DS*
 .env
+notes.md
 passwd.pkl
 __pycache__
