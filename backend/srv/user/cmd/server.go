@@ -24,7 +24,7 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	// init lorem service
+	// init  service
 	var svc service.Service
 	svc = service.UserService{}
 	errChan := make(chan error)

@@ -11,14 +11,12 @@ import unittest
 def connect():
     import os
     # load_dotenv('../../.env')
-    # host = os.getenv("SQL_HOST")
-    # database = os.getenv("SQL_DATABASE")
-    # user = os.getenv("SQL_USER")
-    # password = os.getenv("SQL_PASSWORD")
-    host = "121.199.33.44"
-    database = "dolphin"
-    user = "root"
-    password = "610878"
+    host = os.getenv("SQL_HOST")
+    database = os.getenv("SQL_DATABASE")
+    user = os.getenv("SQL_USER")
+    password = os.getenv("SQL_PASSWORD")
+
+
 
     """ Connect to MySQL database """
     conn = None
