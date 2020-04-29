@@ -22,18 +22,16 @@ CREATE TABLE `user_group` (
     `group_id` BIGINT(20) NOT NULL,
     PRIMARY KEY (`user_id`, `group_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`group_id`) REFERENCES `group`(`id`) ON DELETE CASCADE,
-    INDEX(`user_id`),
-    INDEX(`group_id`)
+    FOREIGN KEY (`group_id`) REFERENCES `group`(`id`) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `group` (
     `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(10) DEFAULT "",
-    PRIMARY KEY (`id`, `name`),
-    INDEX (`name`),
-    INDEX (`id`)
+    `type` ENUM('GROUP', 'INDIVIDUAL') DEFAULT 'GROUP',
+    PRIMARY KEY (`id`),
+    UNIQUE (`name`)
 ) DEFAULT CHARSET=utf8;
 
 DELIMITER $$
@@ -68,10 +66,6 @@ CREATE TABLE `task` (
     CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),
     UNIQUE INDEX (`group_id`, `name`),
-    INDEX (`group_id`),
-    INDEX (`publisher_id`),
-    # today is the ddl!
-    INDEX (`end_date`),
     FOREIGN KEY (`publisher_id`, `group_id`) REFERENCES `user_group`(`user_id`, `group_id`) ON DELETE CASCADE,
     FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`leader_id`) references `user`(`id`) ON DELETE CASCADE,
@@ -85,9 +79,7 @@ CREATE TABLE `task_user` (
     `done_time` TIMESTAMP DEFAULT NULL,
     PRIMARY KEY (`task_id`, `user_id`),
     FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-    INDEX (`user_id`),
-    INDEX (`task_id`)
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 );
 
 
