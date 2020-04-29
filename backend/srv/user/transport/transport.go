@@ -1,12 +1,11 @@
-package user
+package transport
 
 import (
 	"context"
-	"github.com/go-kit/kit/endpoint"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
-	. "nihplod/srv/user/model"
-	"nihplod/srv/user/pb"
-	endpoints "nihplod/srv/user/endpoints"
+	"github.com/sjtu-miniapp/dolphin/user/model"
+	"github.com/sjtu-miniapp/dolphin/user/endpoints"
+	"github.com/sjtu-miniapp/dolphin/user/pb"
 )
 
 type grpcServer struct {
@@ -18,8 +17,8 @@ func NewGRPCServer(_ context.Context, endpoint endpoints.Endpoints) pb.UserServe
 	return &grpcServer{
 		hello: grpctransport.NewServer(
 			endpoint.HelloEndpoint,
-			DecodeGRPCHelloRequest,
-			EncodeGRPCHelloResponse,
+			model.DecodeGRPCHelloRequest,
+			model.EncodeGRPCHelloResponse,
 			),
 	}
 }

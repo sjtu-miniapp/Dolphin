@@ -1,4 +1,4 @@
-package user
+package middleware
 //
 //func (l loggingMiddleware) SendEmail(ctx context.Context, email string, content string) (string, error) {
 //	defer func() {

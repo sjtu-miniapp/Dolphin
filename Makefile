@@ -1,9 +1,26 @@
 .ONESHELL:
-.PHONY: help docker deploy transfer
+.PHONY: help build docker deploy transfer
+SHELL=/bin/bash
 ENV_FILE=.env
-DOCKER_SQL=backend/database/sql/
+DOCKER_SQL=backend/database/sql
+SRV=backend/srv
+GOOUT=backend
+GOSCP=backend/scripts
 help:
-
+build:
+	@source ${GOSCP}/source.sh
+	@SRVLIST=$$(find ${SRV}/* -maxdepth 0 -type d | sed  "s/^.*\///")
+	@cd ${SRV}/
+	@for srv in $${SRVLIST}; do \
+  		cd $${srv}; \
+  		if [[ $${srv} == group ]]; then  \
+  		cd .. ;\
+  		continue ; \
+		fi ; \
+#  		go build -a -o $(GOOUT)/build/$${srv} ${SRV}/$${srv}/cmd/server.go; \
+  		go build -a -o ../../build/$${srv} cmd/server.go; \
+  		cd .. ;\
+  	done
 docker:
 	@echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
 	# build all the images
@@ -19,3 +36,6 @@ transfer:
 deploy:
 #	@servercnt=$$(sed -n /^SERVER/p ${ENV_FILE}| sed -n '$$p'| cut -b 7)
 	@sshpass -p ${SERVER1_PASSWORD} ssh -o StrictHostKeyChecking=no -P ${SERVER1_SSH} ${SERVER1_USER}@${SERVER1_IP} 'cd dolphin/scripts && ./setup.sh sql'
+
+clean:
+	@rm -rf $(GOOUT)/build

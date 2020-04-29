@@ -1,14 +1,13 @@
-package user
+package model
 
 import (
 	"context"
-	"google.golang.org/protobuf/internal/impl"
-	. "nihplod/srv/user/endpoints"
-	"nihplod/srv/user/pb"
+	"github.com/sjtu-miniapp/dolphin/user/endpoints"
+	"github.com/sjtu-miniapp/dolphin/user/pb"
 )
 
 func EncodeGRPCHelloRequest(_ context.Context, r interface{}) (interface{}, error) {
-	req := r.(HelloRequest)
+	req := r.(endpoints.HelloRequest)
 	return &pb.HelloRequest{
 		Name: req.Name,
 	}, nil
@@ -16,13 +15,13 @@ func EncodeGRPCHelloRequest(_ context.Context, r interface{}) (interface{}, erro
 
 func DecodeGRPCHelloRequest(_ context.Context, r interface{}) (interface{}, error) {
 	req := r.(*pb.HelloRequest)
-	return HelloRequest{
+	return endpoints.HelloRequest{
 		Name: req.Name,
 	}, nil
 }
 
 func EncodeGRPCHelloResponse(_ context.Context, r interface{}) (interface{}, error) {
-	resp := r.(HelloResponse)
+	resp := r.(endpoints.HelloResponse)
 	return &pb.HelloResponse{
 		Message: resp.Message,
 	}, nil
@@ -30,7 +29,7 @@ func EncodeGRPCHelloResponse(_ context.Context, r interface{}) (interface{}, err
 
 func DecodeGRPCHelloResponse(_ context.Context, r interface{}) (interface{}, error) {
 	resp := r.(*pb.HelloResponse)
-	return HelloResponse{
+	return endpoints.HelloResponse{
 		Message: resp.Message,
 	}, nil
 }

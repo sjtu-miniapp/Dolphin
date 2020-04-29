@@ -1,9 +1,9 @@
-package user
+package endpoints
 
 import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
-	service "nihplod/srv/user/service"
+	"github.com/sjtu-miniapp/dolphin/user/service"
 )
 
 type HelloRequest struct {
@@ -17,11 +17,11 @@ type HelloResponse struct {
 func MakeHelloEndpoint(srv service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(HelloRequest)
-		message, err := srv.Hello(ctx, req.name)
+		message, err := srv.Hello(ctx, req.Name)
 
 		if err != nil {
 			return nil, err
 		}
-		return HelloResponse{message: message}, nil
+		return HelloResponse{Message: message}, nil
 	}
 }
