@@ -5,7 +5,7 @@
 # python3.7 -m pip install cffi
 # python3.7 -m pip install cryptography
 # python3.7 -m pip install python-dotenv
-
+# python3.7 -m pip install mysql-connector-python
 # export .env files
 ENV_FILE=../.env
 # have to be sourced to run correctly

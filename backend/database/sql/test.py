@@ -2,6 +2,8 @@ import sys
 import mysql.connector
 from mysql.connector import Error
 import unittest
+
+
 # from dotenv import load_dotenv
 # from ...utils.encryption.encrypt import decrypt
 
@@ -67,8 +69,10 @@ class TestCase(unittest.TestCase):
         # check user self_group_id
 
         pass
+
     def test_group(self):
         pass
+
     # add more tests
 
     def tearDown(self):
