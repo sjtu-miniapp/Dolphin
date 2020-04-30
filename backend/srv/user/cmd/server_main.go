@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	// os.getenv
 	var (
 		gRPCAddr = flag.String("grpc", ":8081",
 			"gRPC listen address")
@@ -53,10 +52,6 @@ func main() {
 		errChan <- fmt.Errorf("%s", <-c)
 	}()
 
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errChan <- fmt.Errorf("%s", <-c)
-	}()
+
 	fmt.Println(<- errChan)
 }
