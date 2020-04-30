@@ -1,16 +1,17 @@
 package rest
 
-
 import (
 	"context"
-	"log"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/sjtu-miniapp/dolphin/user/logger"
+	"github.com/sjtu-miniapp/dolphin/user/middleware"
+	"github.com/sjtu-miniapp/dolphin/user/pb"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"google.golang.org/grpc"
-	"github.com/sjtu-miniapp/dolphin/user/pb"
 )
 
 // RunServer runs HTTP/REST gateway
@@ -21,23 +22,27 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	if err := pb.RegisterUserServiceHandlerFromEndpoint(ctx, mux, "localhost:" + grpcPort, opts); err != nil {
-		log.Fatalf("failed to start HTTP gateway: %v", err)
+	if err := pb.RegisterUserServiceHandlerFromEndpoint(ctx, mux, "localhost:"+grpcPort, opts); err != nil {
+		logger.Log.Fatal("failed to start HTTP gateway", zap.String("reason", err.Error()))
 	}
 
 	srv := &http.Server{
 		Addr:    ":" + httpPort,
-		Handler: mux,
+		Handler: middleware.AddRequestID(
+			middleware.AddLogger(logger.Log, mux)),
 	}
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
+		for range c {
+		}
 		_, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
+		_ = srv.Shutdown(ctx)
 	}()
 
-	log.Println("starting HTTP/REST gateway...")
+	logger.Log.Info("starting HTTP/REST gateway...")
 	return srv.ListenAndServe()
 }

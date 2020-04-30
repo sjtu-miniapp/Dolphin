@@ -6,13 +6,13 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sjtu-miniapp/dolphin/user/endpoints"
+	"github.com/sjtu-miniapp/dolphin/user/logger"
 	"github.com/sjtu-miniapp/dolphin/user/pb"
 	"github.com/sjtu-miniapp/dolphin/user/rest"
 	"github.com/sjtu-miniapp/dolphin/user/service"
 	"github.com/sjtu-miniapp/dolphin/user/transport"
 	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"log"
 	"net"
 	"os"
 	"os/signal"
@@ -28,6 +28,9 @@ type Config struct {
 	SQLUser     string
 	SQLPassword string
 	SQLDatabase string
+	// logger
+	LogLevel      int
+	LogTimeFormat string
 }
 
 func main() {
@@ -38,6 +41,9 @@ func main() {
 	flag.StringVar(&cfg.SQLUser, "sql-user", "", "sql user")
 	flag.StringVar(&cfg.SQLPassword, "sql-passwd", "", "sql password")
 	flag.StringVar(&cfg.SQLDatabase, "sql-db", "", "sql database")
+	flag.IntVar(&cfg.LogLevel, "log-level", 0, "Global log level")
+	flag.StringVar(&cfg.LogTimeFormat, "log-time-format", "2006-01-02T15:04:05Z07:00",
+		"Print time format for logger e.g. 2006-01-02T15:04:05Z07:00")
 	flag.Parse()
 	ctx := context.Background()
 
@@ -52,22 +58,29 @@ func main() {
 	db, _ = sql.Open("mysql",
 		"root:610878@tcp(127.0.0.1:3306)/test")
 	err := db.Ping()
+	errChan := make(chan error)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		err = fmt.Errorf("failed to connect to database: %v", err)
+		errChan <- err
 	}
 	defer func() {
 		err := db.Close()
 		if err != nil {
-			log.Fatal(err)
+			err = fmt.Errorf("failed to close database: %v", err)
 		}
 	}()
+
+	// initialize logger
+	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
+		err = fmt.Errorf("failed to initialize logger: %v", err)
+
+	}
 
 	// init service
 	var svc service.Service
 	svc = service.UserService{
 		Db: db,
 	}
-	errChan := make(chan error)
 
 	// creating Endpoints struct
 	epts := endpoints.Endpoints{
@@ -84,6 +97,7 @@ func main() {
 		handler := transport.NewGRPCServer(ctx, epts)
 		gRPCServer := grpc.NewServer()
 		pb.RegisterUserServiceServer(gRPCServer, handler)
+		logger.Log.Info("starting gRPC server...")
 		errChan <- gRPCServer.Serve(listener)
 	}()
 
@@ -100,6 +114,7 @@ func main() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 		errChan <- fmt.Errorf("%s", <-c)
+		logger.Log.Warn("shutting down gRPC server...")
 	}()
 
 	fmt.Println(<-errChan)
