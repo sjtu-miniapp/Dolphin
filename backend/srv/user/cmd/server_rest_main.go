@@ -1,8 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/sjtu-miniapp/dolphin/user/endpoints"
 	"github.com/sjtu-miniapp/dolphin/user/pb"
 	"github.com/sjtu-miniapp/dolphin/user/rest"
@@ -10,6 +12,7 @@ import (
 	"github.com/sjtu-miniapp/dolphin/user/transport"
 	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"log"
 	"net"
 	"os"
 	"os/signal"
@@ -17,39 +20,53 @@ import (
 )
 
 type Config struct {
-	// gRPC server start parameters section
 	// GRPCPort is TCP port to listen by gRPC server
 	GRPCPort string
-	// HTTP/REST gateway start parameters section
 	// HTTPPort is TCP port to listen by HTTP/REST gateway
-	HTTPPort string
-	// DB Datastore parameters section
-	// DatastoreDBHost is host of database
-	//DatastoreDBHost string
-	// DatastoreDBUser is username to connect to database
-	//DatastoreDBUser string
-	// DatastoreDBPassword password to connect to database
-	//DatastoreDBPassword string
-	// DatastoreDBSchema is schema of database
-	//DatastoreDBSchema string
+	HTTPPort    string
+	SQLHost     string
+	SQLUser     string
+	SQLPassword string
+	SQLDatabase string
 }
 
 func main() {
-	//var gRPCAddr = flag.String("grpc", ":8081",
-	//		"gRPC listen address")
 	var cfg Config
 	flag.StringVar(&cfg.GRPCPort, "grpc-port", "8081", "gRPC port to bind")
 	flag.StringVar(&cfg.HTTPPort, "http-port", "9081", "HTTP port to bind")
-	//flag.StringVar(&cfg.DatastoreDBHost, "db-host", "", "Database host")
-	//flag.StringVar(&cfg.DatastoreDBUser, "db-user", "", "Database user")
-	//flag.StringVar(&cfg.DatastoreDBPassword, "db-password", "", "Database password")
-	//flag.StringVar(&cfg.DatastoreDBSchema, "db-schema", "", "Database schema")
+	flag.StringVar(&cfg.SQLHost, "sql-host", "", "sql host")
+	flag.StringVar(&cfg.SQLUser, "sql-user", "", "sql user")
+	flag.StringVar(&cfg.SQLPassword, "sql-passwd", "", "sql password")
+	flag.StringVar(&cfg.SQLDatabase, "sql-db", "", "sql database")
 	flag.Parse()
 	ctx := context.Background()
 
+	param := "parseTime=true"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?%s",
+		cfg.SQLUser,
+		cfg.SQLPassword,
+		cfg.SQLHost,
+		cfg.SQLDatabase,
+		param)
+	db, _ := sql.Open("mysql", dsn)
+	db, _ = sql.Open("mysql",
+		"root:610878@tcp(127.0.0.1:3306)/test")
+	err := db.Ping()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer func() {
+		err := db.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	// init service
 	var svc service.Service
-	svc = service.UserService{}
+	svc = service.UserService{
+		Db: db,
+	}
 	errChan := make(chan error)
 
 	// creating Endpoints struct
@@ -59,7 +76,7 @@ func main() {
 
 	//execute grpc server
 	go func() {
-		listener, err := net.Listen("tcp", ":8081")
+		listener, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 		if err != nil {
 			errChan <- err
 			return

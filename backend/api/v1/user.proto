@@ -5,15 +5,16 @@ package pb;
 //import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
+
 service UserService {
-    rpc Hello(HelloRequest) returns (HelloResponse) {
-      option (google.api.http) = {
-              get: "/api/user/{name}"
-          };
-    }
-//    post: "/api/users"
-//  body: "*"
-//    google.protobuf.Timestamp created_at = 2;
+  rpc Hello(HelloRequest) returns (HelloResponse) {
+    option (google.api.http) = {
+      get: "/api/user/{name}"
+    };
+  }
+  //    post: "/api/users"
+  //  body: "*"
+  //    google.protobuf.Timestamp created_at = 2;
 }
 //    "/api/users/{id}"
 message User {

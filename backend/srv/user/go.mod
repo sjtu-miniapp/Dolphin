@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/go-kit/kit v0.10.0
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/protobuf v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	golang.org/x/net v0.0.0-20200425230154-ff2c4b7c35a0

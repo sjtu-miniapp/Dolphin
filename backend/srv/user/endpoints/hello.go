@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
 	"github.com/sjtu-miniapp/dolphin/user/service"
-	"log"
 )
 
 type HelloRequest struct {
@@ -27,7 +26,6 @@ func MakeHelloEndpoint(srv service.Service) endpoint.Endpoint {
 }
 
 func (e Endpoints) Hello(ctx context.Context, name string) (string, error) {
-	log.Print("endp.hello")
 	req := HelloRequest{
 		Name: name,
 	}

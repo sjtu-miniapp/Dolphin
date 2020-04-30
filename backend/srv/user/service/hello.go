@@ -2,15 +2,10 @@ package service
 
 import (
 	"context"
-	"strings"
+	"github.com/sjtu-miniapp/dolphin/user/db"
 )
 
-func (UserService) Hello(_ context.Context, name string) (string, error) {
-	var message string
-	if strings.EqualFold(name, "hello") {
-		message = name
-	} else {
-		message = "world"
-	}
-	return message, nil
+func (us UserService) Hello(ctx context.Context, name string) (string, error) {
+	err := db.UpdateName(ctx, us.Db, name, "hello")
+	return "", err
 }

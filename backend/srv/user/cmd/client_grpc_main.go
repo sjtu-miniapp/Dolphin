@@ -7,6 +7,7 @@ import (
 	"github.com/sjtu-miniapp/dolphin/user/service"
 	"google.golang.org/grpc"
 	"log"
+	"time"
 )
 
 func main() {
@@ -16,8 +17,8 @@ func main() {
 
 	flag.Parse()
 	ctx := context.Background()
-	//ctx, cancel := context.WithTimeout(ctx, time.Second)
-	//defer cancel()
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
 
 	conn, err := grpc.DialContext(ctx,
 		*grpcAddr,

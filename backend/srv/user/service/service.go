@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 )
 
@@ -13,5 +14,7 @@ type Service interface {
 	Hello(ctx context.Context, name string) (string, error)
 }
 
-type UserService struct {}
+type UserService struct {
+	Db *sql.DB
+}
 
