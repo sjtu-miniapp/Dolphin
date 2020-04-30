@@ -13,7 +13,7 @@ import (
 func New(conn *grpc.ClientConn) service.Service {
 	var helloEndpoint = grpctransport.NewClient(
 		conn,
-		"pb.User",
+		"pb.UserService",
 		"Hello",
 		model.EncodeGRPCHelloRequest,
 		model.DecodeGRPCHelloResponse,

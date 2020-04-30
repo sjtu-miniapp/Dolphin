@@ -43,7 +43,7 @@ func main() {
 		}
 		handler := transport.NewGRPCServer(ctx, epts)
 		gRPCServer := grpc.NewServer()
-		pb.RegisterUserServer(gRPCServer, handler)
+		pb.RegisterUserServiceServer(gRPCServer, handler)
 		errChan <- gRPCServer.Serve(listener)
 	}()
 

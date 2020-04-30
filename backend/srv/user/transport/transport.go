@@ -13,7 +13,7 @@ type grpcServer struct {
 }
 
 // service
-func NewGRPCServer(_ context.Context, endpoint endpoints.Endpoints) pb.UserServer {
+func NewGRPCServer(_ context.Context, endpoint endpoints.Endpoints) pb.UserServiceServer {
 	return &grpcServer{
 		// no context
 		hello: grpctransport.NewServer(
