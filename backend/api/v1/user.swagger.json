@@ -1,8 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "user.proto",
-    "version": "version not set"
+    "title": "User protobuf",
+    "version": "1",
+    "contact": {
+      "name": "Dolphin project",
+      "url": "https://github.com/sjtu-miniapp/Dolphin/"
+    }
   },
   "consumes": [
     "application/json"
@@ -11,7 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/user/{name}": {
+    "/api/v1/user/{name}": {
       "get": {
         "operationId": "UserService_Hello",
         "responses": {

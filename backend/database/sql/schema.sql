@@ -1,3 +1,4 @@
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP DATABASE IF EXISTS `dolphin`;
@@ -7,45 +8,39 @@ USE `dolphin`;
 # password not necessary
 # trigger insert after insert self group
 CREATE TABLE `user` (
-    `id`  BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `id`  varchar(30) NOT NULL,
     `name` VARCHAR(10) NOT NULL,
-    `password` VARCHAR(20) NOT NULL,
-    `self_group_id` BIGINT(20) DEFAULT NULL,
+    `gender` TINYINT(1),
+# not exposed to clients
+    `self_group_id` BIGINT(20),
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`self_group_id`) REFERENCES `group`(`id`) ON DELETE SET NULL
+    FOREIGN KEY (`self_group_id`) REFERENCES `group`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) DEFAULT CHARSET=utf8;
 
 
 # every user starts with his own group
+# but the self group relationship is not included here
 CREATE TABLE `user_group` (
-    `user_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `user_id` VARCHAR(30) NOT NULL,
     `group_id` BIGINT(20) NOT NULL,
     PRIMARY KEY (`user_id`, `group_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`group_id`) REFERENCES `group`(`id`) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8;
 
-
+# when insert check whether the same user
 CREATE TABLE `group` (
-    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `id` BIGINT(20) AUTO_INCREMENT,
     `name` VARCHAR(10) DEFAULT "",
+# also used for self group
+    `creator_id` VARCHAR(30) NOT NULL,
     `type` ENUM('GROUP', 'INDIVIDUAL') DEFAULT 'GROUP',
     PRIMARY KEY (`id`),
-    UNIQUE (`name`)
+    UNIQUE (`name`, `creator_id`),
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8;
 
-DELIMITER $$
-CREATE TRIGGER add_self_group
-BEFORE INSERT ON `user`
-FOR EACH ROW
-BEGIN
-  INSERT INTO `group`() VALUES();
-  SET NEW.self_group_id = LAST_INSERT_ID();
-  INSERT INTO `user_group`(`user_id`, `group_id`) VALUES(NEW.id, NEW.self_group_id);
-END$$
-DELIMITER ;
-
-
+# need review
 # contents would be stored in other db
 # assert(user publisher_id in group group_id)
 # assert(start_date <= end_date)
@@ -54,9 +49,9 @@ CREATE TABLE `task` (
     `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
     `group_id` BIGINT(20) NOT NULL,
     `name` VARCHAR(20) DEFAULT "",
-    `publisher_id` BIGINT(20) NOT NULL,
+    `publisher_id` VARCHAR(30) NOT NULL,
     # only for group work, can be null
-    `leader_id` BIGINT(20),
+    `leader_id` VARCHAR(30),
     `start_date` DATE DEFAULT NULL,
     `end_date` DATE DEFAULT NULL,
     # if readonly, only the publisher can revise the task
@@ -74,12 +69,11 @@ CREATE TABLE `task` (
 
 CREATE TABLE `task_user` (
     `task_id` BIGINT(20) NOT NULL,
-    `user_id` BIGINT(20) NOT NULL,
+    `user_id` VARCHAR(30) NOT NULL,
     `done` BOOL DEFAULT FALSE NOT NULL,
     `done_time` TIMESTAMP DEFAULT NULL,
     PRIMARY KEY (`task_id`, `user_id`),
-    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE
 );
 
 

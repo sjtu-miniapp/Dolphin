@@ -25,11 +25,11 @@ func RunServer(ctx context.Context, grpcPort, httpPort string) error {
 	if err := pb.RegisterUserServiceHandlerFromEndpoint(ctx, mux, "localhost:"+grpcPort, opts); err != nil {
 		logger.Log.Fatal("failed to start HTTP gateway", zap.String("reason", err.Error()))
 	}
-
 	srv := &http.Server{
 		Addr:    ":" + httpPort,
 		Handler: middleware.AddRequestID(
-			middleware.AddLogger(logger.Log, mux)),
+			middleware.AddLogger(logger.Log,
+				middleware.CORS(mux))),
 	}
 
 	// graceful shutdown

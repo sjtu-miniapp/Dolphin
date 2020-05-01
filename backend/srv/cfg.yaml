@@ -1,0 +1,20 @@
+# Server configurations
+authServer:
+  host: "localhost"
+  httpPort: 8000
+  grpcPort: 9000
+
+# Database credentials
+mysql:
+  host: "localhost"
+  user: "root"
+  pass: "610878"
+  db:   "test"
+
+log:
+  logLevel: 0
+  logTimeFormat: "2006-01-02T15:04:05Z07:00"
+
+app:
+  appId: ""
+  appSecret: ""

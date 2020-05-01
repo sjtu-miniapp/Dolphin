@@ -55,8 +55,7 @@ func main() {
 		cfg.SQLDatabase,
 		param)
 	db, _ := sql.Open("mysql", dsn)
-	db, _ = sql.Open("mysql",
-		"root:610878@tcp(127.0.0.1:3306)/test")
+
 	err := db.Ping()
 	errChan := make(chan error)
 	if err != nil {

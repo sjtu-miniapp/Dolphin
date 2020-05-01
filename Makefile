@@ -17,13 +17,11 @@ build:
 	@SRVLIST=$$(find ${SRV}/* -maxdepth 0 -type d | sed  "s/^.*\///")
 	@cd ${SRV}/
 	@for srv in $${SRVLIST}; do \
-  		cd $${srv}; \
 #  		if [[ $${srv} == group ]]; then  \
 #  		cd .. ;\
 #  		continue ; \
 #		fi ; \
-  		go build -a -o ../../build/$${srv} cmd/server.go; \
-  		cd .. ;\
+  		go build -a -o ../build/$${srv}_server $${srv}/cmd/server_rest_main.go; \
   	done
 docker:
 	@echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin

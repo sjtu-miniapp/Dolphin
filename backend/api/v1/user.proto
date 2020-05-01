@@ -6,15 +6,24 @@ package pb;
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    title: "User protobuf";
+    version: "1";
+    contact: {
+      name: "Dolphin project";
+      url: "https://github.com/sjtu-miniapp/Dolphin/";
+    };
+  };
+};
+
 service UserService {
   rpc Hello(HelloRequest) returns (HelloResponse) {
     option (google.api.http) = {
-      get: "/api/user/{name}"
+      get: "/api/v1/user/{name}"
     };
   }
-  //    post: "/api/users"
-  //  body: "*"
-  //    google.protobuf.Timestamp created_at = 2;
+
 }
 //    "/api/users/{id}"
 message User {
