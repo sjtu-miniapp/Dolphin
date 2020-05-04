@@ -5,10 +5,10 @@
 # go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 # sqldriver
 # go get github.com/go-sql-driver/mysql
-# python3.7 -m pip install mysql-connector
+# python3.7 -m pip install mysql-connector-python
 # encryption
 # python3.7 -m pip install cffi
 # python3.7 -m pip install cryptography
 # python3.7 -m pip install python-dotenv
-# mysql
-# python3.7 -m pip install mysql-connector-python
+# swagger
+# npm install swagger-merger -g

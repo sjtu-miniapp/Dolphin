@@ -10,7 +10,7 @@ USE `dolphin`;
 CREATE TABLE `user` (
     `id`  varchar(30) NOT NULL,
     `name` VARCHAR(10) NOT NULL,
-    `gender` TINYINT(1),
+    `gender` ENUM('F', 'M'),
 # not exposed to clients
     `self_group_id` BIGINT(20),
     PRIMARY KEY (`id`),

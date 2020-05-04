@@ -3,7 +3,7 @@
 SHELL=/bin/bash
 ENV_FILE=.env
 DOCKER_SQL=backend/database/sql
-SRV=backend/srv
+SRV=backend/service
 GOOUT=backend
 GOSCP=backend/scripts
 API=backend/api
@@ -11,17 +11,18 @@ help:
 source:
 	@cd scripts
 	@source setup.sh local
-	@echo ${SERVER1_PASSWORD}
 build:
+	@version=$$(cat ${API}/VERSION)
 	@source ${GOSCP}/source.sh
 	@SRVLIST=$$(find ${SRV}/* -maxdepth 0 -type d | sed  "s/^.*\///")
 	@cd ${SRV}/
 	@for srv in $${SRVLIST}; do \
-#  		if [[ $${srv} == group ]]; then  \
-#  		cd .. ;\
-#  		continue ; \
-#		fi ; \
-  		go build -a -o ../build/$${srv}_server $${srv}/cmd/server_rest_main.go; \
+  		if [[ $${srv} == database ]]; then  \
+  		continue ; \
+		fi ; \
+  		go build -a -o ../build/$${srv}-srv $${srv}/srv/main.go; \
+  		go build -a -o ../build/$${srv}-api ../api/$${version}/$${srv}/main.go ../api/$${version}/$${srv}/rest.go; \
+  		go build -a -o ../build/$${srv}-cli $${srv}/cli/main.go; \
   	done
 docker:
 	@echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
@@ -51,13 +52,21 @@ api:
    		echo $${version} > "${API}/VERSION";\
    		mkdir -p "${API}/$${version}";\
    	  fi;
+
 	@SRVLIST=$$(find ${SRV}/* -maxdepth 0 -type d | sed  "s/^.*\///")
 	@cd backend/
+	@rm -f api/$${version}/swagger.json
 	@for srv in $${SRVLIST}; do \
-		protoc --proto_path=api/$${version} --proto_path=thirdparty --go_out=plugins=grpc:srv/$${srv}/pb $${srv}.proto; \
-		protoc --proto_path=api/$${version} --proto_path=thirdparty --grpc-gateway_out=logtostderr=true:srv/$${srv}/pb $${srv}.proto; \
-		protoc --proto_path=api/$${version} --proto_path=thirdparty --swagger_out=json_names_for_fields=true:api/$${version} $${srv}.proto; \
+    	if [[ $${srv} == database ]]; then  \
+    		continue ; \
+  		fi ; \
+		protoc --proto_path=service/$${srv}/pb --micro_out=service/$${srv}/pb --go_out=:service/$${srv}/pb $${srv}.proto; \
+#		protoc --proto_path=api/$${version} --proto_path=thirdparty --go_out=plugins=grpc:service/$${srv}/pb $${srv}.proto; \
+#		protoc --proto_path=api/$${version} --proto_path=thirdparty --grpc-gateway_out=logtostderr=true:service/$${srv}/pb $${srv}.proto; \
+		protoc --proto_path=service/$${srv}/pb --proto_path=thirdparty --swagger_out=json_names_for_fields=true:api/$${version} $${srv}.proto; \
+		swagger-merger -i api/$${version}/$${srv}.swagger.json -o api/$${version}/swagger.json; \
    	done
-	@#go run swagger/main.go swagger > api/api.swagger.json
+	@rm -f api/$${version}/*.swagger.json
+
 clean:
 	@rm -rf $(GOOUT)/build

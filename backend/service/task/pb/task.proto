@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = ".;pb";
+service Task {
+  rpc GetTask(GetGroupRequest) returns (GetGroupResponse) {}
+}
+
+message GetGroupRequest {
+  int64 id = 1;
+}
+
+message GetGroupResponse {
+  string name = 1;
+}
+

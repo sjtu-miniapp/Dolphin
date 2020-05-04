@@ -1,0 +1,54 @@
+syntax = "proto3";
+option go_package = ".;pb";
+package pb;
+
+service Auth {
+  // insert user id
+  rpc onLogin(OnLoginRequest) returns (OnLoginResponse) {}
+  // update user name gender, create self_group
+  rpc afterLogin(AfterLoginRequest) returns (AfterLoginResponse) {}
+  rpc getUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc checkAuth(CheckAuthRequest) returns (CheckAuthResponse) {}
+}
+
+message OnLoginRequest {
+    string code = 1;
+}
+
+message OnLoginResponse {
+    // encrypied openid
+    string id = 1;
+    // pass session id for all requests
+    string sid = 2;
+}
+
+message AfterLoginRequest {
+  string id = 1;
+  string name = 2;
+  // 0 male 1 female
+  uint32 gender = 3;
+  string sid = 4;
+}
+
+message AfterLoginResponse {
+  int32 err = 1;
+}
+
+
+message GetUserRequest {
+    string id = 1;
+}
+
+message GetUserResponse {
+    string name = 1;
+    uint32 gender = 2;
+}
+
+message CheckAuthRequest {
+    string id = 1;
+    string sid = 2;
+}
+
+message CheckAuthResponse {
+    bool ok = 1;
+}
