@@ -1,0 +1,21 @@
+version: "3"
+services:
+  etcd:
+    image: quay.io/coreos/etcd:latest
+    ports:
+      - "2379:2379"
+      - "4001:4001"
+      - "2380:2380"
+    environment:
+      - ETCDCTL_API=3
+    volumes:
+      - "/data/etcd/dir:/data"
+    command:
+      /usr/local/bin/etcd
+      -data-dir /data
+      -name node1
+      -advertise-client-urls http://0.0.0.0:2379
+      -listen-client-urls http://0.0.0.0:2379
+      -initial-cluster node1=http://0.0.0.0:2380
+      -listen-peer-urls http://0.0.0.0:2380
+      -initial-cluster-state new

@@ -4,6 +4,8 @@ build
 *~
 .DS*
 .env
+cfg.yaml
+cfg.json
 notes.md
 passwd.pkl
 __pycache__
