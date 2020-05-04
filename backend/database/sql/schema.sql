@@ -11,6 +11,7 @@ CREATE TABLE `user` (
     `id`  varchar(30) NOT NULL,
     `name` VARCHAR(10) NOT NULL,
     `gender` ENUM('F', 'M'),
+    `avatar` VARCHAR(100),
 # not exposed to clients
     `self_group_id` BIGINT(20),
     PRIMARY KEY (`id`),

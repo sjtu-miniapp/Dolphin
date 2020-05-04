@@ -25,231 +25,214 @@
 1. 获取用户权限（token 2小时内有效）
 
 ```
-- Login
-route: /login
-method: POST
-request data:
-{
-  wechatID: string;
-  token: string;
-}
+# onLogin: acquire openid and sessionid and then put them in storage
+- route: /auth/on_login
+- method: POST
+- request data:
+  - code string
+- response data:
+  - openid string
+  - sid string
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 500 failure
 
-response header:
-{
-  set-cookie: string;
-}
-
-response data:
-{
-  userName: string;
-  userID: string;
-}
-
-// Fix me: not sure how we could login when dealing with wechat,
-// we should probably update above spec later on.
+# afterLogin: callback of onLogin; get userInfo through wx api
+- route: /auth/after_login
+- method: PUT
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - avatar string
+  - gender int
+  - nickname string
+- response status:
+  - 200 success
+  - 201 success new user
+  - 401 auth check fails
+  - 500 failure
 ```
 
 2. 获取用户所属小组、创建者
 
 ```
-- Get one group
-route: /groups/:groupID
-method: GET
+# Get one group
+- route: /group/:groupID
+- method: GET
+- request params:
+  - openid string
+  - sid string
+- respnose data:
+  - group Group
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 500 failure
 
-request header:
-{
-  cookie: string;
-}
-
-response:
-When succeed, return:
-status: 200
-data:
-{
-  group: { ... } // Whole data for one group
-}
-
-When failed, return:
-status: 40x // Status code should align with the reason, e.g: 404 -> group not found
-data:
-{
-  error: { ... } // Error message, since we can directly get indication from the status code, this field is optional.
-}
-
-- Get group by userID
-route: /groups?userID=<user-id>
-method: GET
-
-request header:
-{
-  cookie: string;
-}
-
-response:
-status: 200
-data:
-{
-  groups: [
-    {...},
-    {...},
-    {...},
-    ...
-  ]
-}
+# Get group by userID
+- route: /group/user
+- method: GET
+- request params:
+  - openid stirng
+  - sid string
+  - user_id string
+- response data
+  - group []Group
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 ```
-
 
 3. 添加小组
-
 ```
-- Create group
-route: /groups
-method: POST
+# Create group
+- route: /group
+- method: PUT
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - name string
+- response data:
+  - group Group
+  - err string # description on 500
+- response status:
+  - 201 success
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 
-request header:
-{
-  cookie: string;
-}
-
-request data:
-{ ... } // Add necessary fields for creating a group, should not include id.
-
-response:
-status: 200
-data:
-{
-  group: {...} // Whole group object created by request
-}
-
-- Update group
-route: /groups/:groupID
-method: POST
-
-request header:
-{
-  cookie: string;
-}
-
-request data:
-{ ... } // Add necessary fields for updating a group, should not include id.
-
-response:
-status: 200
-data:
-{
-  group: {...} // Whole group object updated by request
-}
+# Update group
+- route: /group/:groupID
+- method: POST
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - id int
+  - name string
+- response data:
+  - group Group
+  - err string # description on 500
+- response status:
+  - 200 success
+  - 201 success group changed
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 
 
-- Delete group
-route: /groups/:groupID
-method: DELETE
 
-request header:
-{
-  cookie: string;
-}
-
-response:
-status: 200
-data:
-{
-  group: {...} // Whole group object deleted by request
-}
+# Delete group
+- route: /group/:groupID
+- method: DELETE
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - id int
+  - name string
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 ```
 
 
 # 首页2（日历页）
 1. 获取任务名、任务相关人员、任务类型、状态——显示未完成任务
-
 ```
-- Get one task
-route: /tasks/:taskID/short
-method: GET
-
-request header:
-{
-  cookie: string;
-}
-
-response:
-data:
-{
-  task: { ... } // we should need the brief data (name, people, type, status) for one task
-}
+# Get one task
+- route: /task/:taskID/short
+- method: GET
+- request params:
+  - openid string
+  - sid string
+- response data:
+  - task:
+    - name string
+    - people []User
+    - type int
+    - status int
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 
 ```
 
 2. 获取任务发布者、任务内容、DDL——显示具体任务
-
 ```
-- Get one task
-route: /tasks/:taskID
+# Get one task
+route: /task/:taskID
 method: GET
-
-request header:
-{
-  cookie: string;
-}
-
-response:
-data:
-{
-  task: { ... } // we should need the whole data for one task
-}
+- request params:
+  - openid string
+  - sid string
+- response data:
+  - task Task # no people included
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 ```
 
 # 小组页
 1. 获取小组下所有任务名称、任务发布者、DDL——罗列小组内所有任务
 
 ```
-- Get tasks by groupID
-route: /tasks?groupID=<group-id>
-method: GET
-
-request header:
-{
-  cookie: string;
-}
-
-response:
-data:
-{
-  tasks: [
-    {...},
-    {...},
-    {...},
-    ...
-  ] 
-}
+# Get tasks by groupID
+- route: /task/group
+- method: GET
+- request params:
+  - openid string
+  - sid string
+  - group_id int
+- response data:
+  - task []Task 
+- response status:
+  - 200 success
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 ```
 
 2. 获取任务相关人员、任务状态——标识未完成任务
-
 3. 添加任务
 
 ```
-- Create task
-route: /tasks
-method: POST
-
-request header:
-{
-  cookie: string;
-}
-
-request data:
-{ ... } // Add necessary fields for creating a task.
-
-response:
-status: 200
-data:
-{
-  task: {...} // Whole task object created by request
-}
+# Create task
+- route: /task
+- method: PUT
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - group_id int
+  - user_ids []string
+  - name string
+  - type int
+  - leader_id # tbd
+  - start_date Date
+  - end_date Date
+  - description string
+- response data:
+    - task Task
+- response status:
+  - 201 success created
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 ```
 
-
+> mark
 # 任务页
 1. 获取任务名称、发布者、内容、DDL、相关人员、任务类型——显示具体任务及相关人员，确认Status修改权限
 
