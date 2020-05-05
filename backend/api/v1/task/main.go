@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	srv pb.taskService
+	srv pb.TaskService
 )
 
 type Config struct {
@@ -46,7 +46,7 @@ func main() {
 			),
 		)
 		_ = service.Init()
-		srv = pb.NewtaskService("go.micro.srv.task", client.DefaultClient)
+		srv = pb.NewTaskService("go.micro.srv.task", client.DefaultClient)
 		base := "/api/" + cfg.Version
 		router := Router(base)
 		service.Handle("/", router)

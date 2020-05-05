@@ -15,6 +15,10 @@ case "$1" in
 #     docker
 #./server_rest_main -cfg=cfg.yaml
       ;;
+    redis)
+      docker pull nihplod/mysql
+      docker run -dit --name redis -p 6379:6379 nihplod/redis redis-server
+      ;;
     sql)
       docker pull nihplod/mysql
       docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=${SQL_PASSWORD} -d nihplod/mysql

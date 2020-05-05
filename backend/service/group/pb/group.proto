@@ -1,5 +1,6 @@
 syntax = "proto3";
 option go_package = ".;pb";
+
 service Group {
   rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {}
 }

@@ -35,7 +35,6 @@
   - sid string
 - response status:
   - 200 success
-  - 401 auth check fails
   - 500 failure
 
 # afterLogin: callback of onLogin; get userInfo through wx api

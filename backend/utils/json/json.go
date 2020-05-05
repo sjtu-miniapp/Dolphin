@@ -12,3 +12,11 @@ func Struct2json(s interface{}) string {
 	}
 	return string(jsonData)
 }
+
+func Json2struct(j string, s interface{}) error {
+	err := json.Unmarshal([]byte(j), s)
+	if err != nil {
+		log.Fatal("fail to unmarshal json", err)
+	}
+	return err
+}

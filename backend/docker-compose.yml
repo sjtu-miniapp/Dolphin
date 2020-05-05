@@ -8,14 +8,13 @@ services:
       - "2380:2380"
     environment:
       - ETCDCTL_API=3
-    volumes:
-      - "/data/etcd/dir:/data"
     command:
       /usr/local/bin/etcd
-      -data-dir /data
-      -name node1
-      -advertise-client-urls http://0.0.0.0:2379
+      -name infra0
+      --initial-advertise-peer-urls http://localhost:2380
+      -advertise-client-urls http://localhost:2379
       -listen-client-urls http://0.0.0.0:2379
-      -initial-cluster node1=http://0.0.0.0:2380
+      --initial-cluster-token etcd-cluster-1
+      -initial-cluster infra0=http://localhost:2380
       -listen-peer-urls http://0.0.0.0:2380
       -initial-cluster-state new

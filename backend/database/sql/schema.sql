@@ -10,7 +10,8 @@ USE `dolphin`;
 CREATE TABLE `user` (
     `id`  varchar(30) NOT NULL,
     `name` VARCHAR(10) NOT NULL,
-    `gender` ENUM('F', 'M'),
+    # 0: F, 1: M
+    `gender` TINYINT(1),
     `avatar` VARCHAR(100),
 # not exposed to clients
     `self_group_id` BIGINT(20),
@@ -23,7 +24,7 @@ CREATE TABLE `user` (
 # but the self group relationship is not included here
 CREATE TABLE `user_group` (
     `user_id` VARCHAR(30) NOT NULL,
-    `group_id` BIGINT(20) NOT NULL,
+    `group_id` BIGINT(16) NOT NULL,
     PRIMARY KEY (`user_id`, `group_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`group_id`) REFERENCES `group`(`id`) ON DELETE CASCADE
@@ -31,11 +32,12 @@ CREATE TABLE `user_group` (
 
 # when insert check whether the same user
 CREATE TABLE `group` (
-    `id` BIGINT(20) AUTO_INCREMENT,
+    `id` BIGINT(16) AUTO_INCREMENT,
     `name` VARCHAR(10) DEFAULT "",
 # also used for self group
     `creator_id` VARCHAR(30) NOT NULL,
-    `type` ENUM('GROUP', 'INDIVIDUAL') DEFAULT 'GROUP',
+    # 0: GROUP, 1: INIDVIDUAL
+    `type` TINYINT(1) DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE (`name`, `creator_id`),
     FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
@@ -47,8 +49,8 @@ CREATE TABLE `group` (
 # assert(start_date <= end_date)
 # assert(leader_id in task worker)
 CREATE TABLE `task` (
-    `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
-    `group_id` BIGINT(20) NOT NULL,
+    `id` BIGINT(16) NOT NULL AUTO_INCREMENT,
+    `group_id` BIGINT(16) NOT NULL,
     `name` VARCHAR(20) DEFAULT "",
     `publisher_id` VARCHAR(30) NOT NULL,
     # only for group work, can be null
@@ -57,7 +59,8 @@ CREATE TABLE `task` (
     `end_date` DATE DEFAULT NULL,
     # if readonly, only the publisher can revise the task
     `readonly` BOOL DEFAULT FALSE NOT NULL,
-    `type` ENUM('GROUP', 'INDIVIDUAL') DEFAULT 'GROUP',
+    # 0: group, 1: inidvidua;
+    `type` TINYINT(1) DEFAULT 0,
     `description` TEXT,
     CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),
@@ -69,7 +72,7 @@ CREATE TABLE `task` (
 ) DEFAULT CHARSET=utf8;
 
 CREATE TABLE `task_user` (
-    `task_id` BIGINT(20) NOT NULL,
+    `task_id` BIGINT(16) NOT NULL,
     `user_id` VARCHAR(30) NOT NULL,
     `done` BOOL DEFAULT FALSE NOT NULL,
     `done_time` TIMESTAMP DEFAULT NULL,

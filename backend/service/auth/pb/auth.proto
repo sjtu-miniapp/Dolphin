@@ -1,14 +1,15 @@
 syntax = "proto3";
 option go_package = ".;pb";
-package pb;
 
 service Auth {
   // insert user id
-  rpc onLogin(OnLoginRequest) returns (OnLoginResponse) {}
-  // update user name gender, create self_group
-  rpc afterLogin(AfterLoginRequest) returns (AfterLoginResponse) {}
-  rpc getUser(GetUserRequest) returns (GetUserResponse) {}
-  rpc checkAuth(CheckAuthRequest) returns (CheckAuthResponse) {}
+  rpc OnLogin(OnLoginRequest) returns (OnLoginResponse) {}
+
+  // update user, create self_group
+  rpc PutUser(PutUserRequest) returns (PutUserResponse) {}
+
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc CheckAuth(CheckAuthRequest) returns (CheckAuthResponse) {}
 }
 
 message OnLoginRequest {
@@ -16,24 +17,20 @@ message OnLoginRequest {
 }
 
 message OnLoginResponse {
-    // encrypied openid
-    string id = 1;
-    // pass session id for all requests
+    string openid = 1;
     string sid = 2;
 }
 
-message AfterLoginRequest {
-  string id = 1;
+message PutUserRequest {
+  string openid = 1;
   string name = 2;
-  // 0 male 1 female
-  uint32 gender = 3;
-  string sid = 4;
+  int32 gender = 3;
+  string avatar = 4;
 }
 
-message AfterLoginResponse {
+message PutUserResponse {
   int32 err = 1;
 }
-
 
 message GetUserRequest {
     string id = 1;
@@ -41,11 +38,14 @@ message GetUserRequest {
 
 message GetUserResponse {
     string name = 1;
-    uint32 gender = 2;
+    int32 gender = 2;
+    string avatar = 3;
+    uint32  self_group_id = 4;
 }
 
+
 message CheckAuthRequest {
-    string id = 1;
+    string openid = 1;
     string sid = 2;
 }
 

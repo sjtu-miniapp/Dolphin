@@ -8,6 +8,7 @@ cfg.yaml
 cfg.json
 notes.md
 passwd.pkl
+redis.conf
 __pycache__
 *node_modules
 *dist

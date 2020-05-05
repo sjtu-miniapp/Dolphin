@@ -36,8 +36,8 @@ var _ server.Option
 type AuthService interface {
 	// insert user id
 	OnLogin(ctx context.Context, in *OnLoginRequest, opts ...client.CallOption) (*OnLoginResponse, error)
-	// update user name gender, create self_group
-	AfterLogin(ctx context.Context, in *AfterLoginRequest, opts ...client.CallOption) (*AfterLoginResponse, error)
+	// update user, create self_group
+	PutUser(ctx context.Context, in *PutUserRequest, opts ...client.CallOption) (*PutUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error)
 	CheckAuth(ctx context.Context, in *CheckAuthRequest, opts ...client.CallOption) (*CheckAuthResponse, error)
 }
@@ -52,7 +52,7 @@ func NewAuthService(name string, c client.Client) AuthService {
 		c = client.NewClient()
 	}
 	if len(name) == 0 {
-		name = "pb"
+		name = "auth"
 	}
 	return &authService{
 		c:    c,
@@ -61,7 +61,7 @@ func NewAuthService(name string, c client.Client) AuthService {
 }
 
 func (c *authService) OnLogin(ctx context.Context, in *OnLoginRequest, opts ...client.CallOption) (*OnLoginResponse, error) {
-	req := c.c.NewRequest(c.name, "Auth.onLogin", in)
+	req := c.c.NewRequest(c.name, "Auth.OnLogin", in)
 	out := new(OnLoginResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -70,9 +70,9 @@ func (c *authService) OnLogin(ctx context.Context, in *OnLoginRequest, opts ...c
 	return out, nil
 }
 
-func (c *authService) AfterLogin(ctx context.Context, in *AfterLoginRequest, opts ...client.CallOption) (*AfterLoginResponse, error) {
-	req := c.c.NewRequest(c.name, "Auth.afterLogin", in)
-	out := new(AfterLoginResponse)
+func (c *authService) PutUser(ctx context.Context, in *PutUserRequest, opts ...client.CallOption) (*PutUserResponse, error) {
+	req := c.c.NewRequest(c.name, "Auth.PutUser", in)
+	out := new(PutUserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (c *authService) AfterLogin(ctx context.Context, in *AfterLoginRequest, opt
 }
 
 func (c *authService) GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error) {
-	req := c.c.NewRequest(c.name, "Auth.getUser", in)
+	req := c.c.NewRequest(c.name, "Auth.GetUser", in)
 	out := new(GetUserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -91,7 +91,7 @@ func (c *authService) GetUser(ctx context.Context, in *GetUserRequest, opts ...c
 }
 
 func (c *authService) CheckAuth(ctx context.Context, in *CheckAuthRequest, opts ...client.CallOption) (*CheckAuthResponse, error) {
-	req := c.c.NewRequest(c.name, "Auth.checkAuth", in)
+	req := c.c.NewRequest(c.name, "Auth.CheckAuth", in)
 	out := new(CheckAuthResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -105,8 +105,8 @@ func (c *authService) CheckAuth(ctx context.Context, in *CheckAuthRequest, opts 
 type AuthHandler interface {
 	// insert user id
 	OnLogin(context.Context, *OnLoginRequest, *OnLoginResponse) error
-	// update user name gender, create self_group
-	AfterLogin(context.Context, *AfterLoginRequest, *AfterLoginResponse) error
+	// update user, create self_group
+	PutUser(context.Context, *PutUserRequest, *PutUserResponse) error
 	GetUser(context.Context, *GetUserRequest, *GetUserResponse) error
 	CheckAuth(context.Context, *CheckAuthRequest, *CheckAuthResponse) error
 }
@@ -114,7 +114,7 @@ type AuthHandler interface {
 func RegisterAuthHandler(s server.Server, hdlr AuthHandler, opts ...server.HandlerOption) error {
 	type auth interface {
 		OnLogin(ctx context.Context, in *OnLoginRequest, out *OnLoginResponse) error
-		AfterLogin(ctx context.Context, in *AfterLoginRequest, out *AfterLoginResponse) error
+		PutUser(ctx context.Context, in *PutUserRequest, out *PutUserResponse) error
 		GetUser(ctx context.Context, in *GetUserRequest, out *GetUserResponse) error
 		CheckAuth(ctx context.Context, in *CheckAuthRequest, out *CheckAuthResponse) error
 	}
@@ -133,8 +133,8 @@ func (h *authHandler) OnLogin(ctx context.Context, in *OnLoginRequest, out *OnLo
 	return h.AuthHandler.OnLogin(ctx, in, out)
 }
 
-func (h *authHandler) AfterLogin(ctx context.Context, in *AfterLoginRequest, out *AfterLoginResponse) error {
-	return h.AuthHandler.AfterLogin(ctx, in, out)
+func (h *authHandler) PutUser(ctx context.Context, in *PutUserRequest, out *PutUserResponse) error {
+	return h.AuthHandler.PutUser(ctx, in, out)
 }
 
 func (h *authHandler) GetUser(ctx context.Context, in *GetUserRequest, out *GetUserResponse) error {

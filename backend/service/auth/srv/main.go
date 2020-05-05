@@ -41,6 +41,14 @@ type Config struct {
 		Db   string `yaml:"db"`
 	} `yaml:"mysql"`
 	Registry []string `yaml:"registry"`
+	App struct {
+		AppId string `yaml:"appId"`
+		AppSecret string `yaml:"appSecret"`
+	} `yaml:"app"`
+	Redis struct{
+		Host string `yaml:"host"`
+		Pass string `yaml:"pass"`
+	} `yaml:"redis"`
 }
 
 func main() {
@@ -52,8 +60,19 @@ func main() {
 
 	srv := createService(cfg)
 	sqldb, err := database.InitDb(cfg.Mysql.User, cfg.Mysql.Pass, cfg.Mysql.Host, cfg.Mysql.Db)
-
-	_ = pb.RegisterAuthHandler(srv.Server(), &impl.Auth{SqlDb: sqldb})
+	if err != nil {
+		return
+	}
+	redisdb, err := database.InitRedis(cfg.Redis.Host, cfg.Redis.Pass)
+	if err != nil {
+		return
+	}
+	_ = pb.RegisterAuthHandler(srv.Server(), &impl.Auth{
+		SqlDb:     sqldb,
+		RedisDb:   redisdb,
+		AppId:     cfg.App.AppId,
+		AppSecret: cfg.App.AppSecret,
+	})
 	if err := srv.Run(); err != nil {
 		log.Fatal("fail to run the service", err)
 	}

@@ -1,5 +1,5 @@
 .ONESHELL:
-.PHONY: help build docker deploy transfer api source
+.PHONY: help build docker deploy transfer api source temp
 SHELL=/bin/bash
 ENV_FILE=.env
 DOCKER_SQL=backend/database/sql
@@ -22,7 +22,7 @@ build:
 		fi ; \
   		go build -a -o ../build/$${srv}-srv $${srv}/srv/main.go; \
   		go build -a -o ../build/$${srv}-api ../api/$${version}/$${srv}/main.go ../api/$${version}/$${srv}/rest.go; \
-  		go build -a -o ../build/$${srv}-cli $${srv}/cli/main.go; \
+  		go build -a -o ../build/$${srv}-cli $${srv}/cli/test.go; \
   	done
 docker:
 	@echo $DOCKER_PASSWORD | sudo docker login -u $DOCKER_USERNAME --password-stdin
@@ -60,6 +60,7 @@ api:
     	if [[ $${srv} == database ]]; then  \
     		continue ; \
   		fi ; \
+  		rm -f service/$${srv}/pb/*.go; \
 		protoc --proto_path=service/$${srv}/pb --micro_out=service/$${srv}/pb --go_out=:service/$${srv}/pb $${srv}.proto; \
 #		protoc --proto_path=api/$${version} --proto_path=thirdparty --go_out=plugins=grpc:service/$${srv}/pb $${srv}.proto; \
 #		protoc --proto_path=api/$${version} --proto_path=thirdparty --grpc-gateway_out=logtostderr=true:service/$${srv}/pb $${srv}.proto; \
@@ -70,3 +71,13 @@ api:
 
 clean:
 	@rm -rf $(GOOUT)/build
+	@rm -rf backend/tmp
+temp:
+	@etcd --name infra0 --initial-advertise-peer-urls http://localhost:2380 \
+       --listen-peer-urls http://localhost:2380 \
+       --listen-client-urls http://localhost:2379 \
+       --advertise-client-urls http://localhost:2379 \
+       --initial-cluster-token etcd-cluster-1 \
+       --initial-cluster infra0=http://localhost:2380 \
+       --initial-cluster-state new &
+	@micro --registry=etcd --registry_address=localhost:2379 web &

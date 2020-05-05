@@ -35,12 +35,30 @@ func main() {
 		),
 	)
 	service.Init()
-	auth := pb.NewAuthService("go.micro.srv.group", service.Client())
+	auth := pb.NewAuthService("go.micro.srv.auth", service.Client())
 
-	//rsp, err := auth.GetAuth(context.TODO(), &pb.GetAuthRequest{
-	//	Id: 1,
-	//})
-	//fmt.Println(rsp)
+	resp, err := auth.OnLogin(context.TODO(), &pb.OnLoginRequest{
+		Code: "abcdef",
+	})
+	fmt.Println(err)
+	fmt.Println(resp)
+
+	r, err := auth.CheckAuth(context.TODO(), &pb.CheckAuthRequest{
+		Openid: resp.Openid,
+		Sid:    resp.Sid,
+	})
+	fmt.Println(r)
+	_, err = auth.PutUser(context.Background(), &pb.PutUserRequest{
+		Openid: resp.Openid,
+		Name:   "hello",
+		Gender: "F",
+		Avatar: "world",
+	})
+	fmt.Println(err)
+	rs, _ := auth.GetUser(context.Background(), &pb.GetUserRequest{
+		Id: resp.Openid,
+	})
+	fmt.Println(rs)
 	if err != nil {
 		fmt.Println(err)
 	}

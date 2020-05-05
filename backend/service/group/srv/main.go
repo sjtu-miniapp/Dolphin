@@ -34,11 +34,6 @@ func createService(c Config) micro.Service {
 }
 
 type Config struct {
-	//////
-	Log struct {
-		LogLevel      int    `yaml:"logLevel"`
-		LogTimeFormat string `yaml:"logTimeFormat"`
-	} `yaml:"log"`
 	Mysql struct {
 		Host string `yaml:"host"`
 		User string `yaml:"user"`
@@ -57,7 +52,9 @@ func main() {
 
 	srv := createService(cfg)
 	sqldb, err:= database.InitDb(cfg.Mysql.User, cfg.Mysql.Pass, cfg.Mysql.Host, cfg.Mysql.Db)
-
+	if err != nil {
+		return
+	}
 	_ = pb.RegisterGroupHandler(srv.Server(), &impl.Group{SqlDb: sqldb})
 	if err := srv.Run(); err != nil {
 		log.Fatal("fail to run the service", err)
