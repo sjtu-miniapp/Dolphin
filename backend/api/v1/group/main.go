@@ -22,7 +22,6 @@ var (
 
 type Config struct {
 	Version string `yaml:"version"`
-	//////
 	Log struct {
 		LogLevel      int    `yaml:"logLevel"`
 		LogTimeFormat string `yaml:"logTimeFormat"`

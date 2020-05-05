@@ -105,15 +105,15 @@
   - 403 not allowed
   - 500 failure
 
-# Update group
+# Update group; get into the group
 - route: /group/:groupID
 - method: POST
 - request params:
   - openid string
   - sid string
 - request data:
-  - id int
   - name string
+  - user_ids []string
 - response data:
   - group Group
   - err string # description on 500
@@ -132,9 +132,6 @@
 - request params:
   - openid string
   - sid string
-- request data:
-  - id int
-  - name string
 - response status:
   - 200 success
   - 401 auth check fails
@@ -169,13 +166,13 @@
 2. 获取任务发布者、任务内容、DDL——显示具体任务
 ```
 # Get one task
-route: /task/:taskID
-method: GET
+- route: /task/:taskID
+- method: GET
 - request params:
   - openid string
   - sid string
 - response data:
-  - task Task # no people included
+  - task Task # computed field `done`
 - response status:
   - 200 success
   - 401 auth check fails
@@ -195,7 +192,7 @@ method: GET
   - sid string
   - group_id int
 - response data:
-  - task []Task 
+  - task []Task # computed field `done`
 - response status:
   - 200 success
   - 401 auth check fails
@@ -205,7 +202,6 @@ method: GET
 
 2. 获取任务相关人员、任务状态——标识未完成任务
 3. 添加任务
-
 ```
 # Create task
 - route: /task
@@ -219,78 +215,78 @@ method: GET
   - name string
   - type int
   - leader_id # tbd
-  - start_date Date
+  - start_date Date: # easier to use then built-in date type; or timestamp I guess
+    - year int
+    - month int
+    - day int  
   - end_date Date
   - description string
 - response data:
-    - task Task
+    - task Task 
 - response status:
+  - 200 success
   - 201 success created
+  - 400 wrong request format
   - 401 auth check fails
   - 403 not allowed
   - 500 failure
 ```
 
-> mark
 # 任务页
 1. 获取任务名称、发布者、内容、DDL、相关人员、任务类型——显示具体任务及相关人员，确认Status修改权限
 
 ```
-- Update a task
-route: /tasks/:taskID
-method: POST
+# Update a task; only update meta value; contents update would be implemented in next sprint
+- route: /task/:taskID/meta
+- method: POST
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - name string
+  - start_date Date
+  - end_date Date
+  - readonly bool
+  - description string
+  - done bool
+- response status:
+  - 200 success
+  - 201 success updated
+  - 400 wrong request format
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 
-request header:
-{
-  cookie: string;
-}
 
-request data:
-{ ... } // Add necessary fields for updating a task, should not include id.
-
-response:
-status: 200
-data:
-{
-  task: {...} // Whole task object updated by request
-}
-
-
-- Delete task
-route: /tasks/:taskID
-method: DELETE
-
-request header:
-{
-  cookie: string;
-}
-
-response:
-status: 200
-data:
-{
-  task: {...} // Whole task object deleted by request
-}
+# Delete task
+- route: /tasks/:taskID
+- method: DELETE
+- request params:
+  - openid string
+  - sid string
+- response status:
+  - 200 success
+  - 201 success deleted
+  - 401 auth check fails
+  - 403 not allowed
+  - 500 failure
 ```
-
-2. 修改任务属性（具体内容、相关人员、DDL、任务类型、任务状态）——获取修改记录
+> mark
+ 
+2. 修改任务属性（具体内容、相关人员、DDL、任务类型、任务状态）—获取修改记录
 
 ```
+# record history is an advanced feature
 // TODO: Design form of data for tasks modification records (in frontend, we want to display sth. like `git-diff` or `color-diff` for each modification)
 ```
 
 3. （获取用户信息，添加评论）
 
 ```
+# comments are advanced feature
 - Get comments for one task
 route: /tasks/:taskID/comments
 method: GET
-
-request header:
-{
-  cookie: string;
-}
-
 response:
 data:
 {
@@ -302,26 +298,10 @@ data:
   ]
 }
 
-- Create task
-route: /tasks/:taskID/comments
-method: POST
-
-request header:
-{
-  cookie: string;
-}
-
-request data:
-{ ... } // Add necessary fields for creating a comment.
-
-response:
-status: 200
-data:
-{
-  comment: {...} // Whole comment object created by request
-}
 
 
+
+#
 - Update a comment
 route: /tasks/:taskID/comment/:commentID
 method: POST
@@ -341,6 +321,7 @@ data:
   comment: {...} // Whole comment object updated by request
 }
 
+# 
 - Delete comment
 route: /tasks/:taskID/comment/:commentID
 method: DELETE

@@ -43,7 +43,6 @@ CREATE TABLE `group` (
     FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8;
 
-# need review
 # contents would be stored in other db
 # assert(user publisher_id in group group_id)
 # assert(start_date <= end_date)
@@ -59,9 +58,9 @@ CREATE TABLE `task` (
     `end_date` DATE DEFAULT NULL,
     # if readonly, only the publisher can revise the task
     `readonly` BOOL DEFAULT FALSE NOT NULL,
-    # 0: group, 1: inidvidua;
+    # 0: group, 1: individuaL;
     `type` TINYINT(1) DEFAULT 0,
-    `description` TEXT,
+    `description` VARCHAR(255) DEFAULT "",
     CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),
     UNIQUE INDEX (`group_id`, `name`),
