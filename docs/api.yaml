@@ -131,7 +131,7 @@
     - openid string
     - sid string
 - response data:
-    - workers []User
+    - workers []User # done, done time, id, name
 - response status:
     - 200 success
     - 401 auth check fails

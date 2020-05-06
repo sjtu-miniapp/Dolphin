@@ -38,6 +38,8 @@ message GetTaskPeopleResponse {
   message User {
     string id = 1;
     string name = 2;
+    bool done = 3;
+    string done_time = 4;
   }
   repeated User workers = 1;
 }

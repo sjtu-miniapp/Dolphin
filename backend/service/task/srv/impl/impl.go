@@ -3,9 +3,7 @@ package impl
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
-	"log"
 )
 
 
@@ -40,13 +38,29 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 	return nil
 }
 
-func (g Task) GetTaskPeolple(ctx context.Context, requset *pb.GetTaskPeopleRequset, response *pb.GetTaskPeopleResponse) error {
+func (g Task) GetTaskPeolple(ctx context.Context, request *pb.GetTaskPeopleRequset, response *pb.GetTaskPeopleResponse) error {
 	db := g.SqlDb
-	panic("implement me")
+	rows, err := db.QueryContext(ctx, "SELECT `user_id`, `name`, `done`, `done_time` FROM `task_user` JOIN `user` ON `user_id`=`id` WHERE `task_id`=?", request.Id)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		user := new(pb.GetTaskPeopleResponse_User)
+		var dt sql.NullString
+		err = rows.Scan(&user.Id, &user.Name, &user.Done, &dt)
+		if err != nil {
+			return err
+		}
+		if dt.Valid {
+			user.DoneTime = dt.String
+		}
+	}
+	return nil
 }
 
 func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaByGroupIdRequest, response *pb.GetTaskMetaByGroupIdResponse) error {
 	db := g.SqlDb
+	request
 	panic("implement me")
 }
 

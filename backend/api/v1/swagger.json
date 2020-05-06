@@ -62,6 +62,13 @@
         },
         "name": {
           "type": "string"
+        },
+        "done": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "doneTime": {
+          "type": "string"
         }
       }
     },

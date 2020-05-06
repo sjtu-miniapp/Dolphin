@@ -77,7 +77,8 @@ CREATE TABLE `task_user` (
     `task_id` BIGINT(16) NOT NULL,
     `user_id` VARCHAR(30) NOT NULL,
     `done` BOOL DEFAULT FALSE NOT NULL,
-    `done_time` TIMESTAMP DEFAULT NULL,
+    # YYYY-MM-DD hh:mm:ss
+    `done_time` DATETIME DEFAULT NULL,
     PRIMARY KEY (`task_id`, `user_id`),
     FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE
 );
