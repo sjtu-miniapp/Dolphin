@@ -18,3 +18,45 @@ services:
       -initial-cluster infra0=http://localhost:2380
       -listen-peer-urls http://0.0.0.0:2380
       -initial-cluster-state new
+  micro-api:
+    command: --registry=etcd --registry_address=localhost:2379 api --handler=http
+    image: microhq/micro:latest
+    links:
+      - etcd
+  micro-web:
+    command: --registry=etcd --registry_address=localhost:2379 web
+    image: microhq/micro:latest
+    links:
+      - etcd
+#      - api
+    ports:
+      - "8080:8080"
+#  api:
+#    build: ./api/hotel
+#    command: --registry_address=consul:8500
+#    links:
+#      - consul
+#      - auth
+#      - geo
+#      - profile
+#      - rate
+#  auth:
+#    build: ./srv/auth
+#    command: --registry_address=consul:8500
+#    links:
+#      - consul
+#  geo:
+#    build: ./srv/geo
+#    command: --registry_address=consul:8500
+#    links:
+#      - consul
+#  profile:
+#    build: ./srv/profile
+#    command: --registry_address=consul:8500
+#    links:
+#      - consul
+#  rate:
+#    build: ./srv/rate
+#    command: --registry_address=consul:8500
+#    links:
+#      - consul
