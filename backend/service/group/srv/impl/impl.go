@@ -11,6 +11,10 @@ type Group struct {
 	SqlDb *sql.DB
 }
 
+func (g Group) UserInGroup(ctx context.Context, request *pb.UserInGroupRequest, response *pb.UserInGroupResponse) error {
+	panic("implement me")
+}
+
 func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserIdRequest, response *pb.GetGroupByUserIdResponse) error {
 	panic("implement me")
 }
