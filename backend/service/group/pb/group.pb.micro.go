@@ -35,6 +35,11 @@ var _ server.Option
 
 type GroupService interface {
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...client.CallOption) (*GetGroupResponse, error)
+	GetGroupByUserId(ctx context.Context, in *GetGroupByUserIdRequest, opts ...client.CallOption) (*GetGroupByUserIdResponse, error)
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error)
+	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
+	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*UpdateGroupResponse, error)
+	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*DeleteGroupResponse, error)
 }
 
 type groupService struct {
@@ -65,15 +70,75 @@ func (c *groupService) GetGroup(ctx context.Context, in *GetGroupRequest, opts .
 	return out, nil
 }
 
+func (c *groupService) GetGroupByUserId(ctx context.Context, in *GetGroupByUserIdRequest, opts ...client.CallOption) (*GetGroupByUserIdResponse, error) {
+	req := c.c.NewRequest(c.name, "Group.GetGroupByUserId", in)
+	out := new(GetGroupByUserIdResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupService) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...client.CallOption) (*CreateGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Group.CreateGroup", in)
+	out := new(CreateGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupService) AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error) {
+	req := c.c.NewRequest(c.name, "Group.AddUser", in)
+	out := new(AddUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupService) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*UpdateGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Group.UpdateGroup", in)
+	out := new(UpdateGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*DeleteGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Group.DeleteGroup", in)
+	out := new(DeleteGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Group service
 
 type GroupHandler interface {
 	GetGroup(context.Context, *GetGroupRequest, *GetGroupResponse) error
+	GetGroupByUserId(context.Context, *GetGroupByUserIdRequest, *GetGroupByUserIdResponse) error
+	CreateGroup(context.Context, *CreateGroupRequest, *CreateGroupResponse) error
+	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
+	UpdateGroup(context.Context, *UpdateGroupRequest, *UpdateGroupResponse) error
+	DeleteGroup(context.Context, *DeleteGroupRequest, *DeleteGroupResponse) error
 }
 
 func RegisterGroupHandler(s server.Server, hdlr GroupHandler, opts ...server.HandlerOption) error {
 	type group interface {
 		GetGroup(ctx context.Context, in *GetGroupRequest, out *GetGroupResponse) error
+		GetGroupByUserId(ctx context.Context, in *GetGroupByUserIdRequest, out *GetGroupByUserIdResponse) error
+		CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error
+		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
+		UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *UpdateGroupResponse) error
+		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *DeleteGroupResponse) error
 	}
 	type Group struct {
 		group
@@ -88,4 +153,24 @@ type groupHandler struct {
 
 func (h *groupHandler) GetGroup(ctx context.Context, in *GetGroupRequest, out *GetGroupResponse) error {
 	return h.GroupHandler.GetGroup(ctx, in, out)
+}
+
+func (h *groupHandler) GetGroupByUserId(ctx context.Context, in *GetGroupByUserIdRequest, out *GetGroupByUserIdResponse) error {
+	return h.GroupHandler.GetGroupByUserId(ctx, in, out)
+}
+
+func (h *groupHandler) CreateGroup(ctx context.Context, in *CreateGroupRequest, out *CreateGroupResponse) error {
+	return h.GroupHandler.CreateGroup(ctx, in, out)
+}
+
+func (h *groupHandler) AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error {
+	return h.GroupHandler.AddUser(ctx, in, out)
+}
+
+func (h *groupHandler) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *UpdateGroupResponse) error {
+	return h.GroupHandler.UpdateGroup(ctx, in, out)
+}
+
+func (h *groupHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *DeleteGroupResponse) error {
+	return h.GroupHandler.DeleteGroup(ctx, in, out)
 }

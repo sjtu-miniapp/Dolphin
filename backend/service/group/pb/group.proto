@@ -3,6 +3,7 @@ option go_package = ".;pb";
 
 service Group {
   rpc GetGroup(GetGroupRequest) returns (GetGroupResponse);
+  rpc GetGroupByUserId(GetGroupByUserIdRequest) returns (GetGroupByUserIdResponse);
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse);
   rpc AddUser(AddUserRequest) returns (AddUserResponse);
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse);
@@ -22,6 +23,18 @@ message GetGroupResponse {
   string creator_id = 2;
   uint32 type = 3;
   repeated User users = 4;
+}
+
+message GetGroupByUserIdRequest {
+  string user_id = 1;
+}
+message GetGroupByUserIdResponse {
+  message Group {
+    uint32 id = 1;
+    string name = 2;
+    string creator_id = 3;
+  }
+  repeated Group groups = 3;
 }
 
 message CreateGroupRequest {

@@ -46,13 +46,11 @@
 - request params:
     - openid stirng
     - sid string
-    - user_id string
 - response data
   - group []Group
 - response status:
     - 200 success
     - 401 auth check fails
-    - 403 not allowed
     - 500 failure
 
 # Create group

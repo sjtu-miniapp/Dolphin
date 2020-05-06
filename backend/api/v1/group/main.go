@@ -10,6 +10,7 @@ import (
 	"github.com/micro/go-micro/web"
 	"github.com/micro/go-plugins/registry/etcdv3"
 	"github.com/sjtu-miniapp/dolphin/service/group/pb"
+	auth "github.com/sjtu-miniapp/dolphin/service/auth/pb"
 	"github.com/sjtu-miniapp/dolphin/utils/parse"
 	"os"
 	"os/signal"
@@ -18,6 +19,7 @@ import (
 
 var (
 	srv pb.GroupService
+	authSrv auth.AuthService
 )
 
 type Config struct {
@@ -52,6 +54,7 @@ func main() {
 		)
 		_ = service.Init()
 		srv = pb.NewGroupService("go.micro.srv.group", client.DefaultClient)
+		authSrv = auth.NewAuthService("go.micro.api.auth", client.DefaultClient)
 		base := "/api/" + cfg.Version
 		router := Router(base)
 		service.Handle("/", router)
