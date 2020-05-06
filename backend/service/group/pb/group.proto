@@ -2,13 +2,56 @@ syntax = "proto3";
 option go_package = ".;pb";
 
 service Group {
-  rpc GetGroup(GetGroupRequest) returns (GetGroupResponse) {}
+  rpc GetGroup(GetGroupRequest) returns (GetGroupResponse);
+  rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse);
+  rpc AddUser(AddUserRequest) returns (AddUserResponse);
+  rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse);
+  rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse);
+}
+message User {
+  string id = 1;
+  string name = 2;
 }
 
 message GetGroupRequest {
-  int64 id = 1;
+  uint32 id = 1;
 }
 
 message GetGroupResponse {
   string name = 1;
+  string creator_id = 2;
+  uint32 type = 3;
+  repeated User users = 4;
 }
+
+message CreateGroupRequest {
+  string name = 1;
+  string creator_id = 2;
+  uint32 type = 3;
+}
+
+message CreateGroupResponse {
+  uint32 id = 1;
+}
+
+message AddUserRequest {
+  uint32  group_id = 1;
+  repeated string user_ids = 2;
+}
+message AddUserResponse {
+}
+
+message UpdateGroupRequest {
+  uint32 id = 1;
+  string name = 2;
+}
+message UpdateGroupResponse {
+}
+
+message DeleteGroupRequest {
+  uint32 id = 1;
+}
+message DeleteGroupResponse {
+}
+
+

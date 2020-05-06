@@ -63,9 +63,9 @@
     - sid string
 - request data:
     - name string
+    - user_ids []string
 - response data:
-    - group Group
-    - err string # description on 500
+    - id int
 - response status:
     - 201 success
     - 401 auth check fails
@@ -81,9 +81,6 @@
 - request data:
     - id int
     - name string
-- response data:
-    - group Group
-    - err string # description on 500
 - response status:
     - 200 success
     - 201 success group changed
@@ -99,7 +96,6 @@
     - sid string
 - request data:
     - id int
-    - name string
 - response status:
     - 200 success
     - 401 auth check fails

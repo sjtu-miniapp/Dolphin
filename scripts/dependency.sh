@@ -12,3 +12,6 @@
 # python3.7 -m pip install python-dotenv
 # swagger
 # npm install swagger-merger -g
+# docker-compose
+# sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# sudo chmod +x /usr/local/bin/docker-compose

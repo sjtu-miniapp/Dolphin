@@ -37,6 +37,7 @@ func Router(base string) *gin.Engine {
     - 500 failure
  */
 func (g Group) GetGroup(context *gin.Context) {
+	srv.GetGroup()
 	panic("implement me")
 }
 /*
@@ -56,6 +57,7 @@ func (g Group) GetGroup(context *gin.Context) {
     - 500 failure
  */
 func (g Group) GetGroupByUser(context *gin.Context) {
+	srv.GetGroup()
 	panic("implement me")
 
 }
@@ -78,6 +80,8 @@ func (g Group) GetGroupByUser(context *gin.Context) {
     - 500 failure
  */
 func (g Group) CreateGroup(context *gin.Context) {
+	srv.create
+	srv.adduser
 	panic("implement me")
 
 }
