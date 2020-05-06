@@ -13,7 +13,7 @@ type Group struct {
 
 func (g Group) UserInGroup(ctx context.Context, request *pb.UserInGroupRequest, response *pb.UserInGroupResponse) error {
 	db := g.SqlDb
-	rows, err := db.QueryContext(ctx, "SELECT COUNT(*) FROM `user_group` WHERE `user_id` = ? and `group_id` = ?", request.UserId, request.GroupId)
+	rows, err := db.QueryContext(ctx, "SELECT * FROM `user_group` WHERE `user_id` = ? and `group_id` = ?", request.UserId, request.GroupId)
 	if err != nil {
 		return err
 	}

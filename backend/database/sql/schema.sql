@@ -53,7 +53,7 @@ CREATE TABLE `task` (
     `name` VARCHAR(20) DEFAULT "",
     `publisher_id` VARCHAR(30) NOT NULL,
     # only for group work
-    `leader_id` VARCHAR(30) DEFAULT "",
+    `leader_id` VARCHAR(30),
     # 2020-02-02
     `start_date` DATE DEFAULT NULL,
     `end_date` DATE DEFAULT NULL,
