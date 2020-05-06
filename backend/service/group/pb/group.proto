@@ -8,6 +8,7 @@ service Group {
   rpc AddUser(AddUserRequest) returns (AddUserResponse);
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse);
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse);
+  rpc UserInGroup(UserInGroupRequest) returns(UserInGroupResponse);
 }
 message User {
   string id = 1;
@@ -67,4 +68,11 @@ message DeleteGroupRequest {
 message DeleteGroupResponse {
 }
 
+message UserInGroupRequest {
+  string user_id = 1;
+  uint32 group_id = 2;
+}
 
+message UserInGroupResponse {
+  bool ok = 1;
+}

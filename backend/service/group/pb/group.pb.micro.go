@@ -40,6 +40,7 @@ type GroupService interface {
 	AddUser(ctx context.Context, in *AddUserRequest, opts ...client.CallOption) (*AddUserResponse, error)
 	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...client.CallOption) (*UpdateGroupResponse, error)
 	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...client.CallOption) (*DeleteGroupResponse, error)
+	UserInGroup(ctx context.Context, in *UserInGroupRequest, opts ...client.CallOption) (*UserInGroupResponse, error)
 }
 
 type groupService struct {
@@ -120,6 +121,16 @@ func (c *groupService) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, 
 	return out, nil
 }
 
+func (c *groupService) UserInGroup(ctx context.Context, in *UserInGroupRequest, opts ...client.CallOption) (*UserInGroupResponse, error) {
+	req := c.c.NewRequest(c.name, "Group.UserInGroup", in)
+	out := new(UserInGroupResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Group service
 
 type GroupHandler interface {
@@ -129,6 +140,7 @@ type GroupHandler interface {
 	AddUser(context.Context, *AddUserRequest, *AddUserResponse) error
 	UpdateGroup(context.Context, *UpdateGroupRequest, *UpdateGroupResponse) error
 	DeleteGroup(context.Context, *DeleteGroupRequest, *DeleteGroupResponse) error
+	UserInGroup(context.Context, *UserInGroupRequest, *UserInGroupResponse) error
 }
 
 func RegisterGroupHandler(s server.Server, hdlr GroupHandler, opts ...server.HandlerOption) error {
@@ -139,6 +151,7 @@ func RegisterGroupHandler(s server.Server, hdlr GroupHandler, opts ...server.Han
 		AddUser(ctx context.Context, in *AddUserRequest, out *AddUserResponse) error
 		UpdateGroup(ctx context.Context, in *UpdateGroupRequest, out *UpdateGroupResponse) error
 		DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *DeleteGroupResponse) error
+		UserInGroup(ctx context.Context, in *UserInGroupRequest, out *UserInGroupResponse) error
 	}
 	type Group struct {
 		group
@@ -173,4 +186,8 @@ func (h *groupHandler) UpdateGroup(ctx context.Context, in *UpdateGroupRequest, 
 
 func (h *groupHandler) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, out *DeleteGroupResponse) error {
 	return h.GroupHandler.DeleteGroup(ctx, in, out)
+}
+
+func (h *groupHandler) UserInGroup(ctx context.Context, in *UserInGroupRequest, out *UserInGroupResponse) error {
+	return h.GroupHandler.UserInGroup(ctx, in, out)
 }

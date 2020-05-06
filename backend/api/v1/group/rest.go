@@ -30,18 +30,14 @@ func Router(base string) *gin.Engine {
 }
 
 func inGroup(userId string, groupId uint32) bool {
-	resp, err := srv.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
-		UserId: userId,
+	resp, err := srv.UserInGroup(context.TODO(), &pb.UserInGroupRequest{
+		UserId:               userId,
+		GroupId:              groupId,
 	})
-	if err != nil {
+	if err != nil || !resp.Ok {
 		return false
 	}
-	for _, v := range resp.Groups {
-		if v.Id == groupId {
-			return true
-		}
-	}
-	return false
+	return true
 }
 func checkAuth(c *gin.Context) error {
 	openid := c.Query("openid")

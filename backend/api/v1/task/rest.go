@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	//"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
+	auth "github.com/sjtu-miniapp/dolphin/service/auth/pb"
 )
 
 type Task struct{}
@@ -26,6 +29,22 @@ func Router(base string) *gin.Engine {
 	router.Use(cors.Default())
 	return router
 }
+
+func checkAuth(c *gin.Context) error {
+	openid := c.Query("openid")
+	sid := c.Query("sid")
+	res, err := authSrv.CheckAuth(context.TODO(),
+		&auth.CheckAuthRequest{
+			Openid: openid,
+			Sid:    sid,
+		},
+	)
+	if err != nil || !res.Ok {
+		return fmt.Errorf("auth check fail")
+	}
+	return nil
+}
+
 /*
 # Get one task
 - route: /task/:taskId/meta
