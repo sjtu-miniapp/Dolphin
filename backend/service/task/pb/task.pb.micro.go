@@ -40,6 +40,7 @@ type TaskService interface {
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...client.CallOption) (*CreateTaskResponse, error)
 	UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, opts ...client.CallOption) (*UpdateTaskMetaResponse, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...client.CallOption) (*DeleteTaskResponse, error)
+	UserInTask(ctx context.Context, in *UserInTaskRequest, opts ...client.CallOption) (*UserInTaskResponse, error)
 }
 
 type taskService struct {
@@ -120,6 +121,16 @@ func (c *taskService) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opt
 	return out, nil
 }
 
+func (c *taskService) UserInTask(ctx context.Context, in *UserInTaskRequest, opts ...client.CallOption) (*UserInTaskResponse, error) {
+	req := c.c.NewRequest(c.name, "Task.UserInTask", in)
+	out := new(UserInTaskResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Task service
 
 type TaskHandler interface {
@@ -129,6 +140,7 @@ type TaskHandler interface {
 	CreateTask(context.Context, *CreateTaskRequest, *CreateTaskResponse) error
 	UpdateTaskMeta(context.Context, *UpdateTaskMetaRequest, *UpdateTaskMetaResponse) error
 	DeleteTask(context.Context, *DeleteTaskRequest, *DeleteTaskResponse) error
+	UserInTask(context.Context, *UserInTaskRequest, *UserInTaskResponse) error
 }
 
 func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.HandlerOption) error {
@@ -139,6 +151,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		CreateTask(ctx context.Context, in *CreateTaskRequest, out *CreateTaskResponse) error
 		UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, out *UpdateTaskMetaResponse) error
 		DeleteTask(ctx context.Context, in *DeleteTaskRequest, out *DeleteTaskResponse) error
+		UserInTask(ctx context.Context, in *UserInTaskRequest, out *UserInTaskResponse) error
 	}
 	type Task struct {
 		task
@@ -173,4 +186,8 @@ func (h *taskHandler) UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequ
 
 func (h *taskHandler) DeleteTask(ctx context.Context, in *DeleteTaskRequest, out *DeleteTaskResponse) error {
 	return h.TaskHandler.DeleteTask(ctx, in, out)
+}
+
+func (h *taskHandler) UserInTask(ctx context.Context, in *UserInTaskRequest, out *UserInTaskResponse) error {
+	return h.TaskHandler.UserInTask(ctx, in, out)
 }

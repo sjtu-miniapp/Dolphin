@@ -7,6 +7,7 @@ service Task {
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
   rpc UpdateTaskMeta(UpdateTaskMetaRequest) returns (UpdateTaskMetaResponse);
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
+  rpc UserInTask(UserInTaskRequest) returns (UserInTaskResponse);
 }
 message Date {
   int32 year = 1;
@@ -81,4 +82,12 @@ message DeleteTaskRequest {
   uint32 id = 1;
 }
 message DeleteTaskResponse {
+}
+
+message UserInTaskRequest {
+  string user_id = 1;
+  uint32 task_id = 2;
+}
+message UserInTaskResponse {
+  bool ok = 1;
 }

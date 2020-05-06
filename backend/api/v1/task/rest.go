@@ -3,6 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	pb2 "github.com/sjtu-miniapp/dolphin/service/group/pb"
+	"github.com/sjtu-miniapp/dolphin/service/task/pb"
+	"strconv"
+
 	//"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
@@ -10,8 +14,6 @@ import (
 )
 
 type Task struct{}
-
-
 
 func Router(base string) *gin.Engine {
 	task := new(Task)
@@ -45,6 +47,17 @@ func checkAuth(c *gin.Context) error {
 	return nil
 }
 
+func inTask(userId string, taskId uint32) bool {
+	resp, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
+		UserId: userId,
+		TaskId: taskId,
+	})
+	if err != nil || !resp.Ok {
+		return false
+	}
+	return true
+}
+
 /*
 # Get one task
 - route: /task/:taskId/meta
@@ -69,10 +82,34 @@ func checkAuth(c *gin.Context) error {
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
- */
-func (t Task) GetTaskMeta(context *gin.Context) {
-	srv.GetTaskMeta()
+*/
+func (t Task) GetTaskMeta(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+
+	openid := c.Query("openid")
+	id, err := strconv.Atoi(c.Param("task_id"))
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
+		Id: uint32(id),
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	if inTask(openid, uint32(id)) {
+		c.JSON(200, resp)
+	} else {
+		c.JSON(403, "not allowed")
+	}
 }
+
 /*
 # Get worker of the task
 - route: /task/:taskId/workers
@@ -87,11 +124,31 @@ func (t Task) GetTaskMeta(context *gin.Context) {
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
- */
-func (t Task) GetTaskWorker(context *gin.Context) {
-	srv.GetTaskPeolple()
+*/
+func (t Task) GetTaskWorker(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
+	id, err := strconv.Atoi(c.Param("task_id"))
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	if !inTask(openid, uint32(id)) {
+		c.JSON(403, "not allowed")
+	}
+	resp, err := srv.GetTaskPeolple(context.TODO(), &pb.GetTaskPeopleRequset{
+		Id: uint32(id),
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	c.JSON(200, resp)
 }
-
 
 /*
 # Get task content # tbd # advanced
@@ -107,10 +164,16 @@ func (t Task) GetTaskWorker(context *gin.Context) {
       - 401 auth check fails
       - 403 not allowed
       - 500 failure
- */
-func (t Task) GetTask(context *gin.Context) {
+*/
+func (t Task) GetTask(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
 	panic("implement me")
 }
+
 /*
 # Get tasks by groupID
 - route: /task/group
@@ -126,10 +189,37 @@ func (t Task) GetTask(context *gin.Context) {
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
- */
-func (t Task) GetTaskByGroup(context *gin.Context) {
-	srv.GetTaskMetaByGroupId()
+*/
+func (t Task) GetTaskByGroup(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
+	groupId, err := strconv.Atoi(c.Query("group_id"))
+	if err !=nil {
+		c.JSON(400, err)
+		return
+	}
+	if resp, err := groupSrv.UserInGroup(context.TODO(), &pb2.UserInGroupRequest{
+		UserId:               openid,
+		GroupId:              uint32(groupId),
+	}); err != nil || !resp.Ok {
+		c.JSON(403, "not allowed")
+		return
+	}
+
+	resp2, err := srv.GetTaskMetaByGroupId(context.TODO(), &pb.GetTaskMetaByGroupIdRequest{
+		GroupId:              groupId,
+	})
+	if err != nil {
+		c.JSON(500, err)
+	}
+
+
 }
+
 /*
 # Create task
 - route: /task
@@ -158,10 +248,17 @@ func (t Task) GetTaskByGroup(context *gin.Context) {
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
- */
-func (t Task) CreateTask(context *gin.Context) {
+*/
+func (t Task) CreateTask(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
 	srv.CreateTask()
 }
+
 /*
 # Update a task; only update meta value; contents update would be implemented in next sprint
 - route: /task/:taskID/meta
@@ -183,10 +280,17 @@ func (t Task) CreateTask(context *gin.Context) {
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
- */
-func (t Task) UpdateTaskMeta(context *gin.Context) {
+*/
+func (t Task) UpdateTaskMeta(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
 	srv.UpdateTaskMeta()
 }
+
 /*
 # Delete task
 - route: /tasks/:taskID
@@ -201,8 +305,14 @@ func (t Task) UpdateTaskMeta(context *gin.Context) {
     - 403 not allowed
     - 500 failure
 
- */
-func (t Task) DeleteTask(context *gin.Context) {
+*/
+func (t Task) DeleteTask(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
 	srv.DeleteTask()
 }
 
@@ -214,8 +324,14 @@ func (t Task) DeleteTask(context *gin.Context) {
     - openid string
     - sid string
 ...
- */
-func (t Task) UpdateTask(context *gin.Context) {
+*/
+func (t Task) UpdateTask(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
+
 	panic("implement me")
 }
-
