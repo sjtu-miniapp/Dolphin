@@ -1,14 +1,14 @@
 syntax = "proto3";
 option go_package = ".;pb";
 service Task {
-  rpc GetTask(GetGroupRequest) returns (GetGroupResponse) {}
+  rpc GetTaskMeta(GetTaskMetaRequest) returns (GetTaskMetaResponse) {}
 }
 
-message GetGroupRequest {
+message GetTaskMetaRequest {
   int64 id = 1;
 }
 
-message GetGroupResponse {
+message GetTaskMetaResponse {
   string name = 1;
 }
 

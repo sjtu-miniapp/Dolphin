@@ -15,48 +15,74 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/task/{task_id}/short", task.GetTaskShort)
-	g.GET("/task/{task_id}", task.GetTask)
+	g.GET("/task/:task_id/meta", task.GetTaskMeta)
+	g.GET("/task/:task_id/workers", task.GetTaskWorker)
+	g.GET("/task/:task_id", task.GetTask)
 	g.GET("/task/group", task.GetTaskByGroup)
 	g.PUT("/task", task.CreateTask)
-	g.POST("/task/{task_id}/meta", task.UpdateTaskMeta)
-	g.DELETE("/task/{task_id}", task.DeleteTask)
-
+	g.POST("/task/:task_id/meta", task.UpdateTaskMeta)
+	g.DELETE("/task/:task_id", task.DeleteTask)
+	g.POST("/task/:task_id", task.UpdateTask)
 	router.Use(cors.Default())
 	return router
 }
-
 /*
 # Get one task
-- route: /task/:taskID/short
+- route: /task/:taskId/meta
 - method: GET
 - request params:
     - openid string
     - sid string
 - response data:
-    - task:
-        - name string
-        - people []User
-        - type int
-        - status int
+    - name string
+    - type int
+    - done bool
+    - group_id int
+    - publisher_id string
+    - leader_id string
+    - start_date Date
+    - end_date Date
+    - readonly bool
+    - type int
+    - description string
 - response status:
     - 200 success
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
  */
-func (t Task) GetTaskShort(context *gin.Context) {
+func (t Task) GetTaskMeta(context *gin.Context) {
 
 }
 /*
-# Get one task
+# Get worker of the task
+- route: /task/:taskId/workers
+- method: GET
+- request params:
+    - openid string
+    - sid string
+- response data:
+    - workers []User
+- response status:
+    - 200 success
+    - 401 auth check fails
+    - 403 not allowed
+    - 500 failure
+ */
+func (t Task) GetTaskWorker(context *gin.Context) {
+
+}
+
+
+/*
+# Get task content # tbd # advanced
 - route: /task/:taskID
 - method: GET
   - request params:
       - openid string
       - sid string
   - response data:
-      - task Task # computed field `done`
+
   - response status:
       - 200 success
       - 401 auth check fails
@@ -64,7 +90,7 @@ func (t Task) GetTaskShort(context *gin.Context) {
       - 500 failure
  */
 func (t Task) GetTask(context *gin.Context) {
-
+	panic("implement me")
 }
 /*
 # Get tasks by groupID
@@ -75,7 +101,7 @@ func (t Task) GetTask(context *gin.Context) {
     - sid string
     - group_id int
 - response data:
-    - task []Task # computed field `done`
+    - task []Task # meta
 - response status:
     - 200 success
     - 401 auth check fails
@@ -160,3 +186,17 @@ func (t Task) UpdateTaskMeta(context *gin.Context) {
 func (t Task) DeleteTask(context *gin.Context) {
 
 }
+
+/*
+# Update data content; advanced feature
+- route: /task/:taskId
+- method: POST
+- request params:
+    - openid string
+    - sid string
+...
+ */
+func (t Task) UpdateTask(context *gin.Context) {
+	panic("implement me")
+}
+

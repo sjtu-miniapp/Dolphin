@@ -26,7 +26,7 @@
     - 401 auth check fails
     - 500 failure
 
------------------------------------------
+  -----------------------------------------
 # Get one group
 - route: /group/:groupID
 - method: GET
@@ -102,36 +102,57 @@
 
 -----------------------------------------
 # Get one task
-- route: /task/:taskID/short
+- route: /task/:taskId/meta
 - method: GET
 - request params:
     - openid string
     - sid string
 - response data:
-    - task:
-        - name string
-        - people []User
-        - type int
-        - status int
+    - name string
+    - type int
+    - done bool
+    - group_id int
+    - publisher_id string
+    - leader_id string
+    - start_date Date
+    - end_date Date
+    - readonly bool
+    - type int
+    - description string
 - response status:
     - 200 success
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
 
-# Get one task
-- route: /task/:taskID
+# Get worker of the task
+- route: /task/:taskId/workers
 - method: GET
-  - request params:
-      - openid string
-      - sid string
-  - response data:
-      - task Task # computed field `done`
-  - response status:
-      - 200 success
-      - 401 auth check fails
-      - 403 not allowed
-      - 500 failure
+- request params:
+    - openid string
+    - sid string
+- response data:
+    - workers []User
+- response status:
+    - 200 success
+    - 401 auth check fails
+    - 403 not allowed
+    - 500 failure
+
+# Get task content # tbd # advanced
+- route: /task/:taskId
+- method: GET
+    - request params:
+        - openid string
+        - sid string
+    - response data:
+
+
+    - response status:
+        - 200 success
+        - 401 auth check fails
+        - 403 not allowed
+        - 500 failure
 
 # Get tasks by groupID
 - route: /task/group
@@ -141,7 +162,7 @@
     - sid string
     - group_id int
 - response data:
-    - task []Task # computed field `done`
+    - task []Task # meta
 - response status:
     - 200 success
     - 401 auth check fails
@@ -178,7 +199,7 @@
     - 500 failure
 
 # Update a task; only update meta value; contents update would be implemented in next sprint
-- route: /task/:taskID/meta
+- route: /task/:taskId/meta
 - method: POST
 - request params:
     - openid string
@@ -197,6 +218,14 @@
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
+
+# Update data content; advanced feature
+- route: /task/:taskId
+- method: POST
+- request params:
+    - openid string
+    - sid string
+...
 
 # Delete task
 - route: /tasks/:taskID
