@@ -62,6 +62,8 @@ message CreateTaskRequest {
   Date start_date = 6;
   Date end_date = 7;
   string description = 8;
+  string publisher_id = 9;
+  bool readonly = 10;
 }
 message CreateTaskResponse {
   uint32 id = 1;
