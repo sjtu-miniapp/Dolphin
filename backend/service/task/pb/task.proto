@@ -1,14 +1,74 @@
 syntax = "proto3";
 option go_package = ".;pb";
 service Task {
-  rpc GetTaskMeta(GetTaskMetaRequest) returns (GetTaskMetaResponse) {}
+  rpc GetTaskMeta(GetTaskMetaRequest) returns (GetTaskMetaResponse);
+  rpc GetTaskPeolple(GetTaskPeopleRequset) returns (GetTaskPeopleResponse);
+  rpc GetTaskMetaByGroupId(GetTaskMetaByGroupIdRequest) returns (GetTaskMetaByGroupIdResponse);
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  rpc UpdateTaskMeta(UpdateTaskMetaRequest) returns (UpdateTaskMetaResponse);
 }
-
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+}
+message TaskMeta {
+  string name = 1;
+  uint32 type = 2;
+  bool done = 3;
+  uint32 groupId = 4;
+  string publisher_id = 5;
+  string leader_id = 6;
+  Date start_date = 7;
+  Date end_date = 8;
+  bool readonly = 9;
+  string description = 10;
+}
 message GetTaskMetaRequest {
-  int64 id = 1;
+  uint32 id = 1;
 }
 
 message GetTaskMetaResponse {
-  string name = 1;
+  TaskMeta meta = 1;
 }
 
+message GetTaskPeopleRequset {
+  uint32 id = 1;
+}
+message GetTaskPeopleResponse {
+  message User {
+    string id = 1;
+    string name = 2;
+  }
+  repeated User workers = 1;
+}
+
+message GetTaskMetaByGroupIdRequest {
+  uint32 group_id = 1;
+}
+
+message GetTaskMetaByGroupIdResponse {
+  repeated TaskMeta metas = 1;
+}
+
+message CreateTaskRequest {
+  int32 group_id = 1;
+  repeated string user_ids = 2;
+  string name = 3;
+  int32 type = 4;
+  string leader_id = 5;
+  Date start_date = 6;
+  Date end_date = 7;
+  string description = 8;
+}
+message CreateTaskResponse {
+  uint32 id = 1;
+}
+
+message UpdateTaskMetaRequest {
+  uint32 id = 1;
+
+}
+message UpdateTaskMetaResponse {
+
+}

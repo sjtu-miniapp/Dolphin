@@ -20,100 +20,639 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type GetGroupRequest struct {
-	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+type Date struct {
+	Year                 int32    `protobuf:"varint,1,opt,name=year,proto3" json:"year,omitempty"`
+	Month                int32    `protobuf:"varint,2,opt,name=month,proto3" json:"month,omitempty"`
+	Day                  int32    `protobuf:"varint,3,opt,name=day,proto3" json:"day,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GetGroupRequest) Reset()         { *m = GetGroupRequest{} }
-func (m *GetGroupRequest) String() string { return proto.CompactTextString(m) }
-func (*GetGroupRequest) ProtoMessage()    {}
-func (*GetGroupRequest) Descriptor() ([]byte, []int) {
+func (m *Date) Reset()         { *m = Date{} }
+func (m *Date) String() string { return proto.CompactTextString(m) }
+func (*Date) ProtoMessage()    {}
+func (*Date) Descriptor() ([]byte, []int) {
 	return fileDescriptor_ce5d8dd45b4a91ff, []int{0}
 }
 
-func (m *GetGroupRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetGroupRequest.Unmarshal(m, b)
+func (m *Date) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Date.Unmarshal(m, b)
 }
-func (m *GetGroupRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetGroupRequest.Marshal(b, m, deterministic)
+func (m *Date) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Date.Marshal(b, m, deterministic)
 }
-func (m *GetGroupRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetGroupRequest.Merge(m, src)
+func (m *Date) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Date.Merge(m, src)
 }
-func (m *GetGroupRequest) XXX_Size() int {
-	return xxx_messageInfo_GetGroupRequest.Size(m)
+func (m *Date) XXX_Size() int {
+	return xxx_messageInfo_Date.Size(m)
 }
-func (m *GetGroupRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetGroupRequest.DiscardUnknown(m)
+func (m *Date) XXX_DiscardUnknown() {
+	xxx_messageInfo_Date.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetGroupRequest proto.InternalMessageInfo
+var xxx_messageInfo_Date proto.InternalMessageInfo
 
-func (m *GetGroupRequest) GetId() int64 {
+func (m *Date) GetYear() int32 {
 	if m != nil {
-		return m.Id
+		return m.Year
 	}
 	return 0
 }
 
-type GetGroupResponse struct {
+func (m *Date) GetMonth() int32 {
+	if m != nil {
+		return m.Month
+	}
+	return 0
+}
+
+func (m *Date) GetDay() int32 {
+	if m != nil {
+		return m.Day
+	}
+	return 0
+}
+
+type TaskMeta struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Type                 uint32   `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
+	Done                 bool     `protobuf:"varint,3,opt,name=done,proto3" json:"done,omitempty"`
+	GroupId              uint32   `protobuf:"varint,4,opt,name=groupId,proto3" json:"groupId,omitempty"`
+	PublisherId          string   `protobuf:"bytes,5,opt,name=publisher_id,json=publisherId,proto3" json:"publisher_id,omitempty"`
+	LeaderId             string   `protobuf:"bytes,6,opt,name=leader_id,json=leaderId,proto3" json:"leader_id,omitempty"`
+	StartDate            *Date    `protobuf:"bytes,7,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
+	EndDate              *Date    `protobuf:"bytes,8,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	Readonly             bool     `protobuf:"varint,9,opt,name=readonly,proto3" json:"readonly,omitempty"`
+	Description          string   `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GetGroupResponse) Reset()         { *m = GetGroupResponse{} }
-func (m *GetGroupResponse) String() string { return proto.CompactTextString(m) }
-func (*GetGroupResponse) ProtoMessage()    {}
-func (*GetGroupResponse) Descriptor() ([]byte, []int) {
+func (m *TaskMeta) Reset()         { *m = TaskMeta{} }
+func (m *TaskMeta) String() string { return proto.CompactTextString(m) }
+func (*TaskMeta) ProtoMessage()    {}
+func (*TaskMeta) Descriptor() ([]byte, []int) {
 	return fileDescriptor_ce5d8dd45b4a91ff, []int{1}
 }
 
-func (m *GetGroupResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetGroupResponse.Unmarshal(m, b)
+func (m *TaskMeta) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TaskMeta.Unmarshal(m, b)
 }
-func (m *GetGroupResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetGroupResponse.Marshal(b, m, deterministic)
+func (m *TaskMeta) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TaskMeta.Marshal(b, m, deterministic)
 }
-func (m *GetGroupResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetGroupResponse.Merge(m, src)
+func (m *TaskMeta) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TaskMeta.Merge(m, src)
 }
-func (m *GetGroupResponse) XXX_Size() int {
-	return xxx_messageInfo_GetGroupResponse.Size(m)
+func (m *TaskMeta) XXX_Size() int {
+	return xxx_messageInfo_TaskMeta.Size(m)
 }
-func (m *GetGroupResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetGroupResponse.DiscardUnknown(m)
+func (m *TaskMeta) XXX_DiscardUnknown() {
+	xxx_messageInfo_TaskMeta.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetGroupResponse proto.InternalMessageInfo
+var xxx_messageInfo_TaskMeta proto.InternalMessageInfo
 
-func (m *GetGroupResponse) GetName() string {
+func (m *TaskMeta) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
+func (m *TaskMeta) GetType() uint32 {
+	if m != nil {
+		return m.Type
+	}
+	return 0
+}
+
+func (m *TaskMeta) GetDone() bool {
+	if m != nil {
+		return m.Done
+	}
+	return false
+}
+
+func (m *TaskMeta) GetGroupId() uint32 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *TaskMeta) GetPublisherId() string {
+	if m != nil {
+		return m.PublisherId
+	}
+	return ""
+}
+
+func (m *TaskMeta) GetLeaderId() string {
+	if m != nil {
+		return m.LeaderId
+	}
+	return ""
+}
+
+func (m *TaskMeta) GetStartDate() *Date {
+	if m != nil {
+		return m.StartDate
+	}
+	return nil
+}
+
+func (m *TaskMeta) GetEndDate() *Date {
+	if m != nil {
+		return m.EndDate
+	}
+	return nil
+}
+
+func (m *TaskMeta) GetReadonly() bool {
+	if m != nil {
+		return m.Readonly
+	}
+	return false
+}
+
+func (m *TaskMeta) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+type GetTaskMetaRequest struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetTaskMetaRequest) Reset()         { *m = GetTaskMetaRequest{} }
+func (m *GetTaskMetaRequest) String() string { return proto.CompactTextString(m) }
+func (*GetTaskMetaRequest) ProtoMessage()    {}
+func (*GetTaskMetaRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{2}
+}
+
+func (m *GetTaskMetaRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskMetaRequest.Unmarshal(m, b)
+}
+func (m *GetTaskMetaRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskMetaRequest.Marshal(b, m, deterministic)
+}
+func (m *GetTaskMetaRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskMetaRequest.Merge(m, src)
+}
+func (m *GetTaskMetaRequest) XXX_Size() int {
+	return xxx_messageInfo_GetTaskMetaRequest.Size(m)
+}
+func (m *GetTaskMetaRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskMetaRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskMetaRequest proto.InternalMessageInfo
+
+func (m *GetTaskMetaRequest) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type GetTaskMetaResponse struct {
+	Meta                 *TaskMeta `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *GetTaskMetaResponse) Reset()         { *m = GetTaskMetaResponse{} }
+func (m *GetTaskMetaResponse) String() string { return proto.CompactTextString(m) }
+func (*GetTaskMetaResponse) ProtoMessage()    {}
+func (*GetTaskMetaResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{3}
+}
+
+func (m *GetTaskMetaResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskMetaResponse.Unmarshal(m, b)
+}
+func (m *GetTaskMetaResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskMetaResponse.Marshal(b, m, deterministic)
+}
+func (m *GetTaskMetaResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskMetaResponse.Merge(m, src)
+}
+func (m *GetTaskMetaResponse) XXX_Size() int {
+	return xxx_messageInfo_GetTaskMetaResponse.Size(m)
+}
+func (m *GetTaskMetaResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskMetaResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskMetaResponse proto.InternalMessageInfo
+
+func (m *GetTaskMetaResponse) GetMeta() *TaskMeta {
+	if m != nil {
+		return m.Meta
+	}
+	return nil
+}
+
+type GetTaskPeopleRequset struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetTaskPeopleRequset) Reset()         { *m = GetTaskPeopleRequset{} }
+func (m *GetTaskPeopleRequset) String() string { return proto.CompactTextString(m) }
+func (*GetTaskPeopleRequset) ProtoMessage()    {}
+func (*GetTaskPeopleRequset) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{4}
+}
+
+func (m *GetTaskPeopleRequset) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskPeopleRequset.Unmarshal(m, b)
+}
+func (m *GetTaskPeopleRequset) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskPeopleRequset.Marshal(b, m, deterministic)
+}
+func (m *GetTaskPeopleRequset) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskPeopleRequset.Merge(m, src)
+}
+func (m *GetTaskPeopleRequset) XXX_Size() int {
+	return xxx_messageInfo_GetTaskPeopleRequset.Size(m)
+}
+func (m *GetTaskPeopleRequset) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskPeopleRequset.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskPeopleRequset proto.InternalMessageInfo
+
+func (m *GetTaskPeopleRequset) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type GetTaskPeopleResponse struct {
+	Workers              []*GetTaskPeopleResponse_User `protobuf:"bytes,1,rep,name=workers,proto3" json:"workers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
+	XXX_unrecognized     []byte                        `json:"-"`
+	XXX_sizecache        int32                         `json:"-"`
+}
+
+func (m *GetTaskPeopleResponse) Reset()         { *m = GetTaskPeopleResponse{} }
+func (m *GetTaskPeopleResponse) String() string { return proto.CompactTextString(m) }
+func (*GetTaskPeopleResponse) ProtoMessage()    {}
+func (*GetTaskPeopleResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{5}
+}
+
+func (m *GetTaskPeopleResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskPeopleResponse.Unmarshal(m, b)
+}
+func (m *GetTaskPeopleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskPeopleResponse.Marshal(b, m, deterministic)
+}
+func (m *GetTaskPeopleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskPeopleResponse.Merge(m, src)
+}
+func (m *GetTaskPeopleResponse) XXX_Size() int {
+	return xxx_messageInfo_GetTaskPeopleResponse.Size(m)
+}
+func (m *GetTaskPeopleResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskPeopleResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskPeopleResponse proto.InternalMessageInfo
+
+func (m *GetTaskPeopleResponse) GetWorkers() []*GetTaskPeopleResponse_User {
+	if m != nil {
+		return m.Workers
+	}
+	return nil
+}
+
+type GetTaskPeopleResponse_User struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetTaskPeopleResponse_User) Reset()         { *m = GetTaskPeopleResponse_User{} }
+func (m *GetTaskPeopleResponse_User) String() string { return proto.CompactTextString(m) }
+func (*GetTaskPeopleResponse_User) ProtoMessage()    {}
+func (*GetTaskPeopleResponse_User) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{5, 0}
+}
+
+func (m *GetTaskPeopleResponse_User) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskPeopleResponse_User.Unmarshal(m, b)
+}
+func (m *GetTaskPeopleResponse_User) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskPeopleResponse_User.Marshal(b, m, deterministic)
+}
+func (m *GetTaskPeopleResponse_User) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskPeopleResponse_User.Merge(m, src)
+}
+func (m *GetTaskPeopleResponse_User) XXX_Size() int {
+	return xxx_messageInfo_GetTaskPeopleResponse_User.Size(m)
+}
+func (m *GetTaskPeopleResponse_User) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskPeopleResponse_User.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskPeopleResponse_User proto.InternalMessageInfo
+
+func (m *GetTaskPeopleResponse_User) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *GetTaskPeopleResponse_User) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type GetTaskMetaByGroupIdRequest struct {
+	GroupId              uint32   `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetTaskMetaByGroupIdRequest) Reset()         { *m = GetTaskMetaByGroupIdRequest{} }
+func (m *GetTaskMetaByGroupIdRequest) String() string { return proto.CompactTextString(m) }
+func (*GetTaskMetaByGroupIdRequest) ProtoMessage()    {}
+func (*GetTaskMetaByGroupIdRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{6}
+}
+
+func (m *GetTaskMetaByGroupIdRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskMetaByGroupIdRequest.Unmarshal(m, b)
+}
+func (m *GetTaskMetaByGroupIdRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskMetaByGroupIdRequest.Marshal(b, m, deterministic)
+}
+func (m *GetTaskMetaByGroupIdRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskMetaByGroupIdRequest.Merge(m, src)
+}
+func (m *GetTaskMetaByGroupIdRequest) XXX_Size() int {
+	return xxx_messageInfo_GetTaskMetaByGroupIdRequest.Size(m)
+}
+func (m *GetTaskMetaByGroupIdRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskMetaByGroupIdRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskMetaByGroupIdRequest proto.InternalMessageInfo
+
+func (m *GetTaskMetaByGroupIdRequest) GetGroupId() uint32 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+type GetTaskMetaByGroupIdResponse struct {
+	Metas                []*TaskMeta `protobuf:"bytes,1,rep,name=metas,proto3" json:"metas,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+
+func (m *GetTaskMetaByGroupIdResponse) Reset()         { *m = GetTaskMetaByGroupIdResponse{} }
+func (m *GetTaskMetaByGroupIdResponse) String() string { return proto.CompactTextString(m) }
+func (*GetTaskMetaByGroupIdResponse) ProtoMessage()    {}
+func (*GetTaskMetaByGroupIdResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{7}
+}
+
+func (m *GetTaskMetaByGroupIdResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTaskMetaByGroupIdResponse.Unmarshal(m, b)
+}
+func (m *GetTaskMetaByGroupIdResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTaskMetaByGroupIdResponse.Marshal(b, m, deterministic)
+}
+func (m *GetTaskMetaByGroupIdResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTaskMetaByGroupIdResponse.Merge(m, src)
+}
+func (m *GetTaskMetaByGroupIdResponse) XXX_Size() int {
+	return xxx_messageInfo_GetTaskMetaByGroupIdResponse.Size(m)
+}
+func (m *GetTaskMetaByGroupIdResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTaskMetaByGroupIdResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTaskMetaByGroupIdResponse proto.InternalMessageInfo
+
+func (m *GetTaskMetaByGroupIdResponse) GetMetas() []*TaskMeta {
+	if m != nil {
+		return m.Metas
+	}
+	return nil
+}
+
+type CreateTaskRequest struct {
+	GroupId              int32    `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserIds              []string `protobuf:"bytes,2,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Type                 int32    `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty"`
+	LeaderId             string   `protobuf:"bytes,5,opt,name=leader_id,json=leaderId,proto3" json:"leader_id,omitempty"`
+	StartDate            *Date    `protobuf:"bytes,6,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
+	EndDate              *Date    `protobuf:"bytes,7,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
+	Description          string   `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateTaskRequest) Reset()         { *m = CreateTaskRequest{} }
+func (m *CreateTaskRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateTaskRequest) ProtoMessage()    {}
+func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{8}
+}
+
+func (m *CreateTaskRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateTaskRequest.Unmarshal(m, b)
+}
+func (m *CreateTaskRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateTaskRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateTaskRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateTaskRequest.Merge(m, src)
+}
+func (m *CreateTaskRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateTaskRequest.Size(m)
+}
+func (m *CreateTaskRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateTaskRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateTaskRequest proto.InternalMessageInfo
+
+func (m *CreateTaskRequest) GetGroupId() int32 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *CreateTaskRequest) GetUserIds() []string {
+	if m != nil {
+		return m.UserIds
+	}
+	return nil
+}
+
+func (m *CreateTaskRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CreateTaskRequest) GetType() int32 {
+	if m != nil {
+		return m.Type
+	}
+	return 0
+}
+
+func (m *CreateTaskRequest) GetLeaderId() string {
+	if m != nil {
+		return m.LeaderId
+	}
+	return ""
+}
+
+func (m *CreateTaskRequest) GetStartDate() *Date {
+	if m != nil {
+		return m.StartDate
+	}
+	return nil
+}
+
+func (m *CreateTaskRequest) GetEndDate() *Date {
+	if m != nil {
+		return m.EndDate
+	}
+	return nil
+}
+
+func (m *CreateTaskRequest) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+type CreateTaskResponse struct {
+	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateTaskResponse) Reset()         { *m = CreateTaskResponse{} }
+func (m *CreateTaskResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateTaskResponse) ProtoMessage()    {}
+func (*CreateTaskResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5d8dd45b4a91ff, []int{9}
+}
+
+func (m *CreateTaskResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateTaskResponse.Unmarshal(m, b)
+}
+func (m *CreateTaskResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateTaskResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateTaskResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateTaskResponse.Merge(m, src)
+}
+func (m *CreateTaskResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateTaskResponse.Size(m)
+}
+func (m *CreateTaskResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateTaskResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateTaskResponse proto.InternalMessageInfo
+
+func (m *CreateTaskResponse) GetId() uint32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
 func init() {
-	proto.RegisterType((*GetGroupRequest)(nil), "GetGroupRequest")
-	proto.RegisterType((*GetGroupResponse)(nil), "GetGroupResponse")
+	proto.RegisterType((*Date)(nil), "Date")
+	proto.RegisterType((*TaskMeta)(nil), "TaskMeta")
+	proto.RegisterType((*GetTaskMetaRequest)(nil), "GetTaskMetaRequest")
+	proto.RegisterType((*GetTaskMetaResponse)(nil), "GetTaskMetaResponse")
+	proto.RegisterType((*GetTaskPeopleRequset)(nil), "GetTaskPeopleRequset")
+	proto.RegisterType((*GetTaskPeopleResponse)(nil), "GetTaskPeopleResponse")
+	proto.RegisterType((*GetTaskPeopleResponse_User)(nil), "GetTaskPeopleResponse.User")
+	proto.RegisterType((*GetTaskMetaByGroupIdRequest)(nil), "GetTaskMetaByGroupIdRequest")
+	proto.RegisterType((*GetTaskMetaByGroupIdResponse)(nil), "GetTaskMetaByGroupIdResponse")
+	proto.RegisterType((*CreateTaskRequest)(nil), "CreateTaskRequest")
+	proto.RegisterType((*CreateTaskResponse)(nil), "CreateTaskResponse")
 }
 
 func init() { proto.RegisterFile("task.proto", fileDescriptor_ce5d8dd45b4a91ff) }
 
 var fileDescriptor_ce5d8dd45b4a91ff = []byte{
-	// 138 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2a, 0x49, 0x2c, 0xce,
-	0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x52, 0xe4, 0xe2, 0x77, 0x4f, 0x2d, 0x71, 0x2f, 0xca,
-	0x2f, 0x2d, 0x08, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0xe2, 0xe3, 0x62, 0xca, 0x4c, 0x91,
-	0x60, 0x54, 0x60, 0xd4, 0x60, 0x0e, 0x62, 0xca, 0x4c, 0x51, 0x52, 0xe3, 0x12, 0x40, 0x28, 0x29,
-	0x2e, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x12, 0xe2, 0x62, 0xc9, 0x4b, 0xcc, 0x4d, 0x05, 0xab, 0xe2,
-	0x0c, 0x02, 0xb3, 0x8d, 0x2c, 0xb8, 0x58, 0x42, 0x12, 0x8b, 0xb3, 0x85, 0x0c, 0xb8, 0xd8, 0xdd,
-	0x53, 0x4b, 0xc0, 0x4c, 0x01, 0x3d, 0x34, 0xc3, 0xa5, 0x04, 0xf5, 0xd0, 0xcd, 0x52, 0x62, 0x70,
-	0x62, 0x8b, 0x62, 0xd1, 0xb3, 0x2e, 0x48, 0x4a, 0x62, 0x03, 0xbb, 0xc9, 0x18, 0x10, 0x00, 0x00,
-	0xff, 0xff, 0x73, 0xc8, 0x5f, 0xa8, 0xa1, 0x00, 0x00, 0x00,
+	// 574 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0x41, 0x6f, 0xd3, 0x30,
+	0x14, 0xc7, 0xd5, 0x34, 0x69, 0x92, 0x17, 0x36, 0x81, 0xb7, 0xa1, 0x2c, 0xdb, 0x44, 0x88, 0x26,
+	0x54, 0x71, 0xf0, 0xa1, 0x30, 0x69, 0x12, 0x87, 0x49, 0x05, 0x69, 0xea, 0x01, 0x09, 0x05, 0xb8,
+	0x70, 0xa9, 0x5c, 0xfc, 0xc4, 0xa2, 0xa6, 0x49, 0x88, 0x5d, 0xa1, 0xf2, 0x1d, 0xf8, 0x1a, 0x7c,
+	0x46, 0x8e, 0xc8, 0x4e, 0x93, 0xa6, 0x6d, 0xa8, 0xb8, 0xd9, 0x7f, 0xff, 0xf3, 0xfc, 0xde, 0xdf,
+	0xbf, 0x16, 0x40, 0x32, 0x31, 0xa7, 0x45, 0x99, 0xcb, 0x3c, 0x1a, 0x83, 0xf9, 0x8e, 0x49, 0x24,
+	0x04, 0xcc, 0x15, 0xb2, 0xd2, 0xef, 0x85, 0xbd, 0xa1, 0x15, 0xeb, 0x35, 0x39, 0x05, 0x6b, 0x91,
+	0x67, 0xf2, 0xc1, 0x37, 0xb4, 0x58, 0x6d, 0xc8, 0x63, 0xe8, 0x73, 0xb6, 0xf2, 0xfb, 0x5a, 0x53,
+	0xcb, 0xe8, 0xb7, 0x01, 0xce, 0x27, 0x26, 0xe6, 0xef, 0x51, 0x32, 0x55, 0x28, 0x63, 0x0b, 0xd4,
+	0x85, 0xdc, 0x58, 0xaf, 0x95, 0x26, 0x57, 0x05, 0xea, 0x3a, 0x47, 0xb1, 0x5e, 0x2b, 0x8d, 0xe7,
+	0x19, 0xea, 0x3a, 0x4e, 0xac, 0xd7, 0xc4, 0x07, 0xfb, 0x5b, 0x99, 0x2f, 0x8b, 0x09, 0xf7, 0x4d,
+	0x6d, 0xad, 0xb7, 0xe4, 0x39, 0x3c, 0x2a, 0x96, 0xb3, 0x34, 0x11, 0x0f, 0x58, 0x4e, 0x13, 0xee,
+	0x5b, 0xba, 0xba, 0xd7, 0x68, 0x13, 0x4e, 0x2e, 0xc0, 0x4d, 0x91, 0xf1, 0xea, 0x7c, 0xa0, 0xcf,
+	0x9d, 0x4a, 0x98, 0x70, 0x72, 0x0d, 0x20, 0x24, 0x2b, 0xe5, 0x94, 0x33, 0x89, 0xbe, 0x1d, 0xf6,
+	0x86, 0xde, 0xc8, 0xa2, 0x6a, 0xf2, 0xd8, 0xd5, 0x07, 0x3a, 0x84, 0x10, 0x1c, 0xcc, 0x78, 0xe5,
+	0x71, 0xda, 0x1e, 0x1b, 0x33, 0xae, 0x1d, 0x01, 0x38, 0x25, 0x32, 0x9e, 0x67, 0xe9, 0xca, 0x77,
+	0x75, 0xe7, 0xcd, 0x9e, 0x84, 0xe0, 0x71, 0x14, 0x5f, 0xcb, 0xa4, 0x90, 0x49, 0x9e, 0xf9, 0x50,
+	0xb5, 0xd8, 0x92, 0xa2, 0x6b, 0x20, 0xf7, 0x28, 0xeb, 0xa8, 0x62, 0xfc, 0xbe, 0x44, 0x21, 0xc9,
+	0x31, 0x18, 0x09, 0xd7, 0x79, 0x1d, 0xc5, 0x46, 0xc2, 0xa3, 0xd7, 0x70, 0xb2, 0xe5, 0x12, 0x45,
+	0x9e, 0x09, 0x24, 0x57, 0x60, 0x2e, 0x50, 0x32, 0x6d, 0xf4, 0x46, 0x2e, 0x6d, 0x0c, 0x5a, 0x8e,
+	0x5e, 0xc0, 0xe9, 0xfa, 0xab, 0x0f, 0x98, 0x17, 0x29, 0xaa, 0xea, 0x02, 0xf7, 0xab, 0xff, 0x84,
+	0xb3, 0x1d, 0xdf, 0xba, 0xfe, 0x0d, 0xd8, 0x3f, 0xf2, 0x72, 0x8e, 0xa5, 0xf0, 0x7b, 0x61, 0x7f,
+	0xe8, 0x8d, 0x2e, 0x68, 0xa7, 0x91, 0x7e, 0x16, 0x58, 0xc6, 0xb5, 0x37, 0x78, 0x09, 0xa6, 0x12,
+	0x5a, 0xf7, 0xb8, 0xea, 0x9e, 0x86, 0x03, 0x63, 0xc3, 0x41, 0x74, 0x0b, 0x17, 0xad, 0xc9, 0xc6,
+	0xab, 0xfb, 0xea, 0x75, 0xeb, 0x20, 0xce, 0xc1, 0xd1, 0xef, 0x3d, 0x6d, 0x1a, 0xae, 0xdf, 0x3f,
+	0xba, 0x83, 0xcb, 0xee, 0x2f, 0xd7, 0xcd, 0x3f, 0x03, 0x4b, 0xa5, 0x50, 0xb7, 0xde, 0x4a, 0xa7,
+	0xd2, 0xa3, 0x3f, 0x3d, 0x78, 0xf2, 0xb6, 0x44, 0x26, 0x51, 0x9d, 0xfc, 0xeb, 0x46, 0x6b, 0x43,
+	0xdc, 0x39, 0x38, 0x4b, 0xa1, 0x61, 0x12, 0xbe, 0x11, 0xf6, 0x87, 0x6e, 0x6c, 0xab, 0xfd, 0x84,
+	0x8b, 0x66, 0xb4, 0x7e, 0x07, 0xe2, 0x66, 0xf5, 0xfb, 0xd1, 0x88, 0x6f, 0x11, 0x69, 0x1d, 0x24,
+	0x72, 0xf0, 0x1f, 0x44, 0xda, 0x9d, 0x44, 0xee, 0x50, 0xe7, 0x74, 0x52, 0xd7, 0x9e, 0x7c, 0x9d,
+	0xd8, 0x0e, 0x17, 0xa3, 0x5f, 0x06, 0x98, 0xca, 0x40, 0x6e, 0xc1, 0x6b, 0x45, 0x4d, 0x4e, 0xe8,
+	0x3e, 0xb2, 0xc1, 0x29, 0xed, 0x22, 0xf4, 0x0e, 0x8e, 0x37, 0xc4, 0xa4, 0x45, 0x8a, 0xe4, 0x8c,
+	0x76, 0x31, 0x19, 0x3c, 0xed, 0x26, 0x8b, 0x7c, 0x6c, 0x18, 0xde, 0x7a, 0x65, 0x72, 0x49, 0x0f,
+	0x60, 0x13, 0x5c, 0xd1, 0x83, 0x68, 0xdc, 0x00, 0x6c, 0xc6, 0x27, 0x84, 0xee, 0x51, 0x10, 0x9c,
+	0xd0, 0xfd, 0x7c, 0xc6, 0x83, 0x2f, 0x26, 0x7d, 0x53, 0xcc, 0x66, 0x03, 0xfd, 0x3f, 0xf9, 0xea,
+	0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf6, 0x80, 0xb3, 0xe2, 0x35, 0x05, 0x00, 0x00,
 }

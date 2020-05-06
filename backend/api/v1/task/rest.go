@@ -52,7 +52,7 @@ func Router(base string) *gin.Engine {
     - 500 failure
  */
 func (t Task) GetTaskMeta(context *gin.Context) {
-
+	srv.GetTaskMeta()
 }
 /*
 # Get worker of the task
@@ -70,7 +70,7 @@ func (t Task) GetTaskMeta(context *gin.Context) {
     - 500 failure
  */
 func (t Task) GetTaskWorker(context *gin.Context) {
-
+	srv.GetTaskPeolple()
 }
 
 
@@ -109,7 +109,7 @@ func (t Task) GetTask(context *gin.Context) {
     - 500 failure
  */
 func (t Task) GetTaskByGroup(context *gin.Context) {
-
+	srv.GetTaskMetaByGroupId()
 }
 /*
 # Create task
@@ -141,7 +141,7 @@ func (t Task) GetTaskByGroup(context *gin.Context) {
     - 500 failure
  */
 func (t Task) CreateTask(context *gin.Context) {
-
+	srv.CreateTask()
 }
 /*
 # Update a task; only update meta value; contents update would be implemented in next sprint

@@ -12,10 +12,108 @@
   ],
   "paths": {},
   "definitions": {
-    "GetGroupResponse": {
+    "CreateTaskResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Date": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "month": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "day": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "GetTaskMetaByGroupIdResponse": {
+      "type": "object",
+      "properties": {
+        "metas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TaskMeta"
+          }
+        }
+      }
+    },
+    "GetTaskMetaResponse": {
+      "type": "object",
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/TaskMeta"
+        }
+      }
+    },
+    "GetTaskPeopleResponse": {
+      "type": "object",
+      "properties": {
+        "workers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GetTaskPeopleResponseUser"
+          }
+        }
+      }
+    },
+    "GetTaskPeopleResponseUser": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "TaskMeta": {
       "type": "object",
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "done": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "groupId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "publisherId": {
+          "type": "string"
+        },
+        "leaderId": {
+          "type": "string"
+        },
+        "startDate": {
+          "$ref": "#/definitions/Date"
+        },
+        "endDate": {
+          "$ref": "#/definitions/Date"
+        },
+        "readonly": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "description": {
           "type": "string"
         }
       }
