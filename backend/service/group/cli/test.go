@@ -37,10 +37,10 @@ func main() {
 	service.Init()
 	group := pb.NewGroupService("go.micro.srv.group", service.Client())
 
-	rsp, err := group.GetGroup(context.TODO(), &pb.GetGroupRequest{
-		Id: 1,
+	rsp, err := group.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
+		UserId:    "andy",
 	})
-	fmt.Println(rsp)
+	fmt.Println(err, rsp)
 	if err != nil {
 		fmt.Println(err)
 	}
