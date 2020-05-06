@@ -166,7 +166,7 @@ func (t Task) CreateTask(context *gin.Context) {
     - 500 failure
  */
 func (t Task) UpdateTaskMeta(context *gin.Context) {
-
+	srv.UpdateTaskMeta()
 }
 /*
 # Delete task
@@ -184,7 +184,7 @@ func (t Task) UpdateTaskMeta(context *gin.Context) {
 
  */
 func (t Task) DeleteTask(context *gin.Context) {
-
+	srv.DeleteTask()
 }
 
 /*
