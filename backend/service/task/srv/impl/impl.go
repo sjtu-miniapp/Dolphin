@@ -17,18 +17,27 @@ type Task struct {
 func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, response *pb.GetTaskMetaResponse) error {
 	db := g.SqlDb
 
-	rows, err := db.QueryContext(ctx, )
+	rows, err := db.QueryContext(ctx, "SELECT `name`, `type`, `done`, `group_id`, `publisher_id`, `leader_id`, `start_date`, `end_date`, `readonly`, `description` FROM `task` WHERE `id`=?", request.Id)
 	if err != nil {
 		return err
 	}
+	var sd sql.NullString
+	var ed sql.NullString
 	if rows.Next() {
-		err = rows.Scan(&response.Name)
+		err = rows.Scan(&response.Meta.Name, &response.Meta.Type, &response.Meta.Done, &response.Meta.GroupId, &response.Meta.PublisherId,
+			&response.Meta.LeaderId, &sd, &ed, &response.Meta.Readonly, &response.Meta.Description,
+			)
+		if sd.Valid {
+			response.Meta.StartDate = sd.String
+		}
+		if ed.Valid {
+			response.Meta.EndDate = ed.String
+		}
 		if err != nil {
 			return err
 		}
 	}
-
-	panic("implement me")
+	return nil
 }
 
 func (g Task) GetTaskPeolple(ctx context.Context, requset *pb.GetTaskPeopleRequset, response *pb.GetTaskPeopleResponse) error {

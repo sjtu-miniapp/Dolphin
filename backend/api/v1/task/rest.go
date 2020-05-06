@@ -262,8 +262,8 @@ func (t Task) CreateTask(c *gin.Context) {
 		Name        string   `json:"name"`
 		Type        int      `json:"type"`
 		LeaderId    string   `json:"leader_id, omitempty"`
-		StartDate   *pb.Date `json:"start_date, omitempty"`
-		EndDate     *pb.Date `json:"end_date, omitempty"`
+		StartDate   string `json:"start_date, omitempty"`
+		EndDate     string `json:"end_date, omitempty"`
 		Description string   `json:"description, omitempty"`
 		Readonly    bool     `json:"readonly"`
 	}
@@ -345,8 +345,8 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 	var data struct {
 		GroupId     int      `json:"group_id"`
 		Name        *string   `json:"name"`
-		StartDate   *pb.Date `json:"start_date, omitempty"`
-		EndDate     *pb.Date `json:"end_date, omitempty"`
+		StartDate   *string `json:"start_date, omitempty"`
+		EndDate     *string `json:"end_date, omitempty"`
 		Description *string   `json:"description, omitempty"`
 		Readonly 	*bool `json:"readonly"`
 	}
@@ -355,14 +355,20 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+	if data.StartDate == nil {
+		*data.StartDate = resp.Meta.StartDate
+	}
+	if data.EndDate == nil {
+		*data.EndDate = resp.Meta.EndDate
+	}
 	if data.Name == nil {
 		*data.Name = resp.Meta.Name
 	}
 	if data.StartDate == nil {
-		data.StartDate = resp.Meta.StartDate
+		*data.StartDate = resp.Meta.StartDate
 	}
 	if data.EndDate == nil {
-		data.EndDate = resp.Meta.EndDate
+		*data.EndDate = resp.Meta.EndDate
 	}
 	if data.Description == nil {
 		*data.Description = resp.Meta.Description
@@ -373,8 +379,8 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 	_, err = srv.UpdateTaskMeta(context.TODO(), &pb.UpdateTaskMetaRequest{
 		Id:          uint32(id),
 		Name:        *data.Name,
-		StartDate:   data.StartDate,
-		EndDate:     data.EndDate,
+		StartDate:   *data.StartDate,
+		EndDate:     *data.EndDate,
 		Readonly:    *data.Readonly,
 		Description: *data.Description,
 	})

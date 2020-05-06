@@ -21,23 +21,6 @@
         }
       }
     },
-    "Date": {
-      "type": "object",
-      "properties": {
-        "year": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "month": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "day": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
     "DeleteTaskResponse": {
       "type": "object"
     },
@@ -107,10 +90,10 @@
           "type": "string"
         },
         "startDate": {
-          "$ref": "#/definitions/Date"
+          "type": "string"
         },
         "endDate": {
-          "$ref": "#/definitions/Date"
+          "type": "string"
         },
         "readonly": {
           "type": "boolean",

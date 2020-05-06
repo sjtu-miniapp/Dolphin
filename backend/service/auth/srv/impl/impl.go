@@ -44,7 +44,7 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	sid := fmt.Sprintf("%x", sbyte)
 
 	go func() {
-		database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
+		_ = database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
 	}()
 	response.Openid = openid
 	response.Sid = sid

@@ -52,8 +52,9 @@ CREATE TABLE `task` (
     `group_id` BIGINT(16) NOT NULL,
     `name` VARCHAR(20) DEFAULT "",
     `publisher_id` VARCHAR(30) NOT NULL,
-    # only for group work, can be null
-    `leader_id` VARCHAR(30),
+    # only for group work
+    `leader_id` VARCHAR(30) DEFAULT "",
+    # 2020-02-02
     `start_date` DATE DEFAULT NULL,
     `end_date` DATE DEFAULT NULL,
     # if readonly, only the publisher can revise the task
@@ -61,6 +62,7 @@ CREATE TABLE `task` (
     # 0: group, 1: individuaL;
     `type` TINYINT(1) DEFAULT 0,
     `description` VARCHAR(255) DEFAULT "",
+    # the task is closed
     `done` BOOL DEFAULT FALSE  NOT NULL,
     CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),

@@ -9,11 +9,8 @@ service Task {
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
   rpc UserInTask(UserInTaskRequest) returns (UserInTaskResponse);
 }
-message Date {
-  int32 year = 1;
-  int32 month = 2;
-  int32 day = 3;
-}
+
+
 message TaskMeta {
   string name = 1;
   uint32 type = 2;
@@ -21,8 +18,8 @@ message TaskMeta {
   uint32 groupId = 4;
   string publisher_id = 5;
   string leader_id = 6;
-  Date start_date = 7;
-  Date end_date = 8;
+  string start_date = 7;
+  string end_date = 8;
   bool readonly = 9;
   string description = 10;
 }
@@ -59,8 +56,8 @@ message CreateTaskRequest {
   string name = 3;
   int32 type = 4;
   string leader_id = 5;
-  Date start_date = 6;
-  Date end_date = 7;
+  string start_date = 6;
+  string end_date = 7;
   string description = 8;
   string publisher_id = 9;
   bool readonly = 10;
@@ -72,8 +69,8 @@ message CreateTaskResponse {
 message UpdateTaskMetaRequest {
   uint32 id = 1;
   string name = 2;
-  Date start_date = 3;
-  Date end_date = 4;
+  string start_date = 3;
+  string end_date = 4;
   bool readonly = 5;
   string description = 6;
 }

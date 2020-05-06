@@ -114,8 +114,8 @@
     - group_id int
     - publisher_id string
     - leader_id string
-    - start_date Date
-    - end_date Date
+    - start_date string
+    - end_date string
     - readonly bool
     - description string
 - response status:
@@ -180,11 +180,8 @@
     - name string
     - type int
     - leader_id # tbd
-    - start_date Date: # easier to use then built-in date type; or timestamp I guess
-        - year int
-        - month int
-        - day int
-    - end_date Date
+    - start_date string: # format: 2020-02-02
+    - end_date string
     - description string
 - response data:
     - id int
@@ -204,8 +201,8 @@
     - sid string
 - request data:
     - name string
-    - start_date Date
-    - end_date Date
+    - start_date string
+    - end_date string
     - readonly bool
     - description string
     - done bool
