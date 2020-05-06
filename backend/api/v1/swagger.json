@@ -38,6 +38,9 @@
         }
       }
     },
+    "DeleteTaskResponse": {
+      "type": "object"
+    },
     "GetTaskMetaByGroupIdResponse": {
       "type": "object",
       "properties": {
@@ -117,6 +120,9 @@
           "type": "string"
         }
       }
+    },
+    "UpdateTaskMetaResponse": {
+      "type": "object"
     },
     "protobufAny": {
       "type": "object",

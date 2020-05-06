@@ -6,6 +6,7 @@ service Task {
   rpc GetTaskMetaByGroupId(GetTaskMetaByGroupIdRequest) returns (GetTaskMetaByGroupIdResponse);
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
   rpc UpdateTaskMeta(UpdateTaskMetaRequest) returns (UpdateTaskMetaResponse);
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
 }
 message Date {
   int32 year = 1;
@@ -67,8 +68,17 @@ message CreateTaskResponse {
 
 message UpdateTaskMetaRequest {
   uint32 id = 1;
-
+  string name = 2;
+  Date start_date = 3;
+  Date end_date = 4;
+  bool readonly = 5;
+  string description = 6;
 }
 message UpdateTaskMetaResponse {
+}
 
+message DeleteTaskRequest {
+  uint32 id = 1;
+}
+message DeleteTaskResponse {
 }

@@ -61,6 +61,7 @@ CREATE TABLE `task` (
     # 0: group, 1: individuaL;
     `type` TINYINT(1) DEFAULT 0,
     `description` VARCHAR(255) DEFAULT "",
+    `done` BOOL DEFAULT FALSE  NOT NULL,
     CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),
     UNIQUE INDEX (`group_id`, `name`),
