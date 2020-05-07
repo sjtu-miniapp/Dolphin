@@ -1,5 +1,6 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { Index } from './pages/group/index'
+import 'taro-ui/dist/style/index.scss';
 
 import './app.scss'
 
@@ -30,6 +31,8 @@ class App extends Component {
     pages: [
       'pages/group/index',
       'pages/kanban/index',
+      'pages/group-task/index',
+      'pages/eileen-practice/index',
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -50,6 +53,10 @@ class App extends Component {
           text: '看板',
           iconPath: './images/icon/kanban-unselected.png',
           selectedIconPath: './images/icon/kanban-selected.png'
+        },
+        {
+          pagePath: 'pages/eileen-practice/index',
+          text: 'Playground',
         },
       ],
       color: '#ABBCDA',

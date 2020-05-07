@@ -1,11 +1,17 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text, Input } from '@tarojs/components'
+import { AtCalendar, AtList, AtListItem } from 'taro-ui';
 import './index.scss'
 
 interface KanbanProps { }
 
+interface Task {
+  name: string;
+  deadline: Date;
+}
+
 interface KanbanState {
-  list: string[];
+  list: Task[];
   inputVal: string;
 }
 
@@ -16,9 +22,18 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
 
     this.state = {
       list: [
-        'Get Up',
-        'Coding',
-        'Gu Gu Gu'
+        {
+          name: 'Get Up',
+          deadline: new Date()
+        },
+        {
+          name: 'Coding',
+          deadline: new Date()
+        },
+        {
+          name: 'Gu Gu Gu',
+          deadline: new Date()
+        },
       ],
       inputVal: ''
     };
@@ -52,8 +67,13 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
 
     if (inputVal === '') return;
 
+
+    const newTask: Task = {
+      name: inputVal,
+      deadline: new Date()
+    }
     this.setState({
-      list: list.concat(inputVal), inputVal: ''
+      list: list.concat(newTask), inputVal: ''
     });
   }
 
@@ -72,20 +92,27 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
 
     return (
       <View className='index'>
+        <AtCalendar />
         <Input className='input' type='text' value={inputVal} onInput={this.inputHandler} />
         <Text className='add' onClick={this.addTodo}>添加</Text>
         <View className='list_wrap'>
           <Text>Todo List</Text>
-          {
-            list.map((item, index) => {
-              return (
-                <View>
-                  <Text>{index + 1}.{item}</Text>
-                  <Text className='del' id={index.toString()} onClick={this.deleteTodo}>删除</Text>
-                </View>
-              )
-            })
-          }
+          <AtList>
+            {
+              list.map(item => {
+                return (
+                  <AtListItem
+                    title={item.name}
+                    note={item.deadline.toLocaleDateString() + ' ' + item.deadline.toLocaleTimeString()}
+                    arrow='right'
+                    iconInfo={{ size: 25, color: '#78A4FA', value: 'bookmark', }}
+                  // iconInfo={{ size: 25, color: '#425D8A', value: 'bookmark', }}
+                  >
+                  </AtListItem>
+                )
+              })
+            }
+          </AtList>
         </View>
       </View>
     )

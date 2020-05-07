@@ -1,15 +1,13 @@
-import Taro, { Component, Config } from '@tarojs/taro'
+import Taro, { Component, Config, } from '@tarojs/taro'
 import { View, Text, Navigator, Image } from '@tarojs/components'
+import { ITouchEvent } from '@tarojs/components/types/common';
+
+import { Group } from 'src/types';
+import { groups } from '../../tmp';
+
 import './index.scss'
 
 const GENERAL_URL = 'https://pic.downk.cc/item/5ea99a46c2a9a83be5804922.png';
-
-interface Group {
-  name: string;
-  taskNumber: number;
-  updateTime: Date;
-  picUrl?: string;
-}
 
 interface GroupProps { }
 
@@ -22,13 +20,7 @@ export class Index extends Component<GroupProps, GroupState> {
   constructor(props: GroupProps) {
     super(props);
 
-    this.state = {
-      groups: [
-        { name: '商业模式分析', taskNumber: 10, updateTime: new Date() },
-        { name: '宏观经济学', taskNumber: 1, updateTime: new Date() },
-        { name: '职业发展规划', taskNumber: 0, updateTime: new Date() },
-      ],
-    };
+    this.state = { groups };
   }
 
   componentWillMount() { }
@@ -49,7 +41,11 @@ export class Index extends Component<GroupProps, GroupState> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: '首页'
+    navigationBarTitleText: '小组'
+  }
+
+  navigateToGroupTask = (e: ITouchEvent) => {
+    Taro.navigateTo({ url: `/pages/group-task/index?group=${e.currentTarget.dataset.item}` });
   }
 
   render() {
@@ -60,7 +56,7 @@ export class Index extends Component<GroupProps, GroupState> {
         <View className='group_list'>
           {
             groups.map(item => (
-              <View className='item'>
+              <View className='item' onClick={this.navigateToGroupTask} data-item={item.name} >
                 <Navigator url={'/'}>
                   <View className='left'>
                     <View className='text'>
