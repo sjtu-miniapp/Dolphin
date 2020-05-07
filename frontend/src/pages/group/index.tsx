@@ -1,86 +1,100 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Navigator, Image } from '@tarojs/components'
-import './index.scss'
+import Taro, { FC, useState, useEffect } from '@tarojs/taro'
+import { View, ScrollView } from '@tarojs/components'
 
-const GENERAL_URL = 'https://pic.downk.cc/item/5ea99a46c2a9a83be5804922.png';
+import { Group, Task } from 'src/types';
+import { getGroupsByUser } from '../../apis/groups';
+import { getTasksByGroup } from '../../apis/tasks';
 
-interface Group {
-  name: string;
-  taskNumber: number;
-  updateTime: Date;
-  picUrl?: string;
-}
+import GroupView from './group';
+import TaskView from './task';
+import { GroupProps, ViewStatus } from './interface'
+import FabButton from '../../components/fab-button';
 
-interface GroupProps { }
+const GroupPage: FC<GroupProps> = _props => {
 
-interface GroupState {
-  groups: Group[];
-}
+  const [viewStatus, setViewStatus] = useState<ViewStatus>('Full');
 
-export class Index extends Component<GroupProps, GroupState> {
+  const [groups, setGroups] = useState<Group[]>([]);
 
-  constructor(props: GroupProps) {
-    super(props);
+  const updateGroups = async () => {
+    try {
+      const newGroups = await getGroupsByUser();
+      setGroups(newGroups);
+    } catch (error) {
+      // TODO: remote data error handling
+      console.error('Failed to update groups')
+    }
+  };
 
-    this.state = {
-      groups: [
-        { name: '商业模式分析', taskNumber: 10, updateTime: new Date() },
-        { name: '宏观经济学', taskNumber: 1, updateTime: new Date() },
-        { name: '职业发展规划', taskNumber: 0, updateTime: new Date() },
-      ],
-    };
+  useEffect(() => {
+    updateGroups();
+  }, []);
+
+  const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(undefined);
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const updateTasks = async () => {
+    try {
+      if (!selectedGroup) return;
+      const newTasks = await getTasksByGroup(selectedGroup.id);
+      setTasks(newTasks);
+    } catch (error) {
+      // TODO: remote data error handling
+      console.error('Failed to update groups')
+    }
+  };
+
+  useEffect(() => {
+    updateTasks();
+  }, [selectedGroup]);
+
+  const onSelectGroup = (groupID: string) => {
+    const targetGroup = groups.find(g => g.id === groupID);
+
+    if (!targetGroup) {
+      console.error('Invalid selection group');
+      return;
+    }
+
+    setViewStatus('Short');
+    setSelectedGroup(targetGroup);
   }
 
-  componentWillMount() { }
-
-  componentDidMount() { }
-
-  componentWillUnmount() { }
-
-  componentDidShow() { }
-
-  componentDidHide() { }
-
-  /**
-   * 指定config的类型声明为: Taro.Config
-   *
-   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
-   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
-   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
-   */
-  config: Config = {
-    navigationBarTitleText: '首页'
+  const onSelectTask = (taskID: string) => {
+    console.log('todo: trigger task selection', taskID);
   }
 
-  render() {
-    const { groups } = this.state;
+  const groupViewClassName = viewStatus === 'Full' ? 'at-col at-col-12' : 'at-col at-col-2';
 
-    return (
-      <View className='group'>
-        <View className='group_list'>
-          {
-            groups.map(item => (
-              <View className='item'>
-                <Navigator url={'/'}>
-                  <View className='left'>
-                    <View className='text'>
-                      <Text className='name'>{item.name}</Text>
-                      <Text className='count'>任务数: {item.taskNumber}</Text>
-                      <Text className='update'>上次更新: {item.updateTime.toLocaleDateString()}</Text>
-                    </View>
-                  </View>
-                  <Image
-                    className='right'
-                    src={item.picUrl ? item.picUrl : GENERAL_URL}
-                    mode='scaleToFill'
-                    style={{ width: '132px', height: '99px', float: 'right', marginTop: '10px' }}
-                  ></Image>
-                </Navigator>
-              </View>
-            ))
-          }
-        </View>
+  return (
+    <View className='at-row'>
+      <View className={groupViewClassName}>
+        <GroupView groups={groups} viewStatus={viewStatus} onClickGroup={onSelectGroup} seletectGroup={selectedGroup} />
+        <FabButton />
       </View>
-    )
-  }
+      <ScrollView
+        style={{ whiteSpace: 'nowrap' }}
+        scrollX
+        scrollLeft={0}
+        scrollWithAnimation
+        onScrollToLower={() => setViewStatus('Full')}
+      >
+        {viewStatus === 'Full'
+          ? <View />
+          : <TaskView
+            tasks={tasks}
+            onClickTask={onSelectTask}
+            selectedGroupName={selectedGroup && selectedGroup.name}
+          />
+        }
+      </ScrollView>
+    </View>
+  )
 }
+
+GroupPage.config = {
+  navigationBarTitleText: '小组'
+};
+
+export default GroupPage;

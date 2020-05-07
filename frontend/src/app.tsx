@@ -1,7 +1,7 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { Index } from './pages/group/index'
 
-import './app.scss'
+import Index from './pages/group/index'
+import './app.scss';
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -30,6 +30,8 @@ class App extends Component {
     pages: [
       'pages/group/index',
       'pages/kanban/index',
+      'pages/task/index',
+      'pages/eileen-practice/index',
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -50,6 +52,10 @@ class App extends Component {
           text: '看板',
           iconPath: './images/icon/kanban-unselected.png',
           selectedIconPath: './images/icon/kanban-selected.png'
+        },
+        {
+          pagePath: 'pages/eileen-practice/index',
+          text: 'Playground',
         },
       ],
       color: '#ABBCDA',
