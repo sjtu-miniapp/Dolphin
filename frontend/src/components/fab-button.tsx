@@ -3,10 +3,16 @@ import { View } from '@tarojs/components'
 import { AtFab, AtIcon } from 'taro-ui'
 import './fab-button.scss';
 
-const FabButton: FC = () => {
+interface AtFabProps {
+  onClick?: () => void;
+}
+
+const FabButton: FC<AtFabProps> = props => {
+  const onClick = props.onClick || (() => { });
+
   return (
     <View className='button'>
-      <AtFab onClick={() => { }} size='small'>
+      <AtFab onClick={onClick} size='small'>
         <AtIcon className='at-fab__icon at-icon at-icon-add' value='add' ></AtIcon>
       </AtFab>
     </View>
@@ -14,7 +20,7 @@ const FabButton: FC = () => {
 }
 
 FabButton.defaultProps = {
-  tasks: []
+  onClick: () => { }
 }
 
 export default FabButton;

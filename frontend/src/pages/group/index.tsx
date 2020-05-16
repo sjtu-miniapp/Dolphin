@@ -2,13 +2,14 @@ import Taro, { FC, useState, useEffect } from '@tarojs/taro'
 import { View, ScrollView } from '@tarojs/components'
 
 import { Group, Task } from 'src/types';
-import { getGroupsByUser } from '../../apis/groups';
+import * as groupAPI from '../../apis/groups';
 import { getTasksByGroup } from '../../apis/tasks';
 
 import GroupView from './group';
 import TaskView from './task';
 import { GroupProps, ViewStatus } from './interface'
 import FabButton from '../../components/fab-button';
+import GroupModal from '../../components/group-modal';
 
 const GroupPage: FC<GroupProps> = _props => {
 
@@ -16,9 +17,11 @@ const GroupPage: FC<GroupProps> = _props => {
 
   const [groups, setGroups] = useState<Group[]>([]);
 
+  const [showModal, setShowModal] = useState<boolean>(false);
+
   const updateGroups = async () => {
     try {
-      const newGroups = await getGroupsByUser();
+      const newGroups = await groupAPI.getGroupsByUser();
       setGroups(newGroups);
     } catch (error) {
       // TODO: remote data error handling
@@ -67,11 +70,21 @@ const GroupPage: FC<GroupProps> = _props => {
 
   const groupViewClassName = viewStatus === 'Full' ? 'at-col at-col-12' : 'at-col at-col-2';
 
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
+
+  const addGroup = async (groupName: string) => {
+    setShowModal(false);
+    await groupAPI.addGroup(groupName);
+    await updateGroups();
+  }
+
   return (
     <View className='at-row'>
       <View className={groupViewClassName}>
         <GroupView groups={groups} viewStatus={viewStatus} onClickGroup={onSelectGroup} seletectGroup={selectedGroup} />
-        <FabButton />
+        <FabButton onClick={openModal} />
+        <GroupModal isOpened={showModal} handleCancel={closeModal} handleClose={closeModal} handleConfirm={addGroup} />
       </View>
       <ScrollView
         style={{ whiteSpace: 'nowrap' }}
