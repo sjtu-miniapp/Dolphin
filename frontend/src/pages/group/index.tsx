@@ -12,15 +12,19 @@ import GroupModal from '../../components/group-modal';
 
 import FullGroupView from './full-group';
 import TaskView from './task';
-import { GroupProps, ViewStatus } from './interface'
+import { ViewStatus } from './interface'
 
-const GroupPage: FC<GroupProps> = _props => {
+const GroupPage: FC = () => {
 
   const [viewStatus, setViewStatus] = useState<ViewStatus>('Full');
 
   const [groups, setGroups] = useState<Group[]>([]);
 
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(undefined);
+
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const updateGroups = async () => {
     try {
@@ -35,10 +39,6 @@ const GroupPage: FC<GroupProps> = _props => {
   useEffect(() => {
     updateGroups();
   }, []);
-
-  const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(undefined);
-
-  const [tasks, setTasks] = useState<Task[]>([]);
 
   const updateTasks = async () => {
     try {
@@ -63,19 +63,15 @@ const GroupPage: FC<GroupProps> = _props => {
       return;
     }
 
-    setViewStatus('Short');
     setSelectedGroup(targetGroup);
-  }
-
-  const onSelectTask = (taskID: string) => {
-    console.log('todo: trigger task selection', taskID);
+    setViewStatus('Short');
   }
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
   const addGroup = async (groupName: string) => {
-    setShowModal(false);
+    closeModal();
     await groupAPI.addGroup(groupName);
     await updateGroups();
   }
@@ -118,7 +114,6 @@ const GroupPage: FC<GroupProps> = _props => {
             <View className='at-col'>
               <TaskView
                 tasks={tasks}
-                onClickTask={onSelectTask}
                 selectedGroupName={selectedGroup && selectedGroup.name}
               />
             </View>

@@ -1,4 +1,4 @@
-import Taro, { FC, useState } from '@tarojs/taro';
+import Taro, { FC, useState, useEffect } from '@tarojs/taro';
 import { AtModal, AtModalHeader, AtModalAction, AtModalContent, AtInput } from 'taro-ui';
 import { Button } from '@tarojs/components';
 
@@ -12,13 +12,19 @@ interface GroupModalProps {
 const GroupModal: FC<GroupModalProps> = props => {
   const [inputValue, setInputValue] = useState<string>('');
 
+  useEffect(() => {
+    setInputValue('');
+  }, []);
+
   const updateInputValue = (v: string, _e: any) => {
     setInputValue(v);
   }
 
   const onTriggerConfirm = () => {
     if (!inputValue) return;
-    props.handleConfirm(inputValue);
+    const value = inputValue;
+    setInputValue('');
+    props.handleConfirm(value);
   }
 
   return (

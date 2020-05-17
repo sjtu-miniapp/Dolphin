@@ -18,7 +18,6 @@ const TaskView: FC<TaskViewProps> = props => {
 TaskView.defaultProps = {
   tasks: [],
   selectedGroupName: undefined,
-  onClickTask: () => { }
 }
 
 export default TaskView;

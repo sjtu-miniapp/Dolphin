@@ -31,7 +31,6 @@ class App extends Component {
       'pages/group/index',
       'pages/kanban/index',
       'pages/task/index',
-      'pages/eileen-practice/index',
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -52,10 +51,6 @@ class App extends Component {
           text: '看板',
           iconPath: './images/icon/kanban-unselected.png',
           selectedIconPath: './images/icon/kanban-selected.png'
-        },
-        {
-          pagePath: 'pages/eileen-practice/index',
-          text: 'Playground',
         },
       ],
       color: '#ABBCDA',
