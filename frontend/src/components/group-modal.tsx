@@ -25,7 +25,15 @@ const GroupModal: FC<GroupModalProps> = props => {
     <AtModal isOpened={props.isOpened} onClose={props.handleClose}>
       <AtModalHeader>创建小组</AtModalHeader>
       <AtModalContent>
-        <AtInput name='groupName' title='组名' type='text' maxLength={20} placeholder='请输入小组名' value={inputValue} onChange={updateInputValue} />
+        <AtInput
+          name='groupNameInput'
+          title='组名'
+          type='text'
+          maxLength={20}
+          value={inputValue}
+          onChange={updateInputValue}
+          required
+        />
       </AtModalContent>
       <AtModalAction> <Button onClick={props.handleCancel}>取消</Button> <Button onClick={onTriggerConfirm}>确定</Button> </AtModalAction>
     </AtModal>

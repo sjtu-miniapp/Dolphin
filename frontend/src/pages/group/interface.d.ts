@@ -8,15 +8,21 @@ export interface GroupState {
 
 export type ViewStatus = "Full" | "Short";
 
-export interface GroupViewProps {
-  groups: Group[];
-  viewStatus: ViewStatus;
-  onClickGroup: (groupID: string) => void;
-  seletectGroup?: Group;
-}
-
 export interface TaskViewProps {
   tasks: Task[];
   onClickTask: (taskID: string) => void;
   selectedGroupName?: string;
+}
+
+export interface FullGroupViewProps {
+  groups: Group[];
+  onClickGroup: (groupID: string) => void;
+}
+
+export interface GroupTaskViewProps {
+  groups: Group[];
+  onClickGroup: (groupID: string) => void;
+  selectedGroup?: Group;
+  tasks: Task[];
+  onClickTask: (taskID: string) => void;
 }

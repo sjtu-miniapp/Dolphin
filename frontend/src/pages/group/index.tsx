@@ -1,15 +1,18 @@
 import Taro, { FC, useState, useEffect } from '@tarojs/taro'
-import { View, ScrollView } from '@tarojs/components'
+import { View, Swiper, SwiperItem } from '@tarojs/components';
+import { BaseEventOrig } from '@tarojs/components/types/common';
+import { SwiperProps } from '@tarojs/components/types/Swiper';
+import { AtAvatar } from 'taro-ui';
 
-import { Group, Task } from 'src/types';
+import { Group, Task } from '../../types';
 import * as groupAPI from '../../apis/groups';
 import { getTasksByGroup } from '../../apis/tasks';
-
-import GroupView from './group';
-import TaskView from './task';
-import { GroupProps, ViewStatus } from './interface'
 import FabButton from '../../components/fab-button';
 import GroupModal from '../../components/group-modal';
+
+import FullGroupView from './full-group';
+import TaskView from './task';
+import { GroupProps, ViewStatus } from './interface'
 
 const GroupPage: FC<GroupProps> = _props => {
 
@@ -68,8 +71,6 @@ const GroupPage: FC<GroupProps> = _props => {
     console.log('todo: trigger task selection', taskID);
   }
 
-  const groupViewClassName = viewStatus === 'Full' ? 'at-col at-col-12' : 'at-col at-col-2';
-
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -79,29 +80,53 @@ const GroupPage: FC<GroupProps> = _props => {
     await updateGroups();
   }
 
+  const handleSwipe = (e: BaseEventOrig<SwiperProps.onChangeEventDeatil>) => {
+    showModal === true && closeModal();
+    const { current } = e.detail;
+    if (current === 0) setViewStatus('Full');
+    else setViewStatus('Short');
+  }
+
   return (
-    <View className='at-row'>
-      <View className={groupViewClassName}>
-        <GroupView groups={groups} viewStatus={viewStatus} onClickGroup={onSelectGroup} seletectGroup={selectedGroup} />
-        <FabButton onClick={openModal} />
-        <GroupModal isOpened={showModal} handleCancel={closeModal} handleClose={closeModal} handleConfirm={addGroup} />
-      </View>
-      <ScrollView
-        style={{ whiteSpace: 'nowrap' }}
-        scrollX
-        scrollLeft={0}
-        scrollWithAnimation
-        onScrollToLower={() => setViewStatus('Full')}
+    <View>
+      <Swiper
+        current={viewStatus === 'Full' ? 0 : 1}
+        style={{ width: '100vh', height: '100vh' }}
+        onAnimationFinish={handleSwipe}
+        skipHiddenItemLayout={true}
       >
-        {viewStatus === 'Full'
-          ? <View />
-          : <TaskView
-            tasks={tasks}
-            onClickTask={onSelectTask}
-            selectedGroupName={selectedGroup && selectedGroup.name}
-          />
-        }
-      </ScrollView>
+        <SwiperItem>
+          <FullGroupView groups={groups} onClickGroup={onSelectGroup} />
+        </SwiperItem>
+        <SwiperItem>
+          <View className='at-row' >
+            <View className='at-col-1' style={{ marginRight: '20px' }}>
+              {groups.map(g => {
+                const { name, id } = g;
+                const style = name === (selectedGroup && selectedGroup.name) ? { backgroundColor: '#78A4FA' } : {};
+                return (
+                  <View onClick={() => onSelectGroup(id)} style={{ marginLeft: '8px', marginBottom: '20px' }}>
+                    <AtAvatar
+                      customStyle={style}
+                      circle
+                      text={name}
+                    />
+                  </View>
+                );
+              })}
+            </View>
+            <View className='at-col'>
+              <TaskView
+                tasks={tasks}
+                onClickTask={onSelectTask}
+                selectedGroupName={selectedGroup && selectedGroup.name}
+              />
+            </View>
+          </View>
+        </SwiperItem>
+      </Swiper>
+      {viewStatus === 'Full' && <FabButton onClick={openModal} />}
+      <GroupModal isOpened={showModal} handleCancel={closeModal} handleClose={closeModal} handleConfirm={addGroup} />
     </View>
   )
 }
