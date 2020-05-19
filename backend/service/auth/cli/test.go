@@ -51,7 +51,7 @@ func main() {
 	_, err = auth.PutUser(context.Background(), &pb.PutUserRequest{
 		Openid: resp.Openid,
 		Name:   "hello",
-		Gender: "F",
+		Gender: 1,
 		Avatar: "world",
 	})
 	fmt.Println(err)

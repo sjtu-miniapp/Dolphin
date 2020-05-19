@@ -19,12 +19,12 @@ services:
       -listen-peer-urls http://0.0.0.0:2380
       -initial-cluster-state new
   micro-api:
-    command: --registry=etcd --registry_address=localhost:2379 api --handler=http
+    command: --registry=etcd --registry_address=${registry} api --handler=http
     image: microhq/micro:latest
     links:
       - etcd
   micro-web:
-    command: --registry=etcd --registry_address=localhost:2379 web
+    command: --registry=etcd --registry_address=${registry} web
     image: microhq/micro:latest
     links:
       - etcd

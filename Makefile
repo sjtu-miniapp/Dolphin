@@ -42,7 +42,7 @@ transfer:
 	@sshpass -p ${SERVER2_PASSWORD} rsync -za -e "ssh -p ${SERVER2_SSH}" . ${SERVER2_USER}@${SERVER2_IP}:~/dolphin
 	@echo "transfer to server2"
 	@#sshpass -p ${SERVER3_PASSWORD} scp -o StrictHostKeyChecking=no -P ${SERVER3_SSH} -rp * ${SERVER3_USER}@${SERVER3_IP}:~/dolphin
-	@sshpass -p ${SERVER3_PASSWORD} rsync -za -e "ssh -p 28092" . ${SERVER3_USER}@${SERVER3_IP}:~/dolphin
+	@sshpass -p ${SERVER3_PASSWORD} rsync -za -e "ssh -p ${SERVER3_SSH}" . ${SERVER3_USER}@${SERVER3_IP}:~/dolphin
 	@echo "transfer to server3"
 deploy:	build transfer
 	@sshpass -p ${SERVER1_PASSWORD} ssh -o StrictHostKeyChecking=no -P ${SERVER1_SSH} ${SERVER1_USER}@${SERVER1_IP} 'cd dolphin/scripts && ./setup.sh server'
