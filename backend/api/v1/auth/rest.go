@@ -47,6 +47,7 @@ func (s *Auth) OnLogin(c *gin.Context) {
 		c.JSON(400, fmt.Errorf("no code for query"))
 		return
 	}
+
 	response, err := srv.OnLogin(context.TODO(), &pb.OnLoginRequest{
 		Code: code,
 	})
@@ -92,6 +93,7 @@ func (s *Auth) AfterLogin(c *gin.Context) {
 		Openid: openid,
 		Sid:    sid,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -107,11 +109,14 @@ func (s *Auth) AfterLogin(c *gin.Context) {
 		Gender: int32(data.Gender),
 		Avatar: data.Avatar,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 	} else if resp.Err == 1 {
+		// not created
 		c.JSON(200, resp)
 	} else {
+		// created
 		c.JSON(201, resp)
 	}
 }
