@@ -55,7 +55,8 @@ func main() {
 		_ = service.Init()
 		srv = pb.NewGroupService("go.micro.srv.group", client.DefaultClient)
 		authSrv = auth.NewAuthService("go.micro.api.auth", client.DefaultClient)
-		base := "/api/" + cfg.Version
+		//base := "/api/" + cfg.Version
+		base := "/group"
 		router := Router(base)
 		service.Handle("/", router)
 	}

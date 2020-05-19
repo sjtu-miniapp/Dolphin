@@ -5,8 +5,6 @@ DROP DATABASE IF EXISTS `dolphin`;
 CREATE DATABASE `dolphin`;
 USE `dolphin`;
 
-# password not necessary
-# trigger insert after insert self group
 CREATE TABLE `user` (
     `id`  varchar(30) NOT NULL,
     `name` VARCHAR(10) NOT NULL,
