@@ -5,6 +5,7 @@ build
 .DS*
 .env
 cfg.yaml
+cfg-test.yaml
 cfg.json
 notes.md
 passwd.pkl

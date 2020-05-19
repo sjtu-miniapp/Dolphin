@@ -7,6 +7,7 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-plugins/registry/etcdv3"
 	"github.com/sjtu-miniapp/dolphin/service/auth/pb"
+	"github.com/sjtu-miniapp/dolphin/utils/parse"
 	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"os"
@@ -103,4 +104,35 @@ func TestMain(m *testing.M) {
 	setup()
 	code := m.Run()
 	os.Exit(code)
+}
+
+func main() {
+	var cfg Config
+	err := parse.LoadConfig(&cfg)
+	if err != nil {
+		return
+	}
+	reg := etcdv3.NewRegistry(func(op *registry.Options) {
+		op.Addrs = cfg.Registry
+	})
+	service := micro.NewService(
+		micro.Name("go.micro.cli.group"),
+		micro.Registry(reg),
+		micro.Flags(
+			&cli.StringFlag{
+				Name:  "cfg",
+				Usage: "location of config file",
+			},
+		),
+	)
+	service.Init()
+	group := pb.NewGroupService("go.micro.srv.group", service.Client())
+
+	rsp, err := group.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
+		UserId:    "andy",
+	})
+	fmt.Println(err, rsp)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

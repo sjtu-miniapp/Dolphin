@@ -23,7 +23,6 @@ build: clean
 		fi ; \
   		GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -o ../build/$${srv}-srv $${srv}/srv/main.go; \
   		GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -o ../build/$${srv}-api ../api/$${version}/$${srv}/main.go ../api/$${version}/$${srv}/rest.go; \
-  		GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -o ../build/$${srv}-cli $${srv}/cli/test.go; \
   		echo build $${srv}; \
   	done
 docker: build
