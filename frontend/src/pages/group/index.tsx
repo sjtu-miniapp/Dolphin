@@ -1,86 +1,133 @@
-import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Navigator, Image } from '@tarojs/components'
-import './index.scss'
+import Taro, { FC, useState, useEffect } from '@tarojs/taro'
+import { View, Swiper, SwiperItem } from '@tarojs/components';
+import { BaseEventOrig } from '@tarojs/components/types/common';
+import { SwiperProps } from '@tarojs/components/types/Swiper';
+import { AtAvatar } from 'taro-ui';
 
-const GENERAL_URL = 'https://pic.downk.cc/item/5ea99a46c2a9a83be5804922.png';
+import { Group, Task } from '../../types';
+import * as groupAPI from '../../apis/groups';
+import { getTasksByGroup } from '../../apis/tasks';
+import FabButton from '../../components/fab-button';
+import GroupModal from '../../components/group-modal';
 
-interface Group {
-  name: string;
-  taskNumber: number;
-  updateTime: Date;
-  picUrl?: string;
-}
+import FullGroupView from './full-group';
+import TaskView from './task';
+import { ViewStatus } from './interface'
 
-interface GroupProps { }
+const GroupPage: FC = () => {
 
-interface GroupState {
-  groups: Group[];
-}
+  const [viewStatus, setViewStatus] = useState<ViewStatus>('Full');
 
-export class Index extends Component<GroupProps, GroupState> {
+  const [groups, setGroups] = useState<Group[]>([]);
 
-  constructor(props: GroupProps) {
-    super(props);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-    this.state = {
-      groups: [
-        { name: '商业模式分析', taskNumber: 10, updateTime: new Date() },
-        { name: '宏观经济学', taskNumber: 1, updateTime: new Date() },
-        { name: '职业发展规划', taskNumber: 0, updateTime: new Date() },
-      ],
-    };
+  const [selectedGroup, setSelectedGroup] = useState<Group | undefined>(undefined);
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const updateGroups = async () => {
+    try {
+      const newGroups = await groupAPI.getGroupsByUser();
+      setGroups(newGroups);
+    } catch (error) {
+      // TODO: remote data error handling
+      console.error('Failed to update groups')
+    }
+  };
+
+  useEffect(() => {
+    updateGroups();
+  }, []);
+
+  const updateTasks = async () => {
+    try {
+      if (!selectedGroup) return;
+      const newTasks = await getTasksByGroup(selectedGroup.id);
+      setTasks(newTasks);
+    } catch (error) {
+      // TODO: remote data error handling
+      console.error('Failed to update groups')
+    }
+  };
+
+  useEffect(() => {
+    updateTasks();
+  }, [selectedGroup]);
+
+  const onSelectGroup = (groupID: string) => {
+    const targetGroup = groups.find(g => g.id === groupID);
+
+    if (!targetGroup) {
+      console.error('Invalid selection group');
+      return;
+    }
+
+    setSelectedGroup(targetGroup);
+    setViewStatus('Short');
   }
 
-  componentWillMount() { }
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
-  componentDidMount() { }
-
-  componentWillUnmount() { }
-
-  componentDidShow() { }
-
-  componentDidHide() { }
-
-  /**
-   * 指定config的类型声明为: Taro.Config
-   *
-   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
-   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
-   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
-   */
-  config: Config = {
-    navigationBarTitleText: '首页'
+  const addGroup = async (groupName: string) => {
+    closeModal();
+    await groupAPI.addGroup(groupName);
+    await updateGroups();
   }
 
-  render() {
-    const { groups } = this.state;
+  const handleSwipe = (e: BaseEventOrig<SwiperProps.onChangeEventDeatil>) => {
+    showModal === true && closeModal();
+    const { current } = e.detail;
+    if (current === 0) setViewStatus('Full');
+    else setViewStatus('Short');
+  }
 
-    return (
-      <View className='group'>
-        <View className='group_list'>
-          {
-            groups.map(item => (
-              <View className='item'>
-                <Navigator url={'/'}>
-                  <View className='left'>
-                    <View className='text'>
-                      <Text className='name'>{item.name}</Text>
-                      <Text className='count'>任务数: {item.taskNumber}</Text>
-                      <Text className='update'>上次更新: {item.updateTime.toLocaleDateString()}</Text>
-                    </View>
+  return (
+    <View>
+      <Swiper
+        current={viewStatus === 'Full' ? 0 : 1}
+        style={{ width: '100vh', height: '100vh' }}
+        onAnimationFinish={handleSwipe}
+        skipHiddenItemLayout={true}
+      >
+        <SwiperItem>
+          <FullGroupView groups={groups} onClickGroup={onSelectGroup} />
+        </SwiperItem>
+        <SwiperItem>
+          <View className='at-row' >
+            <View className='at-col-1' style={{ marginRight: '20px' }}>
+              {groups.map(g => {
+                const { name, id } = g;
+                const style = name === (selectedGroup && selectedGroup.name) ? { backgroundColor: '#78A4FA' } : {};
+                return (
+                  <View onClick={() => onSelectGroup(id)} style={{ marginLeft: '8px', marginBottom: '20px' }}>
+                    <AtAvatar
+                      customStyle={style}
+                      circle
+                      text={name}
+                    />
                   </View>
-                  <Image
-                    className='right'
-                    src={item.picUrl ? item.picUrl : GENERAL_URL}
-                    mode='scaleToFill'
-                    style={{ width: '132px', height: '99px', float: 'right', marginTop: '10px' }}
-                  ></Image>
-                </Navigator>
-              </View>
-            ))
-          }
-        </View>
-      </View>
-    )
-  }
+                );
+              })}
+            </View>
+            <View className='at-col'>
+              <TaskView
+                tasks={tasks}
+                selectedGroupName={selectedGroup && selectedGroup.name}
+              />
+            </View>
+          </View>
+        </SwiperItem>
+      </Swiper>
+      {viewStatus === 'Full' && <FabButton onClick={openModal} />}
+      <GroupModal isOpened={showModal} handleCancel={closeModal} handleClose={closeModal} handleConfirm={addGroup} />
+    </View>
+  )
 }
+
+GroupPage.config = {
+  navigationBarTitleText: '小组'
+};
+
+export default GroupPage;

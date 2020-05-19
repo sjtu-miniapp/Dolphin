@@ -1,11 +1,16 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View, Text, Input } from '@tarojs/components'
+import { AtCalendar } from 'taro-ui';
+
+import TaskList from '../../components/task-list';
+import { Task } from '../../types';
+import { SAMPLE_TASKS } from '../../apis/tasks'
 import './index.scss'
 
 interface KanbanProps { }
 
 interface KanbanState {
-  list: string[];
+  list: Task[];
   inputVal: string;
 }
 
@@ -15,11 +20,7 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
     super(props);
 
     this.state = {
-      list: [
-        'Get Up',
-        'Coding',
-        'Gu Gu Gu'
-      ],
+      list: SAMPLE_TASKS,
       inputVal: ''
     };
   }
@@ -52,8 +53,27 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
 
     if (inputVal === '') return;
 
+
+    const newTask: Task = {
+      id: new Date().toString(),
+      groupID: '2',
+      name: inputVal,
+      description: '',
+      startDate: new Date(),
+      endDate: new Date(),
+      readOnly: false,
+
+      receivers: [
+        { userName: "Bobo", status: "completed" },
+        { userName: "Biubiu", status: "in-progress" },
+        { userName: "Piupiu", status: "to-start" }
+      ],
+
+      status: ''
+    };
+
     this.setState({
-      list: list.concat(inputVal), inputVal: ''
+      list: list.concat(newTask), inputVal: ''
     });
   }
 
@@ -72,21 +92,10 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
 
     return (
       <View className='index'>
+        <AtCalendar />
         <Input className='input' type='text' value={inputVal} onInput={this.inputHandler} />
         <Text className='add' onClick={this.addTodo}>添加</Text>
-        <View className='list_wrap'>
-          <Text>Todo List</Text>
-          {
-            list.map((item, index) => {
-              return (
-                <View>
-                  <Text>{index + 1}.{item}</Text>
-                  <Text className='del' id={index.toString()} onClick={this.deleteTodo}>删除</Text>
-                </View>
-              )
-            })
-          }
-        </View>
+        <TaskList tasks={list} />
       </View>
     )
   }

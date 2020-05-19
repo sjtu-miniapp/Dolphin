@@ -12,3 +12,4 @@ redis.conf
 __pycache__
 *node_modules
 *dist
+*eileen-practice
