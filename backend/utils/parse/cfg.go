@@ -25,7 +25,7 @@ func LoadConfig(cfg interface{}) error {
 	flag.Parse()
 	err := ReadYamlFile(cfg, *cfgfile)
 	if err != nil {
-		log.Fatal("fail to parse the config file:", err)
+		log.Println("fail to parse the config file:", err)
 		return err
 	}
 	return nil

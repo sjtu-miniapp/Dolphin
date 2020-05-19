@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/micro/go-micro/util/log"
 	pb2 "github.com/sjtu-miniapp/dolphin/service/group/pb"
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
 	"strconv"
@@ -20,14 +21,17 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/task/:task_id/meta", task.GetTaskMeta)
-	g.GET("/task/:task_id/workers", task.GetTaskWorker)
-	g.GET("/task/:task_id", task.GetTask)
-	g.GET("/task/group/_id", task.GetTaskByGroup)
-	g.PUT("/task", task.CreateTask)
-	g.POST("/task/:task_id/meta", task.UpdateTaskMeta)
-	g.DELETE("/task/:task_id", task.DeleteTask)
-	g.POST("/task/:task_id", task.UpdateTask)
+	// add task_id only to avoid stupid conflicts from gin routers
+	// it could be group_id
+	g.GET("/:task_id/group", task.GetTaskByGroup)
+
+	g.GET("/:task_id/meta", task.GetTaskMeta)
+	g.GET("/:task_id/workers", task.GetTaskWorker)
+	g.GET("/:task_id/content", task.GetTask)
+	g.PUT("", task.CreateTask)
+	g.POST("/:task_id/meta", task.UpdateTaskMeta)
+	g.POST("/:task_id", task.UpdateTask)
+	g.DELETE("/:task_id", task.DeleteTask)
 	router.Use(cors.Default())
 	return router
 }
@@ -41,21 +45,36 @@ func checkAuth(c *gin.Context) error {
 			Sid:    sid,
 		},
 	)
-	if err != nil || !res.Ok {
+	if err != nil {
+		return err
+	}
+	if !res.Ok {
 		return fmt.Errorf("auth check fail")
 	}
 	return nil
 }
 
 func inTask(userId string, taskId uint32) bool {
-	resp, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
+
+	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
+		Id:                   taskId,
+	})
+	if err != nil || resp.Meta == nil {
+		return false
+	}
+	if resp.Meta.PublisherId == userId {
+		return true
+	}
+
+	resp2, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
 		UserId: userId,
 		TaskId: taskId,
 	})
-	if err != nil || !resp.Ok {
+	if err != nil {
+		log.Error(err)
 		return false
 	}
-	return true
+	return resp2.Ok
 }
 
 /*
@@ -86,7 +105,7 @@ func inTask(userId string, taskId uint32) bool {
 func (t Task) GetTaskMeta(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 
@@ -96,6 +115,10 @@ func (t Task) GetTaskMeta(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+	if !inTask(openid, uint32(id)) {
+		c.JSON(403, "not allowed")
+	}
+
 	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
 		Id: uint32(id),
 	})
@@ -103,11 +126,8 @@ func (t Task) GetTaskMeta(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
-	if inTask(openid, uint32(id)) {
-		c.JSON(200, resp)
-	} else {
-		c.JSON(403, "not allowed")
-	}
+
+	c.JSON(200, resp.Meta)
 }
 
 /*
@@ -128,7 +148,7 @@ func (t Task) GetTaskMeta(c *gin.Context) {
 func (t Task) GetTaskWorker(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -171,17 +191,17 @@ func (t Task) GetTask(c *gin.Context) {
 		c.JSON(401, "auth check fail")
 		return
 	}
-	panic("implement me")
+	c.JSON(555, "NOT IMPLEMENTED YET!!!!")
 }
 
 /*
 # Get tasks by groupID
-- route: /task/group
+// actually it's task_id described in router
+- route: /task/:group_id/group
 - method: GET
 - request params:
     - openid string
     - sid string
-    - group_id int
 - response data:
     - task []Task # meta
 - response status:
@@ -193,23 +213,28 @@ func (t Task) GetTask(c *gin.Context) {
 func (t Task) GetTaskByGroup(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
-	groupId, err := strconv.Atoi(c.Query("group_id"))
+	groupId, err := strconv.Atoi(c.Param("task_id"))
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	if resp, err := groupSrv.UserInGroup(context.TODO(), &pb2.UserInGroupRequest{
+	resp, err := groupSrv.UserInGroup(context.TODO(), &pb2.UserInGroupRequest{
 		UserId:  openid,
 		GroupId: uint32(groupId),
-	}); err != nil || !resp.Ok {
-		c.JSON(403, "not allowed")
+	})
+	if err != nil {
+		c.JSON(403, err)
 		return
 	}
 
+	if !resp.Ok {
+		c.JSON(403, "not allowed")
+		return
+	}
 	resp2, err := srv.GetTaskMetaByGroupId(context.TODO(), &pb.GetTaskMetaByGroupIdRequest{
 		GroupId: uint32(groupId),
 	})
@@ -272,6 +297,20 @@ func (t Task) CreateTask(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+	for _, v := range data.UserIds {
+		rsp, err := groupSrv.UserInGroup(context.Background(), &pb2.UserInGroupRequest{
+			UserId:               v,
+			GroupId:              uint32(data.GroupId),
+		})
+		if err != nil {
+			c.JSON(500, err)
+			return
+		}
+		if !rsp.Ok {
+			c.JSON(400, "user not in group")
+			return
+		}
+	}
 
 	openid := c.Query("openid")
 	resp, err := srv.CreateTask(context.TODO(), &pb.CreateTaskRequest{
@@ -286,10 +325,12 @@ func (t Task) CreateTask(c *gin.Context) {
 		Description: data.Description,
 		PublisherId: openid,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
 	}
+
 	c.JSON(201, resp.Id)
 }
 
@@ -318,7 +359,7 @@ func (t Task) CreateTask(c *gin.Context) {
 func (t Task) UpdateTaskMeta(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -327,10 +368,12 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+
 	if !inTask(openid, uint32(id)) {
 		c.JSON(403, "not allowed")
 		return
 	}
+
 	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
 		Id: uint32(id),
 	})
@@ -338,10 +381,16 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
+	if resp.Meta == nil {
+		c.JSON(400, "no task found")
+		return
+	}
+
 	if resp.Meta.Readonly && resp.Meta.PublisherId != openid {
 		c.JSON(403, "not allowed")
 		return
 	}
+
 	var data struct {
 		GroupId     int      `json:"group_id"`
 		Name        *string   `json:"name"`
@@ -350,6 +399,7 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		Description *string   `json:"description, omitempty"`
 		Readonly 	*bool `json:"readonly"`
 	}
+
 	err = c.BindJSON(&data)
 	if err != nil {
 		c.JSON(400, err)
@@ -409,22 +459,26 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 func (t Task) DeleteTask(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
+
 	id, err := strconv.Atoi(c.Param("task_id"))
 	if err != nil {
-		c.JSON(403, err)
+		c.JSON(400, err)
 		return
 	}
+	// FIXME: MAYBE DON'T ALLOW MEMBERS TO DELETE TASK
 	if !inTask(openid, uint32(id)) {
 		c.JSON(403, "not allowed")
 		return
 	}
+
 	_, err = srv.DeleteTask(context.TODO(), &pb.DeleteTaskRequest{
 		Id:                   uint32(id),
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -448,6 +502,5 @@ func (t Task) UpdateTask(c *gin.Context) {
 		return
 	}
 	//openid := c.Query("openid")
-
-	panic("implement me")
+	c.JSON(555, "NOT IMPLMENTED YET!")
 }

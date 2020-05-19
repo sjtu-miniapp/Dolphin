@@ -6,13 +6,13 @@ CREATE DATABASE `dolphin`;
 USE `dolphin`;
 
 CREATE TABLE `user` (
-    `id`  varchar(30) NOT NULL,
-    `name` VARCHAR(10) NOT NULL,
+    `id`  VARCHAR(30) NOT NULL,
+    `name` VARCHAR(20) NOT NULL,
     # 0: F, 1: M
     `gender` TINYINT(1),
     `avatar` VARCHAR(100),
 # not exposed to clients
-    `self_group_id` BIGINT(20),
+    `self_group_id` BIGINT(32),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`self_group_id`) REFERENCES `group`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) DEFAULT CHARSET=utf8;
@@ -22,23 +22,23 @@ CREATE TABLE `user` (
 # but the self group relationship is not included here
 CREATE TABLE `user_group` (
     `user_id` VARCHAR(30) NOT NULL,
-    `group_id` BIGINT(16) NOT NULL,
+    `group_id` BIGINT(32) NOT NULL,
     PRIMARY KEY (`user_id`, `group_id`),
-    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`group_id`) REFERENCES `group`(`id`) ON DELETE CASCADE
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`group_id`) REFERENCES `group`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) DEFAULT CHARSET=utf8;
 
 # when insert check whether the same user
 CREATE TABLE `group` (
-    `id` BIGINT(16) AUTO_INCREMENT,
-    `name` VARCHAR(10) DEFAULT "",
+    `id` BIGINT(32) AUTO_INCREMENT NOT NULL,
+    `name` VARCHAR(20) DEFAULT "",
 # also used for self group
     `creator_id` VARCHAR(30) NOT NULL,
     # 0: GROUP, 1: INIDVIDUAL
-    `type` TINYINT(1) DEFAULT 0,
+    `type` TINYINT(1) DEFAULT 0 NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE (`name`, `creator_id`),
-    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) DEFAULT CHARSET=utf8;
 
 # contents would be stored in other db
@@ -46,40 +46,39 @@ CREATE TABLE `group` (
 # assert(start_date <= end_date)
 # assert(leader_id in task worker)
 CREATE TABLE `task` (
-    `id` BIGINT(16) NOT NULL AUTO_INCREMENT,
-    `group_id` BIGINT(16) NOT NULL,
+    `id` BIGINT(32) NOT NULL AUTO_INCREMENT,
+    `group_id` BIGINT(32) NOT NULL,
     `name` VARCHAR(20) DEFAULT "",
     `publisher_id` VARCHAR(30) NOT NULL,
     # only for group work
     `leader_id` VARCHAR(30),
     # 2020-02-02
-    `start_date` DATE DEFAULT NULL,
-    `end_date` DATE DEFAULT NULL,
+    `start_date` DATE,
+    `end_date` DATE,
     # if readonly, only the publisher can revise the task
     `readonly` BOOL DEFAULT FALSE NOT NULL,
     # 0: group, 1: individuaL;
-    `type` TINYINT(1) DEFAULT 0,
+    `type` TINYINT(1) DEFAULT 0 NOT NULL,
     `description` VARCHAR(255) DEFAULT "",
     # the task is closed
     `done` BOOL DEFAULT FALSE  NOT NULL,
-    CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),
-    UNIQUE INDEX (`group_id`, `name`),
-    FOREIGN KEY (`publisher_id`, `group_id`) REFERENCES `user_group`(`user_id`, `group_id`) ON DELETE CASCADE,
-    FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`leader_id`) references `user`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`publisher_id`) references `user`(`id`) ON DELETE CASCADE
+    UNIQUE (`group_id`, `name`),
+    FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`leader_id`) references `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`publisher_id`) references `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) DEFAULT CHARSET=utf8;
 
-CREATE TABLE `task_user` (
-    `task_id` BIGINT(16) NOT NULL,
+CREATE TABLE `user_task` (
     `user_id` VARCHAR(30) NOT NULL,
+    `task_id` BIGINT(32) NOT NULL,
     `done` BOOL DEFAULT FALSE NOT NULL,
     # YYYY-MM-DD hh:mm:ss
-    `done_time` DATETIME DEFAULT NULL,
+    `done_time` DATETIME,
     PRIMARY KEY (`task_id`, `user_id`),
-    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE
-);
+    FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+)DEFAULT CHARSET=utf8;
 
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -19,11 +19,12 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/group/:group_id", group.GetGroup)
-	g.GET("/group/user/_id", group.GetGroupByUser)
-	g.PUT("/group", group.CreateGroup)
-	g.POST("/group/:group_id", group.UpdateGroup)
-	g.DELETE("/group/:group_id", group.DeleteGroup)
+	g.GET("/:group_id", group.GetGroup)
+	// actually user_id
+	g.GET("", group.GetGroupByUser)
+	g.PUT("", group.CreateGroup)
+	g.POST("/:group_id", group.UpdateGroup)
+	g.DELETE("/:group_id", group.DeleteGroup)
 
 	router.Use(cors.Default())
 	return router
@@ -31,14 +32,15 @@ func Router(base string) *gin.Engine {
 
 func inGroup(userId string, groupId uint32) bool {
 	resp, err := srv.UserInGroup(context.TODO(), &pb.UserInGroupRequest{
-		UserId:               userId,
-		GroupId:              groupId,
+		UserId:  userId,
+		GroupId: groupId,
 	})
 	if err != nil || !resp.Ok {
 		return false
 	}
 	return true
 }
+
 func checkAuth(c *gin.Context) error {
 	openid := c.Query("openid")
 	sid := c.Query("sid")
@@ -48,7 +50,9 @@ func checkAuth(c *gin.Context) error {
 			Sid:    sid,
 		},
 	)
-	if err != nil || !res.Ok {
+	if err != nil {
+		return err
+	} else if !res.Ok {
 		return fmt.Errorf("auth check fail")
 	}
 	return nil
@@ -71,7 +75,7 @@ func checkAuth(c *gin.Context) error {
 func (g Group) GetGroup(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -80,21 +84,18 @@ func (g Group) GetGroup(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+	if !inGroup(openid, uint32(groupId)) {
+		c.JSON(403, "user is not in the group")
+		return
+	}
 	resp, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
 		Id: uint32(groupId),
 	})
-
 	if err != nil {
 		c.JSON(500, err)
 		return
 	}
-	for _, user := range resp.Users {
-		if user.Id == openid {
-			c.JSON(200, resp)
-		}
-	}
-	c.JSON(403, "user is not in the group")
-
+	c.JSON(200, resp)
 }
 
 /*
@@ -115,7 +116,7 @@ func (g Group) GetGroup(c *gin.Context) {
 func (g Group) GetGroupByUser(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -149,7 +150,7 @@ func (g Group) GetGroupByUser(c *gin.Context) {
 func (g Group) CreateGroup(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -201,7 +202,7 @@ func (g Group) CreateGroup(c *gin.Context) {
 func (g Group) UpdateGroup(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -210,14 +211,14 @@ func (g Group) UpdateGroup(c *gin.Context) {
 		Name string `json:"name"`
 	}
 	err = c.BindJSON(&data)
-	if err != nil || openid == "" {
+	if err != nil {
 		c.JSON(400, err)
 		return
 	}
 
 	flag := inGroup(openid, data.Id)
 	if !flag {
-		c.JSON(403, "not allowed")
+		c.JSON(403, "user not in group")
 		return
 	}
 
@@ -225,6 +226,7 @@ func (g Group) UpdateGroup(c *gin.Context) {
 		Id:   data.Id,
 		Name: data.Name,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -250,7 +252,7 @@ func (g Group) UpdateGroup(c *gin.Context) {
 func (g Group) DeleteGroup(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
-		c.JSON(401, "auth check fail")
+		c.JSON(401, err)
 		return
 	}
 	openid := c.Query("openid")
@@ -258,21 +260,26 @@ func (g Group) DeleteGroup(c *gin.Context) {
 		Id uint32 `json:"id"`
 	}
 	err = c.BindJSON(&data)
-	if err != nil || openid == "" {
+	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	if r, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
-		Id:                   data.Id,
-	}); err != nil || r.CreatorId != openid {
-		c.JSON(403, "not allowed")
+	r, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
+		Id: data.Id,
+	})
+	if err != nil {
+		c.JSON(403, err)
 		return
 	}
+	if r.CreatorId != openid {
+		c.JSON(403, "not allowed")
+	}
+
 	_, err = srv.DeleteGroup(context.TODO(), &pb.DeleteGroupRequest{
 		Id: data.Id,
 	})
 	if err != nil {
 		c.JSON(500, err)
 	}
-	c.JSON(201, "")
+	c.JSON(201, "deleted")
 }

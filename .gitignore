@@ -5,6 +5,7 @@ build
 .DS*
 .env
 cfg.yaml
+cfg-test.yaml
 cfg.json
 notes.md
 passwd.pkl
@@ -13,3 +14,5 @@ __pycache__
 *node_modules
 *dist
 *eileen-practice
+infra*
+nginx-micro.conf

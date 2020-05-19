@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
+	"log"
+	"time"
 )
 
 type Task struct {
@@ -20,9 +22,12 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 	}
 	var sd sql.NullString
 	var ed sql.NullString
+	var ld sql.NullString
 	if rows.Next() {
-		err = rows.Scan(&response.Meta.Name, &response.Meta.Type, &response.Meta.Done, &response.Meta.GroupId, &response.Meta.PublisherId,
-			&response.Meta.LeaderId, &sd, &ed, &response.Meta.Readonly, &response.Meta.Description,
+		response.Meta = new(pb.TaskMeta)
+		err = rows.Scan(&response.Meta.Name, &response.Meta.Type,
+			&response.Meta.Done, &response.Meta.GroupId, &response.Meta.PublisherId,
+			&ld, &sd, &ed, &response.Meta.Readonly, &response.Meta.Description,
 		)
 		if sd.Valid {
 			response.Meta.StartDate = sd.String
@@ -30,16 +35,21 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 		if ed.Valid {
 			response.Meta.EndDate = ed.String
 		}
+		if ld.Valid {
+			response.Meta.LeaderId = ld.String
+		}
 		if err != nil {
 			return err
 		}
+	} else {
+		return fmt.Errorf("no task found")
 	}
 	return nil
 }
 
 func (g Task) GetTaskPeolple(ctx context.Context, request *pb.GetTaskPeopleRequset, response *pb.GetTaskPeopleResponse) error {
 	db := g.SqlDb
-	rows, err := db.QueryContext(ctx, "SELECT `user_id`, `name`, `done`, `done_time` FROM `task_user` JOIN `user` ON `user_id`=`id` WHERE `task_id`=?", request.Id)
+	rows, err := db.QueryContext(ctx, "SELECT `user_id`, `name`, `done`, `done_time` FROM `user_task` JOIN `user` ON `user_id`=`id` WHERE `task_id`=?", request.Id)
 	if err != nil {
 		return err
 	}
@@ -68,7 +78,8 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 		meta := new(pb.TaskMeta)
 		var sd sql.NullString
 		var ed sql.NullString
-		err = rows.Scan(&meta.Type, &meta.PublisherId, &meta.LeaderId, &meta.Readonly,
+		var ld sql.NullString
+		err = rows.Scan(&meta.Type, &meta.PublisherId, &ld, &meta.Readonly,
 			&meta.Description, &sd, &ed, &meta.Name, &meta.Done)
 		if err != nil {
 			return err
@@ -76,9 +87,26 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 		meta.GroupId = request.GroupId
 		if sd.Valid {
 			meta.StartDate = sd.String
-		}
-		if ed.Valid {
+			if !ed.Valid {
+				return fmt.Errorf("wrong date format")
+			}
 			meta.EndDate = ed.String
+			t1, err := time.Parse("2006-01-02", sd.String)
+			if err != nil {
+				return err
+			}
+			t2, err := time.Parse("2006-01-02", sd.String)
+			if err != nil {
+				return err
+			}
+			if t1.After(t2) {
+				return fmt.Errorf("start date after end date")
+			}
+		} else if ed.Valid {
+			return fmt.Errorf("wrong date format")
+		}
+		if ld.Valid {
+			meta.LeaderId = ld.String
 		}
 		response.Metas = append(response.Metas, meta)
 	}
@@ -119,7 +147,7 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 		}()
 		var str string
 		if request.StartDate != "" {
-			str := fmt.Sprintf("`start_date` = '%s', `end_date` = '%s'", request.StartDate, request.EndDate)
+			str = fmt.Sprintf("`start_date` = '%s', `end_date` = '%s'", request.StartDate, request.EndDate)
 			if request.LeaderId != "" {
 				str += fmt.Sprintf(", `leader_id` = '%s'", request.LeaderId)
 			}
@@ -130,6 +158,7 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 			return
 		}
 		sql1 := fmt.Sprintf("UPDATE `task` SET %s WHERE `id` = %d", str, id)
+		log.Println(sql1)
 		_, err = db.ExecContext(ctx, sql1)
 	}()
 	if <-errChan != nil {
@@ -145,8 +174,23 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 func (g Task) UpdateTaskMeta(ctx context.Context, request *pb.UpdateTaskMetaRequest, response *pb.UpdateTaskMetaResponse) error {
 	db := g.SqlDb
 	str := ""
-	if request.StartDate != "" {
+	if request.StartDate != "" && request.EndDate != "" {
+		t1, err := time.Parse("2006-01-02", request.StartDate)
+		if err != nil {
+			log.Println(err)
+			return fmt.Errorf("wrong date format")
+		}
+		t2, err := time.Parse("2006-01-02", request.EndDate)
+		if err != nil {
+			log.Println(err)
+			return fmt.Errorf("wrong date format")
+		}
+		if t1.After(t2) {
+			return fmt.Errorf("start date after end date")
+		}
 		str = fmt.Sprintf(", `start_date` = '%s', `end_date` = '%s'", request.StartDate, request.EndDate)
+	} else if request.EndDate != "" || request.StartDate != "" {
+		return fmt.Errorf("date date date")
 	}
 	_, err := db.ExecContext(ctx, "UPDATE `task` SET `description` = ?, `readonly` = ?, `name` = ?"+ str + " WHERE `id` = ?",
 		request.Description, request.Readonly, request.Name, request.Id)
@@ -161,7 +205,7 @@ func (g Task) DeleteTask(ctx context.Context, request *pb.DeleteTaskRequest, res
 
 func (g Task) UserInTask(ctx context.Context, request *pb.UserInTaskRequest, response *pb.UserInTaskResponse) error {
 	db := g.SqlDb
-	rows, err := db.QueryContext(ctx, "SELECT * FROM `task_user` WHERE `task_id` = ? and `user_id` = ?", request.TaskId, request.UserId)
+	rows, err := db.QueryContext(ctx, "SELECT * FROM `user_task` WHERE `task_id` = ? AND `user_id` = ?", request.TaskId, request.UserId)
 	if err != nil {
 		response.Ok = false
 		return err

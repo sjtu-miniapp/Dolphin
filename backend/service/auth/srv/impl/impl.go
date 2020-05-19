@@ -4,7 +4,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/json"
+	"github.com/prometheus/common/log"
 	"github.com/sjtu-miniapp/dolphin/service/database"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+
 	//"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
@@ -39,67 +45,68 @@ type User struct {
 // acquire for session_key
 func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response *pb.OnLoginResponse) error {
 	// for test
-	openid, skey := request.Code, ""
-	sbyte := sha256.Sum256([]byte(openid + skey))
-	sid := fmt.Sprintf("%x", sbyte)
-
-	go func() {
-		_ = database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
-	}()
-	response.Openid = openid
-	response.Sid = sid
-	return nil
-
-	//
-	//type auth2SessionResponse struct {
-	//	Openid     string `json:"openid"`
-	//	SessionKey string `json:"session_key"`
-	//	UnionId    string `json:"unionid"`
-	//	Errcode    int    `json:"errcode"`
-	//	Errormsg   string `json:"errmsg"`
-	//}
-	//loginUrl := "https://api.weixin.qq.com/sns/jscode2session?appid=" +
-	//	url.QueryEscape(a.AppId) +
-	//	"&secret=" + url.QueryEscape(a.AppSecret) +
-	//	"&js_code=" + url.QueryEscape(request.Code) +
-	//	"&grant_type=authorization_code"
-	//httpClient := http.DefaultClient
-	//httpClient.Timeout = time.Second * 3
-	//httpResp, err := httpClient.Get(loginUrl)
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//defer httpResp.Body.Close()
-	//if httpResp.StatusCode != http.StatusOK {
-	//	return fmt.Errorf("http.Status got from wx server: %s", httpResp.Status)
-	//}
-	//
-	//body, err := ioutil.ReadAll(httpResp.Body)
-	//if err != nil {
-	//	return err
-	//}
-	//var p auth2SessionResponse
-	//err = json.Unmarshal(body, &p)
-	//if err != nil {
-	//	return err
-	//}
-	//if p.Errcode != 0 {
-	//	err = fmt.Errorf(p.Errormsg)
-	//	return err
-	//}
-	//
-	//// generate unidirectly sid from openid and session_key, store {sid: {sessionkey: ..., openid:...}}
-	//// to redis and set the time to expire
-	//openid, skey := p.Openid, p.SessionKey
+	//openid, skey := request.Code, ""
 	//sbyte := sha256.Sum256([]byte(openid + skey))
 	//sid := fmt.Sprintf("%x", sbyte)
+	//
 	//go func() {
-	//	err = database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
+	//	_ = database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
 	//}()
 	//response.Openid = openid
 	//response.Sid = sid
-	//return err
+	//return nil
+
+
+	type auth2SessionResponse struct {
+		Openid     string `json:"openid"`
+		SessionKey string `json:"session_key"`
+		UnionId    string `json:"unionid"`
+		Errcode    int    `json:"errcode"`
+		Errormsg   string `json:"errmsg"`
+	}
+	loginUrl := "https://api.weixin.qq.com/sns/jscode2session?appid=" +
+		url.QueryEscape(a.AppId) +
+		"&secret=" + url.QueryEscape(a.AppSecret) +
+		"&js_code=" + url.QueryEscape(request.Code) +
+		"&grant_type=authorization_code"
+	httpClient := http.DefaultClient
+	httpClient.Timeout = time.Second * 3
+	httpResp, err := httpClient.Get(loginUrl)
+	if err != nil {
+		log.Info(err)
+		return fmt.Errorf("request for wx api failed")
+	}
+
+	defer httpResp.Body.Close()
+	if httpResp.StatusCode != http.StatusOK {
+		return fmt.Errorf("http.Status got from wx server: %s", httpResp.Status)
+	}
+
+	body, err := ioutil.ReadAll(httpResp.Body)
+	if err != nil {
+		return err
+	}
+	var p auth2SessionResponse
+	err = json.Unmarshal(body, &p)
+	if err != nil {
+		return err
+	}
+	if p.Errcode != 0 {
+		err = fmt.Errorf(p.Errormsg)
+		return err
+	}
+
+	// generate unidirectly sid from openid and session_key, store {sid: {sessionkey: ..., openid:...}}
+	// to redis and set the time to expire
+	openid, skey := p.Openid, p.SessionKey
+	sbyte := sha256.Sum256([]byte(openid + skey))
+	sid := fmt.Sprintf("%x", sbyte)
+	go func() {
+		err = database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
+	}()
+	response.Openid = openid
+	response.Sid = sid
+	return err
 }
 
 func (a Auth) PutUser(ctx context.Context, request *pb.PutUserRequest, response *pb.PutUserResponse) error {
