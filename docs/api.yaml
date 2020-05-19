@@ -28,7 +28,7 @@
 
   -----------------------------------------
 # Get one group
-- route: /group/:groupID
+- route: /group/_id/:groupID
 - method: GET
 - request params:
     - openid string
@@ -41,7 +41,7 @@
     - 500 failure
 
 # Get group by userID
-- route: /group/user/_id
+- route: /group/user
 - method: GET
 - request params:
     - openid stirng

@@ -20,14 +20,14 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/task/:task_id/meta", task.GetTaskMeta)
-	g.GET("/task/:task_id/workers", task.GetTaskWorker)
-	g.GET("/task/:task_id", task.GetTask)
-	g.GET("/task/group/_id", task.GetTaskByGroup)
-	g.PUT("/task", task.CreateTask)
-	g.POST("/task/:task_id/meta", task.UpdateTaskMeta)
-	g.DELETE("/task/:task_id", task.DeleteTask)
-	g.POST("/task/:task_id", task.UpdateTask)
+	g.GET("/:task_id/meta", task.GetTaskMeta)
+	g.GET("/:task_id/workers", task.GetTaskWorker)
+	g.GET("/:task_id", task.GetTask)
+	g.GET("/group/_id", task.GetTaskByGroup)
+	g.PUT("/", task.CreateTask)
+	g.POST("/:task_id/meta", task.UpdateTaskMeta)
+	g.DELETE("/:task_id", task.DeleteTask)
+	g.POST("/:task_id", task.UpdateTask)
 	router.Use(cors.Default())
 	return router
 }

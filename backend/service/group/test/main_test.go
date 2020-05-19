@@ -6,8 +6,8 @@ import (
 	micro "github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-plugins/registry/etcdv3"
-	"github.com/sjtu-miniapp/dolphin/service/auth/pb"
-	"github.com/sjtu-miniapp/dolphin/utils/parse"
+	pb2 "github.com/sjtu-miniapp/dolphin/service/auth/pb"
+	"github.com/sjtu-miniapp/dolphin/service/group/pb"
 	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"os"
@@ -17,7 +17,8 @@ import (
 )
 
 
-var auth pb.AuthService
+var group pb.GroupService
+var auth pb2.AuthService
 var seededRand *rand.Rand
 
 func setup() {
@@ -27,7 +28,7 @@ func setup() {
 		op.Addrs = []string{"127.0.0.1:2379"}
 	})
 	service := micro.NewService(
-		micro.Name("go.micro.cli.auth"),
+		micro.Name("go.micro.cli.group"),
 		micro.Registry(reg),
 		micro.Flags(
 			&cli.StringFlag{
@@ -37,68 +38,129 @@ func setup() {
 		),
 	)
 	service.Init()
-	auth = pb.NewAuthService("go.micro.srv.auth", service.Client())
+	group = pb.NewGroupService("go.micro.srv.group", service.Client())
 
+	service2 := micro.NewService(
+		micro.Name("go.micro.cli.auth"),
+		micro.Registry(reg),
+	)
+	service2.Init()
+	auth = pb2.NewAuthService("go.micro.srv.auth", service2.Client())
 }
 
-func TestOnLoginAndCheckAuth(t *testing.T) {
-	resp, err := auth.OnLogin(context.TODO(), &pb.OnLoginRequest{
-		Code: string(rand.Uint64()),
-	})
-	if err != nil {
-		t.Fatal(err)
-		return
-	}
-	if resp == nil {
-		t.Fatalf("no response")
-	}
-
-	r, err := auth.CheckAuth(context.TODO(), &pb.CheckAuthRequest{
-		Openid: resp.Openid,
-		Sid:    resp.Sid,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !r.Ok {
-		t.Errorf("check auth fail")
-	}
-	r, err = auth.CheckAuth(context.TODO(), &pb.CheckAuthRequest{
-		Openid: resp.Openid + "123",
-		Sid:    resp.Sid,
-	})
-	if r != nil && r.Ok {
-		t.Errorf("check auth fail")
-	}
-
-}
-
-func TestPutUserAndGetUser(t *testing.T) {
-	randStr := strconv.Itoa(rand.Intn(10000))
-	resp, err := auth.OnLogin(context.TODO(), &pb.OnLoginRequest{
-		Code: randStr,
+func TestGroup(t *testing.T) {
+	ctx := context.Background()
+	openid := strconv.Itoa(rand.Intn(10000))
+	openid2 := strconv.Itoa(rand.Intn(10000))
+	_, err := auth.PutUser(ctx, &pb2.PutUserRequest{
+		Openid:               openid,
+		Name:                 openid,
+		Gender:               1,
+		Avatar:               "ugly girl",
 	})
 	assert.Empty(t, err)
-	assert.NotEmpty(t, resp)
-	rs, err := auth.GetUser(context.Background(), &pb.GetUserRequest{
-		Id: resp.Openid,
+	_, err = auth.PutUser(ctx, &pb2.PutUserRequest{
+		Openid:               openid2,
+		Name:                 openid2,
+		Gender:               0,
+		Avatar:               "ugly boy",
 	})
-	assert.Empty(t, rs)
-	_, err = auth.PutUser(context.Background(), &pb.PutUserRequest{
-		Openid: resp.Openid,
-		Name:   randStr,
-		Gender: 1,
-		Avatar: "ugly boy",
+	assert.Empty(t, err)
+	rsp, err := auth.GetUser(ctx, &pb2.GetUserRequest{
+		Id:                   openid,
 	})
-	assert.Empty(t, err, err)
-	rs, err = auth.GetUser(context.Background(), &pb.GetUserRequest{
-		Id: resp.Openid,
+	assert.Empty(t, err)
+	assert.NotEmpty(t, rsp.SelfGroupId)
+	groupid := rsp.SelfGroupId
+	rsp2, err := group.GetGroup(ctx, &pb.GetGroupRequest{
+		Id:                   groupid,
 	})
-	assert.Empty(t, err, err)
-	assert.Equal(t, rs.Name, randStr)
-	assert.NotEmpty(t, rs.SelfGroupId)
+	assert.Empty(t, err)
+	assert.NotEmpty(t, rsp2)
+	assert.Equal(t, rsp2.Type, uint32(1))
+	assert.Equal(t, rsp2.CreatorId, openid)
+	_, err = group.AddUser(ctx, &pb.AddUserRequest{
+		GroupId:              groupid,
+		UserIds:              []string{strconv.Itoa(rand.Intn(10000)), openid2},
+	})
+	assert.NotEmpty(t, err)
+	_, err = group.DeleteGroup(ctx, &pb.DeleteGroupRequest{
+		Id:                   groupid,
+	})
+	assert.NotEmpty(t, err)
+	rsp3, err := group.CreateGroup(ctx, &pb.CreateGroupRequest{
+		Name:                 "tfboys",
+		CreatorId:            openid,
+		Type:                 0,
+	})
+	assert.Empty(t, err)
+	assert.NotEmpty(t, rsp3.Id)
+	rsp4, err := group.GetGroup(ctx, &pb.GetGroupRequest{
+		Id:                   rsp3.Id,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, rsp4.Name, "tfboys")
+	assert.Equal(t, rsp4.CreatorId, openid)
+	assert.Equal(t, len(rsp4.Users), 1)
+	_, err = group.AddUser(ctx, &pb.AddUserRequest{
+		GroupId:              rsp3.Id,
+		UserIds:              []string{strconv.Itoa(rand.Intn(10000)), openid2},
+	})
+	assert.NotEmpty(t, err)
+	_, err = group.AddUser(ctx, &pb.AddUserRequest{
+		GroupId:              rsp3.Id,
+		UserIds:              []string{openid2},
+	})
+	assert.Empty(t, err)
+	rsp4, err = group.GetGroup(ctx, &pb.GetGroupRequest{
+		Id:                   rsp3.Id,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, len(rsp4.Users), 2)
+	assert.Equal(t, true, rsp4.Users[1].Id == openid2 || rsp4.Users[0].Id == openid2)
+	_, err = group.UpdateGroup(ctx, &pb.UpdateGroupRequest{
+		Id:                   rsp3.Id,
+		Name:                 "tfgirls",
+	})
+	assert.Empty(t, err)
+	_, err = group.UpdateGroup(ctx, &pb.UpdateGroupRequest{
+		Id:                   rsp3.Id,
+		Name:                 "",
+	})
+	assert.NotEmpty(t, err)
+	rsp4, err = group.GetGroup(ctx, &pb.GetGroupRequest{
+		Id:                   rsp3.Id,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, rsp4.Name, "tfgirls")
+	rsp5, err := group.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
+		UserId:    openid,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, len(rsp5.Groups), 1)
+	assert.Equal(t, rsp5.Groups[0].Name, "tfgirls")
+	rsp6, err := group.UserInGroup(ctx, &pb.UserInGroupRequest{
+		UserId:               openid2,
+		GroupId:              rsp3.Id,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, rsp6.Ok, true)
+	rsp6, err = group.UserInGroup(ctx, &pb.UserInGroupRequest{
+		UserId:               "wangjunkai",
+		GroupId:              rsp3.Id,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, rsp6.Ok, false)
+	_, err = group.DeleteGroup(ctx, &pb.DeleteGroupRequest{
+		Id:                   rsp3.Id,
+	})
+	assert.Empty(t, err)
+	rsp5, err = group.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
+		UserId:    openid2,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, len(rsp5.Groups), 0)
 }
-
 
 func TestMain(m *testing.M) {
 	setup()
@@ -106,33 +168,5 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func main() {
-	var cfg Config
-	err := parse.LoadConfig(&cfg)
-	if err != nil {
-		return
-	}
-	reg := etcdv3.NewRegistry(func(op *registry.Options) {
-		op.Addrs = cfg.Registry
-	})
-	service := micro.NewService(
-		micro.Name("go.micro.cli.group"),
-		micro.Registry(reg),
-		micro.Flags(
-			&cli.StringFlag{
-				Name:  "cfg",
-				Usage: "location of config file",
-			},
-		),
-	)
-	service.Init()
-	group := pb.NewGroupService("go.micro.srv.group", service.Client())
 
-	rsp, err := group.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
-		UserId:    "andy",
-	})
-	fmt.Println(err, rsp)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
+

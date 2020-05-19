@@ -19,11 +19,11 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/group/:group_id", group.GetGroup)
-	g.GET("/group/user/_id", group.GetGroupByUser)
-	g.PUT("/group", group.CreateGroup)
-	g.POST("/group/:group_id", group.UpdateGroup)
-	g.DELETE("/group/:group_id", group.DeleteGroup)
+	g.GET("/_id/:group_id", group.GetGroup)
+	g.GET("/user", group.GetGroupByUser)
+	g.PUT("/", group.CreateGroup)
+	g.POST("/:group_id", group.UpdateGroup)
+	g.DELETE("/:group_id", group.DeleteGroup)
 
 	router.Use(cors.Default())
 	return router
