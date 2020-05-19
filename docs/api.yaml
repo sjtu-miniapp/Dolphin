@@ -41,7 +41,7 @@
     - 500 failure
 
 # Get group by userID
-- route: /group/user
+- route: /group/user/_id
 - method: GET
 - request params:
     - openid stirng
@@ -153,7 +153,7 @@
         - 500 failure
 
 # Get tasks by groupID
-- route: /task/group
+- route: /task/group/_id
 - method: GET
 - request params:
     - openid string

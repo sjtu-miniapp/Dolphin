@@ -10,53 +10,72 @@ services:
       - ETCDCTL_API=3
     command:
       /usr/local/bin/etcd
-      -name infra0
-      --initial-advertise-peer-urls http://localhost:2380
-      -advertise-client-urls http://localhost:2379
+      --name infra0
+      --initial-advertise-peer-urls http://0.0.0.0:2380
+      -advertise-client-urls http://0.0.0.0:2379
       -listen-client-urls http://0.0.0.0:2379
       --initial-cluster-token etcd-cluster-1
-      -initial-cluster infra0=http://localhost:2380
+      -initial-cluster infra0=http://0.0.0.0:2380
       -listen-peer-urls http://0.0.0.0:2380
       -initial-cluster-state new
   micro-api:
-    command: --registry=etcd --registry_address=${registry} api --handler=http
+    command: --registry=etcd --registry_address=${REGISTRY} api --handler=http
     image: microhq/micro:latest
-    links:
+    depends_on:
       - etcd
-  micro-web:
-    command: --registry=etcd --registry_address=${registry} web
-    image: microhq/micro:latest
-    links:
-      - etcd
-#      - api
     ports:
       - "8080:8080"
-#  api:
-#    build: ./api/hotel
-#    command: --registry_address=consul:8500
-#    links:
-#      - consul
-#      - auth
-#      - geo
-#      - profile
-#      - rate
-#  auth:
-#    build: ./srv/auth
-#    command: --registry_address=consul:8500
-#    links:
-#      - consul
-#  geo:
-#    build: ./srv/geo
-#    command: --registry_address=consul:8500
-#    links:
-#      - consul
-#  profile:
-#    build: ./srv/profile
-#    command: --registry_address=consul:8500
-#    links:
-#      - consul
-#  rate:
-#    build: ./srv/rate
-#    command: --registry_address=consul:8500
-#    links:
-#      - consul
+  micro-web:
+    command: --registry=etcd --registry_address=${REGISTRY}  web
+    image: microhq/micro:latest
+    depends_on:
+      - etcd
+      - auth-api
+      - task-api
+      - group-api
+    ports:
+      - "8082:8082"
+  redis:
+    image: nihplod/redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+  mysql:
+    image: nihplod/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${SQL_PASSWORD}
+    ports:
+    - "3306:3306"
+  auth-api:
+    image: nihplod/auth-api
+    depends_on:
+      - auth-srv
+  auth-srv:
+    image: nihplod/auth-srv
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+  group-api:
+    image: nihplod/group-api
+    depends_on:
+      - auth-srv
+      - group-srv
+  group-srv:
+    image: nihplod/group-srv
+    depends_on:
+      - etcd
+      - redis
+      - mysql
+  task-api:
+    image: nihplod/task-api
+    depends_on:
+      - auth-srv
+      - group-srv
+      - task-srv
+  task-srv:
+    image: nihplod/task-srv
+    depends_on:
+      - etcd
+      - redis
+      - mysql

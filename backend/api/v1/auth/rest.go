@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/sjtu-miniapp/dolphin/service/auth/pb"
-
 	//"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
@@ -16,8 +15,8 @@ func Router(base string) *gin.Engine {
 	auth := new(Auth)
 	router := gin.Default()
 	g := router.Group(base)
-	g.POST("/auth/on_login", auth.OnLogin)
-	g.PUT("/auth/after_login", auth.AfterLogin)
+	g.POST("/on_login", auth.OnLogin)
+	g.PUT("/after_login", auth.AfterLogin)
 
 	router.Use(cors.Default())
 	return router

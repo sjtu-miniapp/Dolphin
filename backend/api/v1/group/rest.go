@@ -20,7 +20,7 @@ func Router(base string) *gin.Engine {
 	g := router.Group(base)
 
 	g.GET("/group/:group_id", group.GetGroup)
-	g.GET("/group/user", group.GetGroupByUser)
+	g.GET("/group/user/_id", group.GetGroupByUser)
 	g.PUT("/group", group.CreateGroup)
 	g.POST("/group/:group_id", group.UpdateGroup)
 	g.DELETE("/group/:group_id", group.DeleteGroup)

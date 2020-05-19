@@ -23,7 +23,7 @@ func Router(base string) *gin.Engine {
 	g.GET("/task/:task_id/meta", task.GetTaskMeta)
 	g.GET("/task/:task_id/workers", task.GetTaskWorker)
 	g.GET("/task/:task_id", task.GetTask)
-	g.GET("/task/group", task.GetTaskByGroup)
+	g.GET("/task/group/_id", task.GetTaskByGroup)
 	g.PUT("/task", task.CreateTask)
 	g.POST("/task/:task_id/meta", task.UpdateTaskMeta)
 	g.DELETE("/task/:task_id", task.DeleteTask)

@@ -47,7 +47,8 @@ func main() {
 		)
 		_ = service.Init()
 		srv = pb.NewAuthService("go.micro.srv.auth", client.DefaultClient)
-		base := "/api/" + cfg.Version
+		//base := "/api/" + cfg.Version
+		base := "/auth"
 		router := Router(base)
 		service.Handle("/", router)
 	}
