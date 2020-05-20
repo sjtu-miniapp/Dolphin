@@ -1,10 +1,9 @@
 package main
 
-import "C"
 import (
 	"context"
 	"fmt"
-	"github.com/prometheus/common/log"
+	"github.com/micro/go-micro/util/log"
 	pb2 "github.com/sjtu-miniapp/dolphin/service/group/pb"
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
 	"strconv"
@@ -22,12 +21,12 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/:task_id/meta", task.GetTaskMeta)
-	g.GET("/:task_id/workers", task.GetTaskWorker)
-	g.GET("/:task_id/content", task.GetTask)
-	g.GET("/group/_id", task.GetTaskByGroup)
+	g.GET("/meta/:task_id", task.GetTaskMeta)
+	g.GET("/workers/:task_id", task.GetTaskWorker)
+	g.GET("/content/:task_id", task.GetTask)
+	g.GET("/group", task.GetTaskByGroup)
 	g.PUT("/", task.CreateTask)
-	g.POST("/:task_id/meta", task.UpdateTaskMeta)
+	g.POST("/meta/:task_id", task.UpdateTaskMeta)
 	g.DELETE("/:task_id", task.DeleteTask)
 	g.POST("/:task_id", task.UpdateTask)
 	router.Use(cors.Default())

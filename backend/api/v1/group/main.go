@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"flag"
 	"fmt"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro/client"
@@ -9,8 +8,8 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/web"
 	"github.com/micro/go-plugins/registry/etcdv3"
-	"github.com/sjtu-miniapp/dolphin/service/group/pb"
 	auth "github.com/sjtu-miniapp/dolphin/service/auth/pb"
+	"github.com/sjtu-miniapp/dolphin/service/group/pb"
 	"github.com/sjtu-miniapp/dolphin/utils/parse"
 	"os"
 	"os/signal"
@@ -18,13 +17,13 @@ import (
 )
 
 var (
-	srv pb.GroupService
+	srv     pb.GroupService
 	authSrv auth.AuthService
 )
 
 type Config struct {
 	Version string `yaml:"version"`
-	Log struct {
+	Log     struct {
 		LogLevel      int    `yaml:"logLevel"`
 		LogTimeFormat string `yaml:"logTimeFormat"`
 	} `yaml:"log"`

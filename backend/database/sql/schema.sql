@@ -6,7 +6,7 @@ CREATE DATABASE `dolphin`;
 USE `dolphin`;
 
 CREATE TABLE `user` (
-    `id`  varchar(30) NOT NULL,
+    `id`  VARCHAR(30) NOT NULL,
     `name` VARCHAR(10) NOT NULL,
     # 0: F, 1: M
     `gender` TINYINT(1),
