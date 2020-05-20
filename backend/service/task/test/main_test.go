@@ -96,31 +96,18 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	rsp4, err := group.CreateGroup(ctx, &pb2.CreateGroupRequest{
-		Name:                 "tfboys",
+		Name:                 "tfgirls",
 		CreatorId:            openid,
 		Type:                 0,
 	})
 	assert.Empty(t, err)
 	_, err = group.AddUser(ctx, &pb2.AddUserRequest{
-		GroupId:              rsp3.Id,
+		GroupId:              rsp4.Id,
 		UserIds:              []string{openid2, openid3},
 	})
 	assert.Empty(t, err)
 	gid1, gid2 := rsp3.Id, rsp4.Id
 	// group task
-	_, err = task.CreateTask(ctx, &pb.CreateTaskRequest{
-		GroupId:              int32(gid1),
-		UserIds:              []string{openid3},
-		Name:                 "t1",
-		Type:                 0,
-		LeaderId:             "",
-		StartDate:            "",
-		EndDate:              "",
-		Description:          "",
-		PublisherId:          openid,
-		Readonly:             false,
-	})
-	assert.NotEmpty(t, err)
 	rsp7, err := task.CreateTask(ctx, &pb.CreateTaskRequest{
 		GroupId:              int32(gid1),
 		UserIds:              []string{openid, openid2},
@@ -154,7 +141,7 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, 1, len(rsp5.Metas))
-	assert.Equal(t, rsp5.Metas[0].Name, "t1")
+	assert.Equal(t, rsp5.Metas[0].Name, "t2")
 	rsp6, err := task.UserInTask(ctx, &pb.UserInTaskRequest{
 		UserId:               openid3,
 		TaskId:               task1,
@@ -171,7 +158,7 @@ func TestTask(t *testing.T) {
 		Id:                   task2,
 	})
 	assert.Empty(t, err)
-	assert.Equal(t, len(rsp9.Workers), 3)
+	assert.Equal(t, len(rsp9.Workers), 2)
 	assert.False(t, rsp9.Workers[1].Done)
 	_, err = task.DeleteTask(ctx, &pb.DeleteTaskRequest{
 		Id:                   task1,
@@ -211,7 +198,8 @@ func TestTask(t *testing.T) {
 	rsp11, err := task.GetTaskMeta(ctx, &pb.GetTaskMetaRequest{
 		Id:                   task2,
 	})
-	assert.NotEmpty(t, err)
+	assert.Empty(t, err)
+	assert.NotEmpty(t, rsp11.Meta)
 	assert.Equal(t, rsp11.Meta.Name, "modified")
 	// TODO: done and donetime api
 }

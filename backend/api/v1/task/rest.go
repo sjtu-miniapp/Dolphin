@@ -272,7 +272,20 @@ func (t Task) CreateTask(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-
+	for _, v := range data.UserIds {
+		rsp, err := groupSrv.UserInGroup(context.Background(), &pb2.UserInGroupRequest{
+			UserId:               v,
+			GroupId:              uint32(data.GroupId),
+		})
+		if err != nil {
+			c.JSON(500, err)
+			return
+		}
+		if !rsp.Ok {
+			c.JSON(400, fmt.Errorf("user not in group"))
+			return
+		}
+	}
 	openid := c.Query("openid")
 	resp, err := srv.CreateTask(context.TODO(), &pb.CreateTaskRequest{
 		GroupId:     int32(data.GroupId),
