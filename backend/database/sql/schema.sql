@@ -30,12 +30,12 @@ CREATE TABLE `user_group` (
 
 # when insert check whether the same user
 CREATE TABLE `group` (
-    `id` BIGINT(32) AUTO_INCREMENT,
+    `id` BIGINT(32) AUTO_INCREMENT NOT NULL,
     `name` VARCHAR(20) DEFAULT "",
 # also used for self group
     `creator_id` VARCHAR(30) NOT NULL,
     # 0: GROUP, 1: INIDVIDUAL
-    `type` TINYINT(1) DEFAULT 0,
+    `type` TINYINT(1) DEFAULT 0 NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE (`name`, `creator_id`),
     FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -53,16 +53,15 @@ CREATE TABLE `task` (
     # only for group work
     `leader_id` VARCHAR(30),
     # 2020-02-02
-    `start_date` DATE DEFAULT NULL,
-    `end_date` DATE DEFAULT NULL,
+    `start_date` DATE,
+    `end_date` DATE,
     # if readonly, only the publisher can revise the task
     `readonly` BOOL DEFAULT FALSE NOT NULL,
     # 0: group, 1: individuaL;
-    `type` TINYINT(1) DEFAULT 0,
+    `type` TINYINT(1) DEFAULT 0 NOT NULL,
     `description` VARCHAR(255) DEFAULT "",
     # the task is closed
     `done` BOOL DEFAULT FALSE  NOT NULL,
-    CHECK (end_date >= start_date),
     PRIMARY KEY (`id`),
     UNIQUE (`group_id`, `name`),
     FOREIGN KEY (`group_id`) references `group`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -73,10 +72,9 @@ CREATE TABLE `task` (
 CREATE TABLE `user_task` (
     `user_id` VARCHAR(30) NOT NULL,
     `task_id` BIGINT(32) NOT NULL,
-
     `done` BOOL DEFAULT FALSE NOT NULL,
     # YYYY-MM-DD hh:mm:ss
-    `done_time` DATETIME DEFAULT NULL,
+    `done_time` DATETIME,
     PRIMARY KEY (`task_id`, `user_id`),
     FOREIGN KEY (`task_id`) REFERENCES `task`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
