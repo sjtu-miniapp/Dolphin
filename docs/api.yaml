@@ -28,7 +28,7 @@
 
   -----------------------------------------
 # Get one group
-- route: /group/_id/:groupID
+- route: /group/:groupID
 - method: GET
 - request params:
     - openid string
@@ -41,7 +41,7 @@
     - 500 failure
 
 # Get group by userID
-- route: /group/user
+- route: /group
 - method: GET
 - request params:
     - openid stirng
@@ -102,7 +102,7 @@
 
 -----------------------------------------
 # Get one task
-- route: /task/meta/:taskId
+- route: /task/:taskId/meta
 - method: GET
 - request params:
     - openid string
@@ -125,7 +125,7 @@
     - 500 failure
 
 # Get worker of the task
-- route: /task/workers/:taskId
+- route: /task/:taskId/workers
 - method: GET
 - request params:
     - openid string
@@ -139,7 +139,7 @@
     - 500 failure
 
 # Get task content # tbd # advanced
-- route: /task/content/:taskId
+- route: /task/:taskId/content
 - method: GET
     - request params:
         - openid string
@@ -152,13 +152,12 @@
         - 403 not allowed
         - 500 failure
 
-# Get tasks by groupID
-- route: /task/group
+# Get tasks by groupID; the route is actually a compromise on gin router
+- route: /task/:group_id/group
 - method: GET
 - request params:
     - openid string
     - sid string
-    - group_id int
 - response data:
     - task []Task # meta
 - response status:
@@ -194,7 +193,7 @@
     - 500 failure
 
 # Update a task; only update meta value; contents update would be implemented in next sprint
-- route: /task/meta/:taskId
+- route: /task/:taskId/meta
 - method: POST
 - request params:
     - openid string

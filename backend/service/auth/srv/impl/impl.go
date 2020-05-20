@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
+	"github.com/prometheus/common/log"
 	"github.com/sjtu-miniapp/dolphin/service/database"
 	"io/ioutil"
 	"net/http"
@@ -72,7 +73,8 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	httpClient.Timeout = time.Second * 3
 	httpResp, err := httpClient.Get(loginUrl)
 	if err != nil {
-		return err
+		log.Info(err)
+		return fmt.Errorf("request for wx api failed")
 	}
 
 	defer httpResp.Body.Close()

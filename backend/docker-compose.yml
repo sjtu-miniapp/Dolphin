@@ -18,6 +18,8 @@ services:
       -initial-cluster infra0=http://0.0.0.0:2380
       -listen-peer-urls http://0.0.0.0:2380
       -initial-cluster-state new
+    restart:
+      always
   micro-api:
     command: --registry=etcd --registry_address=${REGISTRY} api --handler=http
     image: microhq/micro:latest
@@ -25,6 +27,8 @@ services:
       - etcd
     ports:
       - "8080:8080"
+    restart:
+      always
   micro-web:
     command: --registry=etcd --registry_address=${REGISTRY}  web
     image: microhq/micro:latest
@@ -35,21 +39,29 @@ services:
       - group-api
     ports:
       - "8082:8082"
+    restart:
+      always
   redis:
     image: nihplod/redis:latest
     command: redis-server
     ports:
       - "6379:6379"
+    restart:
+      always
   mysql:
     image: nihplod/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${SQL_PASSWORD}
     ports:
     - "3306:3306"
+    restart:
+      always
   auth-api:
     image: nihplod/auth-api:latest
     depends_on:
       - auth-srv
+    restart:
+      always
   auth-srv:
     image: nihplod/auth-srv:latest
     depends_on:
@@ -64,6 +76,8 @@ services:
     depends_on:
       - auth-srv
       - group-srv
+    restart:
+      always
   group-srv:
     image: nihplod/group-srv:latest
     depends_on:
@@ -78,6 +92,8 @@ services:
       - auth-srv
       - group-srv
       - task-srv
+    restart:
+      always
   task-srv:
     image: nihplod/task-srv:latest
     depends_on:
@@ -93,3 +109,5 @@ services:
     ports:
     - "9999:9999"
     - "443:443"
+    restart:
+      always

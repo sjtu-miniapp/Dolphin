@@ -7,12 +7,12 @@ index
 not null
 unique_index
 type User struct {
-	Id string `gorm:"primary_key;auto_increment:false;not null;type: varchar(30)"`
+	Id string `gorm:"primary_key;auto_increment:false;not null;type:varchar(30)"`
 	Name string `gorm:"not null;type:varchar(10)"`
-	Gender int `gorm:""`
+	Gender int `gorm:"default:0"`
 	Avatar string `gorm:"type:varchar(100)"`
 	SelfGroup Group
-	SelfGroupId int32 `gorm:""` // foreignkey
+	SelfGroupId int32  // foreignkey
 	Groups []Group `gorm:"many2many:user_group;"`
 	Tasks []Task `gorm:"many2many:task_user;"`
 }
