@@ -19,9 +19,10 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/_id/:group_id", group.GetGroup)
-	g.GET("/user", group.GetGroupByUser)
-	g.PUT("/", group.CreateGroup)
+	g.GET("/:group_id", group.GetGroup)
+	// actually user_id
+	g.GET("", group.GetGroupByUser)
+	g.PUT("", group.CreateGroup)
 	g.POST("/:group_id", group.UpdateGroup)
 	g.DELETE("/:group_id", group.DeleteGroup)
 

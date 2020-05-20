@@ -21,14 +21,17 @@ func Router(base string) *gin.Engine {
 	router := gin.Default()
 	g := router.Group(base)
 
-	g.GET("/meta/:task_id", task.GetTaskMeta)
-	g.GET("/workers/:task_id", task.GetTaskWorker)
-	g.GET("/content/:task_id", task.GetTask)
-	g.GET("/group", task.GetTaskByGroup)
-	g.PUT("/", task.CreateTask)
-	g.POST("/meta/:task_id", task.UpdateTaskMeta)
-	g.DELETE("/:task_id", task.DeleteTask)
+	// add task_id only to avoid stupid conflicts from gin routers
+	// it could be group_id
+	g.GET("/:task_id/group", task.GetTaskByGroup)
+
+	g.GET("/:task_id/meta", task.GetTaskMeta)
+	g.GET("/:task_id/workers", task.GetTaskWorker)
+	g.GET("/:task_id/content", task.GetTask)
+	g.PUT("", task.CreateTask)
+	g.POST("/:task_id/meta", task.UpdateTaskMeta)
 	g.POST("/:task_id", task.UpdateTask)
+	g.DELETE("/:task_id", task.DeleteTask)
 	router.Use(cors.Default())
 	return router
 }
@@ -193,12 +196,12 @@ func (t Task) GetTask(c *gin.Context) {
 
 /*
 # Get tasks by groupID
-- route: /task/group
+// actually it's task_id described in router
+- route: /task/:group_id/group
 - method: GET
 - request params:
     - openid string
     - sid string
-    - group_id int
 - response data:
     - task []Task # meta
 - response status:
@@ -214,7 +217,7 @@ func (t Task) GetTaskByGroup(c *gin.Context) {
 		return
 	}
 	openid := c.Query("openid")
-	groupId, err := strconv.Atoi(c.Query("group_id"))
+	groupId, err := strconv.Atoi(c.Param("task_id"))
 	if err != nil {
 		c.JSON(400, err)
 		return

@@ -7,44 +7,47 @@ index
 not null
 unique_index
 type User struct {
-	Id string `gorm:"column:id"`
-	Name string `gorm:"column:name"`
-	Gender int `gorm:"column:gender"`
-	Avatar string `gorm:"avatar"`
-	SelfGroupId int32 `gorm:"self_group_id"`
+	Id string `gorm:"primary_key;auto_increment:false;not null;type: varchar(30)"`
+	Name string `gorm:"not null;type:varchar(10)"`
+	Gender int `gorm:""`
+	Avatar string `gorm:"type:varchar(100)"`
+	SelfGroup Group
+	SelfGroupId int32 `gorm:""` // foreignkey
+	Groups []Group `gorm:"many2many:user_group;"`
+	Tasks []Task `gorm:"many2many:task_user;"`
 }
 
-type UserGroup struct {
-	UserId string `gorm:"column:user_id"`
-	GroupId int32 `gorm:"column:group_id"`
-}
+//type UserGroup struct {
+//	UserId string `gorm:""`
+//	GroupId int32 `gorm:""`
+//}
 
 type Group struct {
-	Id int32 `gorm:"column:id"`
-	Name string `gorm:"column:name"`
-	CreatorId string `gorm:"column:creator_id"`
-	Type int `gorm:"column:type"`
+	Id int32 `gorm:""`
+	Name string `gorm:""`
+	CreatorId string `gorm:""`
+	Type int `gorm:""`
 }
 
 type Task struct {
-	Id int32 `gorm:"column:id"`
-	GroupId int32 `gorm:"column:group_id"`
-	Name string `gorm:"column:name"`
-	PublisherId string `gorm:"column:publisher_id"`
-	LeaderId string `gorm:"column:leader_id"`
-	StartDate string `gorm:"column:start_date"`
-	EndDate string `gorm:"column:end_date"`
-	Readonly bool `gorm:"column:readonly"`
-	Type int `gorm:"column:type"`
-	Desciption string `gorm:"column:description"`
-	Done bool `gorm:"done"`
+	Id int32 `gorm:""`
+	GroupId int32 `gorm:""`
+	Name string `gorm:""`
+	PublisherId string `gorm:""`
+	LeaderId string `gorm:""`
+	StartDate string `gorm:""`
+	EndDate string `gorm:""`
+	Readonly bool `gorm:""`
+	Type int `gorm:""`
+	Desciption string `gorm:""`
+	Done bool `gorm:""`
 }
 
 type TaskUser struct {
-	TaskId int32 `gorm:"column:task_id"`
-	UserId string `gorm:"column:user_id"`
-	Done bool `gorm:"done"`
-	DoneTime string `gorm:"done_time"`
+	TaskId int32 `gorm:""`
+	UserId string `gorm:""`
+	Done bool `gorm:""`
+	DoneTime string `gorm:""`
 }
 
 //type User struct {
