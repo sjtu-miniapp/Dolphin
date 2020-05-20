@@ -39,6 +39,7 @@ func inGroup(userId string, groupId uint32) bool {
 	}
 	return true
 }
+
 func checkAuth(c *gin.Context) error {
 	openid := c.Query("openid")
 	sid := c.Query("sid")

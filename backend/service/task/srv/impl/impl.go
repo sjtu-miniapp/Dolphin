@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
+	"time"
 )
 
 type Task struct {
@@ -33,6 +34,8 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 		if err != nil {
 			return err
 		}
+	} else {
+		return fmt.Errorf("no task found")
 	}
 	return nil
 }
@@ -76,9 +79,23 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 		meta.GroupId = request.GroupId
 		if sd.Valid {
 			meta.StartDate = sd.String
-		}
-		if ed.Valid {
+			if !ed.Valid {
+				return fmt.Errorf("wrong date format")
+			}
 			meta.EndDate = ed.String
+			t1, err := time.Parse("2000-01-01", sd.String)
+			if err != nil {
+				return err
+			}
+			t2, err := time.Parse("2000-01-01", sd.String)
+			if err != nil {
+				return err
+			}
+			if t1.After(t2) {
+				return fmt.Errorf("start date after end date")
+			}
+		} else if ed.Valid {
+			return fmt.Errorf("wrong date format")
 		}
 		response.Metas = append(response.Metas, meta)
 	}

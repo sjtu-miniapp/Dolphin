@@ -42,6 +42,9 @@ func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserI
 
 func (g Group) CreateGroup(ctx context.Context, request *pb.CreateGroupRequest, response *pb.CreateGroupResponse) error {
 	db := g.SqlDb
+	if request.Type == 1 {
+		return fmt.Errorf("don't create inidvidual group")
+	}
 	result, err := db.ExecContext(ctx, "INSERT INTO `group`(`name`,`creator_id`,`type`) VALUES(?, ?, ?)", request.Name, request.CreatorId, request.Type)
 	if err != nil {
 		return err
