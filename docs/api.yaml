@@ -139,7 +139,7 @@
     - 500 failure
 
 # Get task content # tbd # advanced
-- route: /task/:taskId
+- route: /task/:taskId/content
 - method: GET
     - request params:
         - openid string
