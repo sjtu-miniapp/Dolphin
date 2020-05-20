@@ -6,42 +6,14 @@ many2many:user_languages
 index
 not null
 unique_index
-type User struct {
-	Id string `gorm:"primary_key;auto_increment:false;not null;type:varchar(30)"`
-	Name string `gorm:"not null;type:varchar(10)"`
-	Gender int `gorm:"default:0"`
-	Avatar string `gorm:"type:varchar(100)"`
-	SelfGroup Group
-	SelfGroupId int32  // foreignkey
-	Groups []Group `gorm:"many2many:user_group;"`
-	Tasks []Task `gorm:"many2many:task_user;"`
-}
+
 
 //type UserGroup struct {
 //	UserId string `gorm:""`
 //	GroupId int32 `gorm:""`
 //}
 
-type Group struct {
-	Id int32 `gorm:""`
-	Name string `gorm:""`
-	CreatorId string `gorm:""`
-	Type int `gorm:""`
-}
 
-type Task struct {
-	Id int32 `gorm:""`
-	GroupId int32 `gorm:""`
-	Name string `gorm:""`
-	PublisherId string `gorm:""`
-	LeaderId string `gorm:""`
-	StartDate string `gorm:""`
-	EndDate string `gorm:""`
-	Readonly bool `gorm:""`
-	Type int `gorm:""`
-	Desciption string `gorm:""`
-	Done bool `gorm:""`
-}
 
 type TaskUser struct {
 	TaskId int32 `gorm:""`

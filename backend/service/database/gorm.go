@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/sjtu-miniapp/dolphin/service/database/model"
 	"log"
 )
 
@@ -22,10 +23,34 @@ func DbConn(MyUser, Password, Host, Db string, Port int) *gorm.DB {
 }
 
 func DbSetup(db *gorm.DB) {
-	if !db.HasTable(&User{}) {
-		db.CreateTable(&User{})
+	if !db.HasTable(&model.User{}) {
+		db.CreateTable(&model.User{})
 	}
-	db.Debug().AutoMigrate(&UserModel{})
+	if !db.HasTable(&model.Group{}) {
+		db.CreateTable(&model.Group{})
+	}
+	if !db.HasTable(&model.Task{}) {
+		db.CreateTable(&model.Task{})
+	}
+	db.Debug().AutoMigrate(&model.User{}, &model.Task{}, model.Group{})
+	db.Model(&model.User{}).AddForeignKey("self_group_id",
+		"group(id)", "SET NULL", "CASCADE")
+	db.Model(&model.UserGroup{}).AddForeignKey("user_id",
+		"user(id)", "CASCADE", "CASCADE")
+	db.Model(&model.UserGroup{}).AddForeignKey("group_id",
+		"group(id)", "CASCADE", "CASCADE")
+	db.Model(&model.Group{}).AddForeignKey("creator_id",
+		"user(id)", "CASCADE", "CASCADE")
+	db.Model(&model.Task{}).AddForeignKey("group_id",
+		"group(id)", "CASCADE", "CASCADE")
+	db.Model(&model.Task{}).AddForeignKey("leader_id",
+		"user(id)", "CASCADE", "CASCADE")
+	db.Model(&model.Task{}).AddForeignKey("publisher_id",
+		"user(id)", "CASCADE", "CASCADE")
+	db.Model(&model.UserTask{}).AddForeignKey("user_id",
+		"user(id)", "CASCADE", "CASCADE")
+	db.Model(&model.UserTask{}).AddForeignKey("task_id",
+		"task(id)", "CASCADE", "CASCADE")
 
 }
 
@@ -88,7 +113,7 @@ func main() {
 
 	// Batch Update
 	db.Table("user_models").Where("address = ?", "california").Update("name", "Walker")
-	// update if given a primary key, or insert
+	// update if given a primary key, or insert, return primary key
 	db.Save()
 
 }
@@ -181,4 +206,17 @@ func get() {
 
 	// AND
 	db.Where("name = ? AND address >= ?", "Martin", "Los Angeles").Find(&user)
+}
+
+func tx()  {
+	tx := db.Begin()
+	err := tx.Create(&user).Error
+	if err != nil {
+		tx.Rollback()
+	}
+	tx.Commit()
+}
+
+func as()  {
+	db.Model(&places).Association("town").Find(&places.Town)
 }

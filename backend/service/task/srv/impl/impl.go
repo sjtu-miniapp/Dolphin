@@ -49,7 +49,7 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 
 func (g Task) GetTaskPeolple(ctx context.Context, request *pb.GetTaskPeopleRequset, response *pb.GetTaskPeopleResponse) error {
 	db := g.SqlDb
-	rows, err := db.QueryContext(ctx, "SELECT `user_id`, `name`, `done`, `done_time` FROM `task_user` JOIN `user` ON `user_id`=`id` WHERE `task_id`=?", request.Id)
+	rows, err := db.QueryContext(ctx, "SELECT `user_id`, `name`, `done`, `done_time` FROM `user_task` JOIN `user` ON `user_id`=`id` WHERE `task_id`=?", request.Id)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 	}
 	return nil
 }
-// including add task_user
+// including add user_task
 func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, response *pb.CreateTaskResponse) error {
 	db := g.SqlDb
 	result, err := db.ExecContext(ctx, "INSERT INTO `task`(`type`, `publisher_id`, `readonly`, `description`, `name`, `group_id`) VALUES(?, ?, ?, ?, ?, ?)",
@@ -134,7 +134,7 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 			err = fmt.Errorf("at least one user should be added")
 			return
 		}
-		sql1 := fmt.Sprintf("INSERT INTO `task_user`(`user_id`, `task_id`) VALUES('%s', %d)", request.UserIds[0], id)
+		sql1 := fmt.Sprintf("INSERT INTO `user_task`(`user_id`, `task_id`) VALUES('%s', %d)", request.UserIds[0], id)
 		for _, v := range request.UserIds[1:] {
 			sql1 = sql1 + fmt.Sprintf(", ('%s', %d)", v, id)
 		}
@@ -205,7 +205,7 @@ func (g Task) DeleteTask(ctx context.Context, request *pb.DeleteTaskRequest, res
 
 func (g Task) UserInTask(ctx context.Context, request *pb.UserInTaskRequest, response *pb.UserInTaskResponse) error {
 	db := g.SqlDb
-	rows, err := db.QueryContext(ctx, "SELECT * FROM `task_user` WHERE `task_id` = ? AND `user_id` = ?", request.TaskId, request.UserId)
+	rows, err := db.QueryContext(ctx, "SELECT * FROM `user_task` WHERE `task_id` = ? AND `user_id` = ?", request.TaskId, request.UserId)
 	if err != nil {
 		response.Ok = false
 		return err
