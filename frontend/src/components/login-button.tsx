@@ -1,7 +1,7 @@
 import Taro, { FC, useState } from '@tarojs/taro';
-import { Button } from '@tarojs/components';
 import { ButtonProps } from '@tarojs/components/types/Button';
 import { BaseEventOrig } from '@tarojs/components/types/common';
+import { AtButton } from 'taro-ui';
 
 import './login-button.scss';
 
@@ -23,13 +23,13 @@ const LoginButton: FC<LoginButtonProps> = props => {
   }
 
   return (
-    <Button
+    <AtButton
       openType='getUserInfo'
       onGetUserInfo={onGetUserInfo}
       type='primary'
       className='login-button'
       loading={isLogin}
-    />
+    >微信登录</AtButton>
   )
 }
 

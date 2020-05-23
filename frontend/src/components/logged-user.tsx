@@ -1,20 +1,20 @@
 import Taro, { FC } from '@tarojs/taro'
 import { View, Image } from '@tarojs/components'
 
-import avatar from '../images/icon/kanban-selected.png';
+import avatar from '../images/icon/dolphin.jpg';
+
+import './logged-user.scss';
 
 interface LoggedUserProps {
   userInfo: {
     avatar: string;
     nickName: string;
-    userName: string;
   }
 }
 
 const DEFAULT_PROPS = {
   avatar: '',
   nickName: '',
-  userName: ''
 }
 
 const LoggedUser: FC<LoggedUserProps> = props => {
@@ -36,7 +36,6 @@ const LoggedUser: FC<LoggedUserProps> = props => {
       <View className="nickName">
         {userInfo.nickName || '游客'}
       </View>
-      <View className="username">{userInfo.userName}</View>
     </View>
   )
 }
