@@ -4,9 +4,9 @@ import "time"
 
 type User struct {
 	Id string `gorm:"primary_key;auto_increment:false;not null;type:varchar(30)"`
-	Name string `gorm:"not null;type:varchar(10)"`
+	Name string `gorm:"not null;type:varchar(20)"`
 	Gender int8
-	Avatar string `gorm:"type:varchar(100)"`
+	Avatar string `gorm:"type:varchar(156)"`
 	// associated
 	SelfGroup Group
 	SelfGroupId int32  `gorm:"foreign_key:id"`
@@ -20,15 +20,15 @@ type Group struct {
 	Id int32 `gorm:"primary_key;auto_increment;not null"`
 	Name string `gorm:"default:'';type:varchar(20);unique_index:idx_name_creatorid"`
 	// associated
-	CreatorId string `gorm:"foreign_key:id;unique_index:idx_name_creatorid;not null"`
+	CreatorId string `gorm:"foreign_key:id;unique_index:idx_name_creatorid;not null;type:varchar(30)"`
 	Type int8 `gorm:"default:0;not null"`
-	Tasks []Task `gorm:"ForeignKey:group_id"`
+	Tasks []Task `gorm:"foreign_key:group_id"`
 }
 
 type Task struct {
 	Id int32 `gorm:"primary_key;auto_increment;not null"`
-	GroupId int32 `gorm:"foreign_key:id;not null"`
-	Name string `gorm:"type:varchar(20);default:''"`
+	GroupId int32 `gorm:"foreign_key:id;not null;unique_index:idx_name_groupid"`
+	Name string `gorm:"type:varchar(20);default:'';unique_index:idx_name_groupid"`
 	PublisherId string `gorm:"foreign_key:id;not null;type:varchar(30)"`
 	LeaderId string `gorm:"foreign_key:id;type:varchar(30)"`
 	StartDate  time.Time

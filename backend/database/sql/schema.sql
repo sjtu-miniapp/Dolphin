@@ -1,4 +1,4 @@
-
+#
 SET FOREIGN_KEY_CHECKS = 0;
 
 DROP DATABASE IF EXISTS `dolphin`;
@@ -52,8 +52,8 @@ CREATE TABLE `task` (
     # only for group work
     `leader_id` VARCHAR(30),
     # 2020-02-02
-    `start_date` DATE,
-    `end_date` DATE,
+    `start_date` DATETIME,
+    `end_date` DATETIME,
     # if readonly, only the publisher can revise the task
     `readonly` BOOL DEFAULT FALSE NOT NULL,
     # 0: group, 1: individuaL;
