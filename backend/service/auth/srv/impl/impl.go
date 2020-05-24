@@ -3,10 +3,11 @@ package impl
 import (
 	"context"
 	"crypto/sha256"
-	"database/sql"
 	"encoding/json"
+	"github.com/jinzhu/gorm"
 	"github.com/prometheus/common/log"
 	"github.com/sjtu-miniapp/dolphin/service/database"
+	"github.com/sjtu-miniapp/dolphin/service/database/model"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -22,7 +23,7 @@ import (
 )
 
 type Auth struct {
-	SqlDb     *sql.DB
+	SqlDb     *gorm.DB
 	RedisDb   *redis.Client
 	AppId     string
 	AppSecret string
@@ -34,11 +35,11 @@ type authVal struct {
 }
 
 type User struct {
-	Openid      string        `json:"openid"`
-	Name        string        `json:"name"`
-	Gender      int32         `json:"gender"`
-	Avatar      string        `json:"avatar"`
-	SelfGroupId sql.NullInt32 `json:"self_group_id"`
+	Openid      string  `json:"openid"`
+	Name        string  `json:"name"`
+	Gender      *int32  `json:"gender"`
+	Avatar      *string `json:"avatar"`
+	SelfGroupId *int32  `json:"self_group_id"`
 }
 
 // openid, sid
@@ -55,6 +56,9 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	//response.Openid = openid
 	//response.Sid = sid
 	//return nil
+	if request.Code == nil {
+		return fmt.Errorf("nil pointer")
+	}
 	type auth2SessionResponse struct {
 		Openid     string `json:"openid"`
 		SessionKey string `json:"session_key"`
@@ -65,7 +69,7 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	loginUrl := "https://api.weixin.qq.com/sns/jscode2session?appid=" +
 		url.QueryEscape(a.AppId) +
 		"&secret=" + url.QueryEscape(a.AppSecret) +
-		"&js_code=" + url.QueryEscape(request.Code) +
+		"&js_code=" + url.QueryEscape(*request.Code) +
 		"&grant_type=authorization_code"
 	httpClient := http.DefaultClient
 	httpClient.Timeout = time.Second * 3
@@ -107,12 +111,16 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	go func() {
 		err = database.Set(a.RedisDb, 1*time.Hour, sid, authVal{Openid: openid, Sid: sid})
 	}()
-	response.Openid = openid
-	response.Sid = sid
+
+	response.Openid = &openid
+	response.Sid = &sid
 	return err
 }
 
 func (a Auth) PutUser(ctx context.Context, request *pb.PutUserRequest, response *pb.PutUserResponse) error {
+	if request.Openid == nil || request.Name == nil {
+		return fmt.Errorf("nil pointer")
+	}
 	db := a.SqlDb
 	var user pb.GetUserResponse
 	err := a.GetUser(ctx, &pb.GetUserRequest{
@@ -120,73 +128,96 @@ func (a Auth) PutUser(ctx context.Context, request *pb.PutUserRequest, response 
 	}, &user)
 	if err != nil {
 		if err.Error() == "not found" {
-			response.Err = 0
-			rows, err := db.ExecContext(ctx, "INSERT INTO `user`(`id`, `avatar`, `gender`, `name`) VALUES(?, ?, ?, ?)",
-				request.Openid, request.Avatar, request.Gender, request.Name)
-			if err != nil {
+			response.Err = nil
+			newUser := model.User{
+				Id:          *request.Openid,
+				Name:        *request.Name,
+				Gender:      request.Gender,
+				Avatar:      request.Avatar,
+				SelfGroupId: nil,
+			}
+			tx := db.Begin()
+			// put user
+			if err = tx.Create(&newUser).Error; err != nil {
+				tx.Rollback()
 				return err
 			}
-			n, _ := rows.RowsAffected()
-			if n == 1 {
-				rows, err = db.ExecContext(ctx, "INSERT INTO `group` (`creator_id`, `type`) VALUES(?, 1)", request.Openid)
-				if err != nil {
-					return err
-				}
-				gid, err := rows.LastInsertId()
-				if err != nil {
-					return err
-				}
-				_, err = db.ExecContext(ctx, "UPDATE `user` SET `self_group_id` = ? WHERE `id` = ?", gid, request.Openid)
-				if err != nil {
-					return err
-				}
-				// created
-				response.Err = 0
-				return nil
-			} else {
-				return fmt.Errorf("not inserted")
+			group := model.Group{
+				Name:      new(string),
+				CreatorId: *request.Openid,
+				Type:      1,
 			}
+			// put group
+			if err = tx.Create(&group).Error; err != nil {
+				tx.Rollback()
+				return err
+			}
+			// add self_group_id
+			if err = tx.Model(&newUser).Update("SelfGroupId", group.Id).Error; err != nil {
+				tx.Rollback()
+				return err
+			}
+			// created
+			tx.Commit()
+			return nil
 		} else {
 			return err
 		}
 	}
-	_, err = db.ExecContext(ctx, "UPDATE `user` SET `avatar` = ?, `gender` = ?, `name` = ? WHERE `id` = ?",
-		request.Avatar, request.Gender, request.Name, request.Openid)
-	if err == nil {
-		response.Err = 1
+	oldUser := model.User{
+		Id:     *request.Openid,
+		Name:   *request.Name,
+		Gender: request.Gender,
+		Avatar: request.Avatar,
+		SelfGroupId: user.SelfGroupId,
 	}
+	if request.Gender == nil {
+		oldUser.Gender = user.Gender
+	}
+	if request.Avatar == nil {
+		oldUser.Avatar = user.Avatar
+	}
+	if err = db.Save(&oldUser).Error; err != nil {
+		return err
+	}
+	response.Err = new(int32)
+	*response.Err = 1
 	return err
 }
 
 func (a Auth) GetUser(ctx context.Context, request *pb.GetUserRequest, response *pb.GetUserResponse) error {
+	if request.Id == nil {
+		return fmt.Errorf("nil pointer")
+	}
 	db := a.SqlDb
-	rows, err := db.QueryContext(ctx, "SELECT `name`, `gender`, `self_group_id`, `avatar` FROM `user` WHERE `id` = ?", request.Id)
-	if err != nil {
+	var user model.User
+	user.Id = *request.Id
+	if err := db.Find(&user).Error; err != nil {
+		// perhaps "record not found"
 		return err
 	}
-	var sgid sql.NullInt64
-	if rows.Next() {
-		err = rows.Scan(&response.Name, &response.Gender, &sgid, &response.Avatar)
-		if sgid.Valid {
-			response.SelfGroupId = uint32(sgid.Int64)
-		}
-	} else {
-		return fmt.Errorf("not found")
-	}
-	return err
+	response.Name= &user.Name
+	response.SelfGroupId = user.SelfGroupId
+	response.Gender = user.Gender
+	response.Avatar = user.Avatar
+	return nil
 }
 
 func (a Auth) CheckAuth(ctx context.Context, request *pb.CheckAuthRequest, response *pb.CheckAuthResponse) error {
+	if request.Openid == nil || request.Sid == nil {
+		return fmt.Errorf("nil pointer")
+	}
 	var val authVal
-	err := database.Get(a.RedisDb, request.Sid, &val)
+	err := database.Get(a.RedisDb, *request.Sid, &val)
+	response.Ok = new(bool)
 	if err != nil {
-		response.Ok = false
+		*response.Ok = false
 		return err
 	}
-	if val.Openid != request.Openid {
-		response.Ok = false
+	if val.Openid != *request.Openid {
+		*response.Ok = false
 		return fmt.Errorf("user id and session id don't match")
 	}
-	response.Ok = true
+	*response.Ok = true
 	return nil
 }

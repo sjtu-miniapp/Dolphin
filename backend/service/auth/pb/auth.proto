@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 option go_package = ".;pb";
 
 service Auth {
@@ -13,42 +13,42 @@ service Auth {
 }
 
 message OnLoginRequest {
-    string code = 1;
+    required string code = 1;
 }
 
 message OnLoginResponse {
-    string openid = 1;
-    string sid = 2;
+    required string openid = 1;
+    required string sid = 2;
 }
 
 message PutUserRequest {
-  string openid = 1;
-  string name = 2;
-  int32 gender = 3;
-  string avatar = 4;
+  required string openid = 1;
+  required string name = 2;
+  optional int32 gender = 3;
+  optional string avatar = 4;
 }
 
 message PutUserResponse {
-  int32 err = 1;
+  optional int32 err = 1;
 }
 
 message GetUserRequest {
-    string id = 1;
+   required string id = 1;
 }
 
 message GetUserResponse {
-    string name = 1;
-    int32 gender = 2;
-    string avatar = 3;
-    uint32  self_group_id = 4;
+   required string name = 1;
+   optional int32 gender = 2;
+   optional string avatar = 3;
+   required int32  self_group_id = 4;
 }
 
 
 message CheckAuthRequest {
-    string openid = 1;
-    string sid = 2;
+   required string openid = 1;
+   required string sid = 2;
 }
 
 message CheckAuthResponse {
-    bool ok = 1;
+   required bool ok = 1;
 }
