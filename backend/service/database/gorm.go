@@ -9,13 +9,16 @@ import (
 )
 
 // REF: https://www.mindbowser.com/golang-go-with-gorm/
-func DbConn(User, Password, Host, Db string, Port int) (*gorm.DB, error) {
+func DbConn(User, Password, Host, Db string, Port int, Debug int) (*gorm.DB, error) {
 	connArgs := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		User, Password, Host, Port, Db)
 	db, err := gorm.Open("mysql", connArgs)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
+	}
+	if Debug == 1 {
+		db = db.Debug()
 	}
 	// dont add s for tables
 	db.SingularTable(true)
@@ -24,7 +27,6 @@ func DbConn(User, Password, Host, Db string, Port int) (*gorm.DB, error) {
 }
 
 func DbSetup(db *gorm.DB) {
-	db = db.Debug()
 	if !db.HasTable(&model.User{}) {
 		db.CreateTable(&model.User{})
 	}

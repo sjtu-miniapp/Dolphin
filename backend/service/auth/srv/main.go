@@ -49,6 +49,7 @@ type Config struct {
 		Host string `yaml:"host"`
 		Pass string `yaml:"pass"`
 	} `yaml:"redis"`
+	Debug int `yaml:"debug"`
 }
 
 func main() {
@@ -60,7 +61,7 @@ func main() {
 
 	srv := createService(cfg)
 	sqldb, err := database.DbConn(cfg.Mysql.User, cfg.Mysql.Pass,
-		cfg.Mysql.Host, cfg.Mysql.Db, 3306)
+		cfg.Mysql.Host, cfg.Mysql.Db, 3306, cfg.Debug)
 	if err != nil {
 		return
 	}

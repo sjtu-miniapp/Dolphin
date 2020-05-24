@@ -10,11 +10,10 @@ type User struct {
 	// associated
 	SelfGroup *Group
 	SelfGroupId *int32  `gorm:"foreign_key:id;default null"`
-	// TODO: POINTER?
 	// associated
-	Groups []Group `gorm:"many2many:user_group;foreign_key:user_id"`
+	Groups []*Group `gorm:"many2many:user_group;foreign_key:user_id"`
 	// associated
-	Tasks []Task `gorm:"many2many:user_task;foreign_key:user_id"`
+	Tasks []*Task `gorm:"many2many:user_task;foreign_key:user_id"`
 }
 
 type Group struct {
@@ -23,7 +22,8 @@ type Group struct {
 	// associated
 	CreatorId string `gorm:"foreign_key:id;unique_index:idx_name_creatorid;not null;type:varchar(30)"`
 	Type int32 `gorm:"default:0;not null"`
-	Tasks []Task `gorm:"foreign_key:group_id"`
+	Users []*User `gorm:"many2many:user_group;foreign_key:group_id"`
+ 	Tasks []*Task `gorm:"foreign_key:group_id"`
 }
 
 type Task struct {

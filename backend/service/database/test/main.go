@@ -8,20 +8,20 @@ import (
 )
 
 func main() {
-	db, err := database.DbConn("root", "610878", "localhost", "test", 3306)
+	db, err := database.DbConn("root", "610878", "localhost", "test", 3306, 1)
 	if err != nil {
 		log.Fatal(err)
 	}
-	user := model.User{Id: "hlo"}
-	err = db.Find(&user).Error
-	fmt.Println(err)
-	fmt.Println(user)
+	//user := model.User{Id: "andy"}
+	//err = db.Find(&user).Error
+	//fmt.Println(err)
+	//fmt.Println(user)
 	//_ = rand.New(
 	//	rand.NewSource(time.Now().UnixNano()))
 	//name := "ahelsddaaadasdfalddffdadso" + strconv.Itoa(rand.Intn(1000))
 	//// put user
-	//user := model.User{Id: name, SelfGroupId: nil}
-
+	//user = model.User{Id: name, SelfGroupId: nil}
+	//
 	//db.Create(&user)
 	//group := model.Group{
 	//	Name:      new(string),
@@ -34,6 +34,13 @@ func main() {
 	////db.Find(&user).Update("SelfGroup", group)
 	////fmt.Println(*user.SelfGroup, *user.SelfGroupId)
 	//_ = db.Preload("SelfGroup").Find(&user).Error
+	//db.Preload("Groups").Find(&user)
+	//fmt.Println(user.Groups[0].Id)
+	group := model.Group{
+		Id:        6,
+	}
+	db.Preload("Users").Find(&group)
+	fmt.Println(group.Users[0].Name)
 
 }
 

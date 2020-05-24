@@ -41,6 +41,7 @@ type Config struct {
 		Db   string `yaml:"db"`
 	} `yaml:"mysql"`
 	Registry []string `yaml:"registry"`
+	Debug int `yaml:"debug"`
 }
 
 func main() {
@@ -51,10 +52,12 @@ func main() {
 	}
 
 	srv := createService(cfg)
-	sqldb, err:= database.InitDb(cfg.Mysql.User, cfg.Mysql.Pass, cfg.Mysql.Host, cfg.Mysql.Db)
+	sqldb, err := database.DbConn(cfg.Mysql.User, cfg.Mysql.Pass,
+		cfg.Mysql.Host, cfg.Mysql.Db, 3306, cfg.Debug)
 	if err != nil {
 		return
 	}
+
 	_ = pb.RegisterGroupHandler(srv.Server(), &impl.Group{SqlDb: sqldb})
 	if err := srv.Run(); err != nil {
 		log.Fatal("fail to run the service", err)
