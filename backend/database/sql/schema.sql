@@ -10,13 +10,12 @@ CREATE TABLE `user` (
     `name` VARCHAR(20) NOT NULL,
     # 0: F, 1: M
     `gender` TINYINT(1),
-    `avatar` VARCHAR(100),
+    `avatar` VARCHAR(156),
 # not exposed to clients
     `self_group_id` BIGINT(32),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`self_group_id`) REFERENCES `group`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) DEFAULT CHARSET=utf8;
-
 
 # every user starts with his own group
 # but the self group relationship is not included here

@@ -38,9 +38,9 @@ docker: build
       		if [[ $${srv} == database ]]; then  \
       		continue ; \
     		fi ; \
-    		sudo docker build -t nihplod/$${srv}-srv -f ${SRV}/$${srv}/Dockerfile backend; \
+    		sudo docker build --no-cache -t nihplod/$${srv}-srv -f ${SRV}/$${srv}/Dockerfile backend; \
     		sudo docker push nihplod/$${srv}-srv ; \
-    		sudo docker build -t nihplod/$${srv}-api -f ${API}/$${version}/$${srv}/Dockerfile backend; \
+    		sudo docker build --no-cache -t nihplod/$${srv}-api -f ${API}/$${version}/$${srv}/Dockerfile backend; \
             sudo docker push nihplod/$${srv}-api ; \
             echo image $${srv} ; \
     done
