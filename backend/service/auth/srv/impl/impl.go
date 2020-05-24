@@ -47,6 +47,7 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	}()
 	response.Openid = &openid
 	response.Sid = &sid
+	fmt.Println(response)
 	return nil
 	//if request.Code == nil {
 	//	return fmt.Errorf("nil pointer")

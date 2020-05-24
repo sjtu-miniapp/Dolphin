@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 option go_package = ".;pb";
 service Task {
   rpc GetTaskMeta(GetTaskMetaRequest) returns (GetTaskMetaResponse);
@@ -12,40 +12,42 @@ service Task {
 
 
 message TaskMeta {
-  string name = 1;
-  uint32 type = 2;
-  bool done = 3;
-  uint32 groupId = 4;
-  string publisher_id = 5;
-  string leader_id = 6;
-  string start_date = 7;
-  string end_date = 8;
-  bool readonly = 9;
-  string description = 10;
+  required string name = 1;
+  required int32 type = 2;
+  required bool done = 3;
+  required int32 groupId = 4;
+  required string publisher_id = 5;
+  optional string leader_id = 6;
+  optional string start_date = 7;
+  optional string end_date = 8;
+  required bool readonly = 9;
+  required string description = 10;
 }
 message GetTaskMetaRequest {
-  uint32 id = 1;
+  required int32 id = 1;
 }
 
 message GetTaskMetaResponse {
-  TaskMeta meta = 1;
+  required TaskMeta meta = 1;
 }
 
 message GetTaskPeopleRequset {
-  uint32 id = 1;
+  required int32 id = 1;
 }
 message GetTaskPeopleResponse {
   message User {
-    string id = 1;
-    string name = 2;
-    bool done = 3;
-    string done_time = 4;
+    required string id = 1;
+    required string name = 2;
+    required bool done = 3;
+    required string done_time = 4;
+    optional string avatar = 5;
+    optional int32 gender = 6;
   }
   repeated User workers = 1;
 }
 
 message GetTaskMetaByGroupIdRequest {
-  uint32 group_id = 1;
+  required int32 group_id = 1;
 }
 
 message GetTaskMetaByGroupIdResponse {
@@ -53,42 +55,42 @@ message GetTaskMetaByGroupIdResponse {
 }
 
 message CreateTaskRequest {
-  int32 group_id = 1;
+  required int32 group_id = 1;
   repeated string user_ids = 2;
-  string name = 3;
-  int32 type = 4;
-  string leader_id = 5;
-  string start_date = 6;
-  string end_date = 7;
-  string description = 8;
-  string publisher_id = 9;
-  bool readonly = 10;
+  required string name = 3;
+  required int32 type = 4;
+  optional string leader_id = 5;
+  optional string start_date = 6;
+  optional string end_date = 7;
+  optional string description = 8;
+  required string publisher_id = 9;
+  required bool readonly = 10;
 }
 message CreateTaskResponse {
-  uint32 id = 1;
+  required int32 id = 1;
 }
 
 message UpdateTaskMetaRequest {
-  uint32 id = 1;
-  string name = 2;
-  string start_date = 3;
-  string end_date = 4;
-  bool readonly = 5;
-  string description = 6;
+  required int32 id = 1;
+  optional string name = 2;
+  optional string start_date = 3;
+  optional string end_date = 4;
+  optional bool readonly = 5;
+  optional string description = 6;
 }
 message UpdateTaskMetaResponse {
 }
 
 message DeleteTaskRequest {
-  uint32 id = 1;
+  required int32 id = 1;
 }
 message DeleteTaskResponse {
 }
 
 message UserInTaskRequest {
-  string user_id = 1;
-  uint32 task_id = 2;
+  required string user_id = 1;
+  required int32 task_id = 2;
 }
 message UserInTaskResponse {
-  bool ok = 1;
+  required bool ok = 1;
 }

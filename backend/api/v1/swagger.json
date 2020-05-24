@@ -17,7 +17,7 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64"
+          "format": "int32"
         }
       }
     },
@@ -69,6 +69,13 @@
         },
         "doneTime": {
           "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -80,7 +87,7 @@
         },
         "type": {
           "type": "integer",
-          "format": "int64"
+          "format": "int32"
         },
         "done": {
           "type": "boolean",
@@ -88,7 +95,7 @@
         },
         "groupId": {
           "type": "integer",
-          "format": "int64"
+          "format": "int32"
         },
         "publisherId": {
           "type": "string"

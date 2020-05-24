@@ -21,16 +21,16 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type TaskMeta struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Type                 uint32   `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"`
-	Done                 bool     `protobuf:"varint,3,opt,name=done,proto3" json:"done,omitempty"`
-	GroupId              uint32   `protobuf:"varint,4,opt,name=groupId,proto3" json:"groupId,omitempty"`
-	PublisherId          string   `protobuf:"bytes,5,opt,name=publisher_id,json=publisherId,proto3" json:"publisher_id,omitempty"`
-	LeaderId             string   `protobuf:"bytes,6,opt,name=leader_id,json=leaderId,proto3" json:"leader_id,omitempty"`
-	StartDate            string   `protobuf:"bytes,7,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate              string   `protobuf:"bytes,8,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
-	Readonly             bool     `protobuf:"varint,9,opt,name=readonly,proto3" json:"readonly,omitempty"`
-	Description          string   `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	Name                 *string  `protobuf:"bytes,1,req,name=name" json:"name,omitempty"`
+	Type                 *int32   `protobuf:"varint,2,req,name=type" json:"type,omitempty"`
+	Done                 *bool    `protobuf:"varint,3,req,name=done" json:"done,omitempty"`
+	GroupId              *int32   `protobuf:"varint,4,req,name=groupId" json:"groupId,omitempty"`
+	PublisherId          *string  `protobuf:"bytes,5,req,name=publisher_id,json=publisherId" json:"publisher_id,omitempty"`
+	LeaderId             *string  `protobuf:"bytes,6,opt,name=leader_id,json=leaderId" json:"leader_id,omitempty"`
+	StartDate            *string  `protobuf:"bytes,7,opt,name=start_date,json=startDate" json:"start_date,omitempty"`
+	EndDate              *string  `protobuf:"bytes,8,opt,name=end_date,json=endDate" json:"end_date,omitempty"`
+	Readonly             *bool    `protobuf:"varint,9,req,name=readonly" json:"readonly,omitempty"`
+	Description          *string  `protobuf:"bytes,10,req,name=description" json:"description,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -62,77 +62,77 @@ func (m *TaskMeta) XXX_DiscardUnknown() {
 var xxx_messageInfo_TaskMeta proto.InternalMessageInfo
 
 func (m *TaskMeta) GetName() string {
-	if m != nil {
-		return m.Name
+	if m != nil && m.Name != nil {
+		return *m.Name
 	}
 	return ""
 }
 
-func (m *TaskMeta) GetType() uint32 {
-	if m != nil {
-		return m.Type
+func (m *TaskMeta) GetType() int32 {
+	if m != nil && m.Type != nil {
+		return *m.Type
 	}
 	return 0
 }
 
 func (m *TaskMeta) GetDone() bool {
-	if m != nil {
-		return m.Done
+	if m != nil && m.Done != nil {
+		return *m.Done
 	}
 	return false
 }
 
-func (m *TaskMeta) GetGroupId() uint32 {
-	if m != nil {
-		return m.GroupId
+func (m *TaskMeta) GetGroupId() int32 {
+	if m != nil && m.GroupId != nil {
+		return *m.GroupId
 	}
 	return 0
 }
 
 func (m *TaskMeta) GetPublisherId() string {
-	if m != nil {
-		return m.PublisherId
+	if m != nil && m.PublisherId != nil {
+		return *m.PublisherId
 	}
 	return ""
 }
 
 func (m *TaskMeta) GetLeaderId() string {
-	if m != nil {
-		return m.LeaderId
+	if m != nil && m.LeaderId != nil {
+		return *m.LeaderId
 	}
 	return ""
 }
 
 func (m *TaskMeta) GetStartDate() string {
-	if m != nil {
-		return m.StartDate
+	if m != nil && m.StartDate != nil {
+		return *m.StartDate
 	}
 	return ""
 }
 
 func (m *TaskMeta) GetEndDate() string {
-	if m != nil {
-		return m.EndDate
+	if m != nil && m.EndDate != nil {
+		return *m.EndDate
 	}
 	return ""
 }
 
 func (m *TaskMeta) GetReadonly() bool {
-	if m != nil {
-		return m.Readonly
+	if m != nil && m.Readonly != nil {
+		return *m.Readonly
 	}
 	return false
 }
 
 func (m *TaskMeta) GetDescription() string {
-	if m != nil {
-		return m.Description
+	if m != nil && m.Description != nil {
+		return *m.Description
 	}
 	return ""
 }
 
 type GetTaskMetaRequest struct {
-	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   *int32   `protobuf:"varint,1,req,name=id" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -163,15 +163,15 @@ func (m *GetTaskMetaRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetTaskMetaRequest proto.InternalMessageInfo
 
-func (m *GetTaskMetaRequest) GetId() uint32 {
-	if m != nil {
-		return m.Id
+func (m *GetTaskMetaRequest) GetId() int32 {
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return 0
 }
 
 type GetTaskMetaResponse struct {
-	Meta                 *TaskMeta `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	Meta                 *TaskMeta `protobuf:"bytes,1,req,name=meta" json:"meta,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -210,7 +210,7 @@ func (m *GetTaskMetaResponse) GetMeta() *TaskMeta {
 }
 
 type GetTaskPeopleRequset struct {
-	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   *int32   `protobuf:"varint,1,req,name=id" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -241,15 +241,15 @@ func (m *GetTaskPeopleRequset) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetTaskPeopleRequset proto.InternalMessageInfo
 
-func (m *GetTaskPeopleRequset) GetId() uint32 {
-	if m != nil {
-		return m.Id
+func (m *GetTaskPeopleRequset) GetId() int32 {
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return 0
 }
 
 type GetTaskPeopleResponse struct {
-	Workers              []*GetTaskPeopleResponse_User `protobuf:"bytes,1,rep,name=workers,proto3" json:"workers,omitempty"`
+	Workers              []*GetTaskPeopleResponse_User `protobuf:"bytes,1,rep,name=workers" json:"workers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_unrecognized     []byte                        `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
@@ -288,10 +288,12 @@ func (m *GetTaskPeopleResponse) GetWorkers() []*GetTaskPeopleResponse_User {
 }
 
 type GetTaskPeopleResponse_User struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Done                 bool     `protobuf:"varint,3,opt,name=done,proto3" json:"done,omitempty"`
-	DoneTime             string   `protobuf:"bytes,4,opt,name=done_time,json=doneTime,proto3" json:"done_time,omitempty"`
+	Id                   *string  `protobuf:"bytes,1,req,name=id" json:"id,omitempty"`
+	Name                 *string  `protobuf:"bytes,2,req,name=name" json:"name,omitempty"`
+	Done                 *bool    `protobuf:"varint,3,req,name=done" json:"done,omitempty"`
+	DoneTime             *string  `protobuf:"bytes,4,req,name=done_time,json=doneTime" json:"done_time,omitempty"`
+	Avatar               *string  `protobuf:"bytes,5,opt,name=avatar" json:"avatar,omitempty"`
+	Gender               *int32   `protobuf:"varint,6,opt,name=gender" json:"gender,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -323,35 +325,49 @@ func (m *GetTaskPeopleResponse_User) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetTaskPeopleResponse_User proto.InternalMessageInfo
 
 func (m *GetTaskPeopleResponse_User) GetId() string {
-	if m != nil {
-		return m.Id
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return ""
 }
 
 func (m *GetTaskPeopleResponse_User) GetName() string {
-	if m != nil {
-		return m.Name
+	if m != nil && m.Name != nil {
+		return *m.Name
 	}
 	return ""
 }
 
 func (m *GetTaskPeopleResponse_User) GetDone() bool {
-	if m != nil {
-		return m.Done
+	if m != nil && m.Done != nil {
+		return *m.Done
 	}
 	return false
 }
 
 func (m *GetTaskPeopleResponse_User) GetDoneTime() string {
-	if m != nil {
-		return m.DoneTime
+	if m != nil && m.DoneTime != nil {
+		return *m.DoneTime
 	}
 	return ""
 }
 
+func (m *GetTaskPeopleResponse_User) GetAvatar() string {
+	if m != nil && m.Avatar != nil {
+		return *m.Avatar
+	}
+	return ""
+}
+
+func (m *GetTaskPeopleResponse_User) GetGender() int32 {
+	if m != nil && m.Gender != nil {
+		return *m.Gender
+	}
+	return 0
+}
+
 type GetTaskMetaByGroupIdRequest struct {
-	GroupId              uint32   `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	GroupId              *int32   `protobuf:"varint,1,req,name=group_id,json=groupId" json:"group_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -382,15 +398,15 @@ func (m *GetTaskMetaByGroupIdRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetTaskMetaByGroupIdRequest proto.InternalMessageInfo
 
-func (m *GetTaskMetaByGroupIdRequest) GetGroupId() uint32 {
-	if m != nil {
-		return m.GroupId
+func (m *GetTaskMetaByGroupIdRequest) GetGroupId() int32 {
+	if m != nil && m.GroupId != nil {
+		return *m.GroupId
 	}
 	return 0
 }
 
 type GetTaskMetaByGroupIdResponse struct {
-	Metas                []*TaskMeta `protobuf:"bytes,1,rep,name=metas,proto3" json:"metas,omitempty"`
+	Metas                []*TaskMeta `protobuf:"bytes,1,rep,name=metas" json:"metas,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
 	XXX_sizecache        int32       `json:"-"`
@@ -429,16 +445,16 @@ func (m *GetTaskMetaByGroupIdResponse) GetMetas() []*TaskMeta {
 }
 
 type CreateTaskRequest struct {
-	GroupId              int32    `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
-	UserIds              []string `protobuf:"bytes,2,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
-	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Type                 int32    `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty"`
-	LeaderId             string   `protobuf:"bytes,5,opt,name=leader_id,json=leaderId,proto3" json:"leader_id,omitempty"`
-	StartDate            string   `protobuf:"bytes,6,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate              string   `protobuf:"bytes,7,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
-	Description          string   `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
-	PublisherId          string   `protobuf:"bytes,9,opt,name=publisher_id,json=publisherId,proto3" json:"publisher_id,omitempty"`
-	Readonly             bool     `protobuf:"varint,10,opt,name=readonly,proto3" json:"readonly,omitempty"`
+	GroupId              *int32   `protobuf:"varint,1,req,name=group_id,json=groupId" json:"group_id,omitempty"`
+	UserIds              []string `protobuf:"bytes,2,rep,name=user_ids,json=userIds" json:"user_ids,omitempty"`
+	Name                 *string  `protobuf:"bytes,3,req,name=name" json:"name,omitempty"`
+	Type                 *int32   `protobuf:"varint,4,req,name=type" json:"type,omitempty"`
+	LeaderId             *string  `protobuf:"bytes,5,opt,name=leader_id,json=leaderId" json:"leader_id,omitempty"`
+	StartDate            *string  `protobuf:"bytes,6,opt,name=start_date,json=startDate" json:"start_date,omitempty"`
+	EndDate              *string  `protobuf:"bytes,7,opt,name=end_date,json=endDate" json:"end_date,omitempty"`
+	Description          *string  `protobuf:"bytes,8,opt,name=description" json:"description,omitempty"`
+	PublisherId          *string  `protobuf:"bytes,9,req,name=publisher_id,json=publisherId" json:"publisher_id,omitempty"`
+	Readonly             *bool    `protobuf:"varint,10,req,name=readonly" json:"readonly,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -470,8 +486,8 @@ func (m *CreateTaskRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_CreateTaskRequest proto.InternalMessageInfo
 
 func (m *CreateTaskRequest) GetGroupId() int32 {
-	if m != nil {
-		return m.GroupId
+	if m != nil && m.GroupId != nil {
+		return *m.GroupId
 	}
 	return 0
 }
@@ -484,63 +500,63 @@ func (m *CreateTaskRequest) GetUserIds() []string {
 }
 
 func (m *CreateTaskRequest) GetName() string {
-	if m != nil {
-		return m.Name
+	if m != nil && m.Name != nil {
+		return *m.Name
 	}
 	return ""
 }
 
 func (m *CreateTaskRequest) GetType() int32 {
-	if m != nil {
-		return m.Type
+	if m != nil && m.Type != nil {
+		return *m.Type
 	}
 	return 0
 }
 
 func (m *CreateTaskRequest) GetLeaderId() string {
-	if m != nil {
-		return m.LeaderId
+	if m != nil && m.LeaderId != nil {
+		return *m.LeaderId
 	}
 	return ""
 }
 
 func (m *CreateTaskRequest) GetStartDate() string {
-	if m != nil {
-		return m.StartDate
+	if m != nil && m.StartDate != nil {
+		return *m.StartDate
 	}
 	return ""
 }
 
 func (m *CreateTaskRequest) GetEndDate() string {
-	if m != nil {
-		return m.EndDate
+	if m != nil && m.EndDate != nil {
+		return *m.EndDate
 	}
 	return ""
 }
 
 func (m *CreateTaskRequest) GetDescription() string {
-	if m != nil {
-		return m.Description
+	if m != nil && m.Description != nil {
+		return *m.Description
 	}
 	return ""
 }
 
 func (m *CreateTaskRequest) GetPublisherId() string {
-	if m != nil {
-		return m.PublisherId
+	if m != nil && m.PublisherId != nil {
+		return *m.PublisherId
 	}
 	return ""
 }
 
 func (m *CreateTaskRequest) GetReadonly() bool {
-	if m != nil {
-		return m.Readonly
+	if m != nil && m.Readonly != nil {
+		return *m.Readonly
 	}
 	return false
 }
 
 type CreateTaskResponse struct {
-	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   *int32   `protobuf:"varint,1,req,name=id" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -571,20 +587,20 @@ func (m *CreateTaskResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateTaskResponse proto.InternalMessageInfo
 
-func (m *CreateTaskResponse) GetId() uint32 {
-	if m != nil {
-		return m.Id
+func (m *CreateTaskResponse) GetId() int32 {
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return 0
 }
 
 type UpdateTaskMetaRequest struct {
-	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	StartDate            string   `protobuf:"bytes,3,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`
-	EndDate              string   `protobuf:"bytes,4,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`
-	Readonly             bool     `protobuf:"varint,5,opt,name=readonly,proto3" json:"readonly,omitempty"`
-	Description          string   `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
+	Id                   *int32   `protobuf:"varint,1,req,name=id" json:"id,omitempty"`
+	Name                 *string  `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	StartDate            *string  `protobuf:"bytes,3,opt,name=start_date,json=startDate" json:"start_date,omitempty"`
+	EndDate              *string  `protobuf:"bytes,4,opt,name=end_date,json=endDate" json:"end_date,omitempty"`
+	Readonly             *bool    `protobuf:"varint,5,opt,name=readonly" json:"readonly,omitempty"`
+	Description          *string  `protobuf:"bytes,6,opt,name=description" json:"description,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -615,44 +631,44 @@ func (m *UpdateTaskMetaRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UpdateTaskMetaRequest proto.InternalMessageInfo
 
-func (m *UpdateTaskMetaRequest) GetId() uint32 {
-	if m != nil {
-		return m.Id
+func (m *UpdateTaskMetaRequest) GetId() int32 {
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return 0
 }
 
 func (m *UpdateTaskMetaRequest) GetName() string {
-	if m != nil {
-		return m.Name
+	if m != nil && m.Name != nil {
+		return *m.Name
 	}
 	return ""
 }
 
 func (m *UpdateTaskMetaRequest) GetStartDate() string {
-	if m != nil {
-		return m.StartDate
+	if m != nil && m.StartDate != nil {
+		return *m.StartDate
 	}
 	return ""
 }
 
 func (m *UpdateTaskMetaRequest) GetEndDate() string {
-	if m != nil {
-		return m.EndDate
+	if m != nil && m.EndDate != nil {
+		return *m.EndDate
 	}
 	return ""
 }
 
 func (m *UpdateTaskMetaRequest) GetReadonly() bool {
-	if m != nil {
-		return m.Readonly
+	if m != nil && m.Readonly != nil {
+		return *m.Readonly
 	}
 	return false
 }
 
 func (m *UpdateTaskMetaRequest) GetDescription() string {
-	if m != nil {
-		return m.Description
+	if m != nil && m.Description != nil {
+		return *m.Description
 	}
 	return ""
 }
@@ -689,7 +705,7 @@ func (m *UpdateTaskMetaResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_UpdateTaskMetaResponse proto.InternalMessageInfo
 
 type DeleteTaskRequest struct {
-	Id                   uint32   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   *int32   `protobuf:"varint,1,req,name=id" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -720,9 +736,9 @@ func (m *DeleteTaskRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteTaskRequest proto.InternalMessageInfo
 
-func (m *DeleteTaskRequest) GetId() uint32 {
-	if m != nil {
-		return m.Id
+func (m *DeleteTaskRequest) GetId() int32 {
+	if m != nil && m.Id != nil {
+		return *m.Id
 	}
 	return 0
 }
@@ -759,8 +775,8 @@ func (m *DeleteTaskResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_DeleteTaskResponse proto.InternalMessageInfo
 
 type UserInTaskRequest struct {
-	UserId               string   `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	TaskId               uint32   `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	UserId               *string  `protobuf:"bytes,1,req,name=user_id,json=userId" json:"user_id,omitempty"`
+	TaskId               *int32   `protobuf:"varint,2,req,name=task_id,json=taskId" json:"task_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -792,21 +808,21 @@ func (m *UserInTaskRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_UserInTaskRequest proto.InternalMessageInfo
 
 func (m *UserInTaskRequest) GetUserId() string {
-	if m != nil {
-		return m.UserId
+	if m != nil && m.UserId != nil {
+		return *m.UserId
 	}
 	return ""
 }
 
-func (m *UserInTaskRequest) GetTaskId() uint32 {
-	if m != nil {
-		return m.TaskId
+func (m *UserInTaskRequest) GetTaskId() int32 {
+	if m != nil && m.TaskId != nil {
+		return *m.TaskId
 	}
 	return 0
 }
 
 type UserInTaskResponse struct {
-	Ok                   bool     `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	Ok                   *bool    `protobuf:"varint,1,req,name=ok" json:"ok,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -838,8 +854,8 @@ func (m *UserInTaskResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_UserInTaskResponse proto.InternalMessageInfo
 
 func (m *UserInTaskResponse) GetOk() bool {
-	if m != nil {
-		return m.Ok
+	if m != nil && m.Ok != nil {
+		return *m.Ok
 	}
 	return false
 }
@@ -866,50 +882,51 @@ func init() {
 func init() { proto.RegisterFile("task.proto", fileDescriptor_ce5d8dd45b4a91ff) }
 
 var fileDescriptor_ce5d8dd45b4a91ff = []byte{
-	// 706 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x95, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0xc7, 0x65, 0xc7, 0x71, 0xec, 0x09, 0xad, 0xd4, 0x4d, 0x3f, 0x5c, 0xa7, 0x15, 0xc1, 0x20,
-	0x94, 0xd3, 0x1e, 0x0a, 0x95, 0x2a, 0x71, 0xa8, 0x28, 0x45, 0x55, 0x0e, 0x48, 0xc8, 0xb4, 0x17,
-	0x38, 0x44, 0x2e, 0x3b, 0x02, 0x2b, 0x8e, 0x6d, 0xbc, 0x1b, 0xa1, 0xbe, 0x09, 0xaf, 0x80, 0x38,
-	0x72, 0xe7, 0xd9, 0xd0, 0xae, 0x1d, 0xc7, 0x8e, 0x5d, 0x9f, 0xe2, 0x9d, 0x99, 0xfd, 0x98, 0x99,
-	0xdf, 0x7f, 0x02, 0x20, 0x02, 0xbe, 0xa0, 0x69, 0x96, 0x88, 0xc4, 0xfb, 0xa5, 0x83, 0x75, 0x1b,
-	0xf0, 0xc5, 0x07, 0x14, 0x01, 0x21, 0x60, 0xc4, 0xc1, 0x12, 0x1d, 0x6d, 0xa2, 0x4d, 0x6d, 0x5f,
-	0x7d, 0x4b, 0x9b, 0x78, 0x48, 0xd1, 0xd1, 0x27, 0xda, 0x74, 0xc7, 0x57, 0xdf, 0xd2, 0xc6, 0x92,
-	0x18, 0x9d, 0xde, 0x44, 0x9b, 0x5a, 0xbe, 0xfa, 0x26, 0x0e, 0x0c, 0xbe, 0x65, 0xc9, 0x2a, 0x9d,
-	0x31, 0xc7, 0x50, 0xa1, 0xeb, 0x25, 0x79, 0x06, 0x4f, 0xd2, 0xd5, 0x7d, 0x14, 0xf2, 0xef, 0x98,
-	0xcd, 0x43, 0xe6, 0xf4, 0xd5, 0xe9, 0xc3, 0xd2, 0x36, 0x63, 0x64, 0x0c, 0x76, 0x84, 0x01, 0xcb,
-	0xfd, 0xa6, 0xf2, 0x5b, 0xb9, 0x61, 0xc6, 0xc8, 0x29, 0x00, 0x17, 0x41, 0x26, 0xe6, 0x2c, 0x10,
-	0xe8, 0x0c, 0x94, 0xd7, 0x56, 0x96, 0xeb, 0x40, 0x20, 0x39, 0x06, 0x0b, 0x63, 0x96, 0x3b, 0x2d,
-	0xe5, 0x1c, 0x60, 0xcc, 0x94, 0xcb, 0x05, 0x2b, 0xc3, 0x80, 0x25, 0x71, 0xf4, 0xe0, 0xd8, 0xea,
-	0xad, 0xe5, 0x9a, 0x4c, 0x60, 0xc8, 0x90, 0x7f, 0xcd, 0xc2, 0x54, 0x84, 0x49, 0xec, 0x40, 0xfe,
-	0xa8, 0x8a, 0xc9, 0x7b, 0x01, 0xe4, 0x06, 0xc5, 0xba, 0x38, 0x3e, 0xfe, 0x58, 0x21, 0x17, 0x64,
-	0x17, 0xf4, 0x90, 0xa9, 0x0a, 0xed, 0xf8, 0x7a, 0xc8, 0xbc, 0xd7, 0x30, 0xaa, 0x45, 0xf1, 0x34,
-	0x89, 0x39, 0x92, 0x53, 0x30, 0x96, 0x28, 0x02, 0x15, 0x38, 0x3c, 0xb3, 0x69, 0x19, 0xa0, 0xcc,
-	0xde, 0x4b, 0xd8, 0x2f, 0x76, 0x7d, 0xc4, 0x24, 0x8d, 0x50, 0x9e, 0xce, 0xb1, 0x79, 0xfa, 0x1f,
-	0x0d, 0x0e, 0xb6, 0x02, 0x8b, 0x0b, 0xce, 0x61, 0xf0, 0x33, 0xc9, 0x16, 0x98, 0x71, 0x47, 0x9b,
-	0xf4, 0xa6, 0xc3, 0xb3, 0x31, 0x6d, 0x0d, 0xa4, 0x77, 0x1c, 0x33, 0x7f, 0x1d, 0xeb, 0x7e, 0x01,
-	0x43, 0x1a, 0x2a, 0x17, 0xd9, 0xf2, 0xa2, 0xb2, 0xf5, 0x7a, 0xbd, 0xf5, 0x8d, 0x36, 0x8f, 0xc1,
-	0x96, 0xbf, 0x73, 0x11, 0x2e, 0x51, 0x35, 0xda, 0xf6, 0x2d, 0x69, 0xb8, 0x0d, 0x97, 0xe8, 0x5d,
-	0xc0, 0xb8, 0x52, 0x8b, 0xab, 0x87, 0x9b, 0x9c, 0x80, 0x75, 0xe9, 0x8e, 0xc1, 0x52, 0x4c, 0xcc,
-	0xcb, 0x14, 0xd7, 0x8c, 0x78, 0x97, 0x70, 0xd2, 0xbe, 0xb3, 0xc8, 0xf6, 0x29, 0xf4, 0x65, 0xdd,
-	0xd6, 0xb9, 0x56, 0xea, 0x99, 0xdb, 0xbd, 0xdf, 0x3a, 0xec, 0xbd, 0xcb, 0x30, 0x10, 0x28, 0x3d,
-	0x8f, 0xdd, 0xd8, 0xdf, 0x50, 0x79, 0x0c, 0xd6, 0x8a, 0x2b, 0xe0, 0xb8, 0xa3, 0x4f, 0x7a, 0x12,
-	0x1b, 0xb9, 0x9e, 0x31, 0x5e, 0xd6, 0xa2, 0xd7, 0x22, 0x03, 0x43, 0x9d, 0x92, 0xcb, 0xa0, 0x46,
-	0x6d, 0xbf, 0x93, 0x5a, 0xb3, 0x8b, 0xda, 0x41, 0x9d, 0xda, 0x2d, 0x32, 0xad, 0x06, 0x99, 0x0d,
-	0x45, 0xd9, 0x4d, 0x45, 0x55, 0xd1, 0x87, 0x3a, 0xfa, 0x12, 0xec, 0x6a, 0xa9, 0x8a, 0x12, 0x6f,
-	0xa3, 0xf7, 0x57, 0x83, 0x83, 0xbb, 0x94, 0x15, 0x61, 0x1d, 0x12, 0x68, 0x65, 0xa7, 0x9e, 0x7e,
-	0xaf, 0x2b, 0x7d, 0xe3, 0x71, 0xd1, 0xf6, 0xbb, 0x45, 0x6b, 0x36, 0x45, 0xeb, 0xc0, 0xe1, 0xf6,
-	0xa3, 0xf3, 0xfc, 0xbc, 0xe7, 0xb0, 0x77, 0x8d, 0x11, 0xd6, 0x01, 0xd9, 0x4e, 0x7a, 0x1f, 0x48,
-	0x35, 0xa8, 0xd8, 0xfa, 0x1e, 0xf6, 0xa4, 0x68, 0x66, 0x71, 0x75, 0xeb, 0x11, 0x0c, 0x0a, 0x80,
-	0x0a, 0x19, 0x99, 0x39, 0x3f, 0xd2, 0x21, 0x07, 0xac, 0x74, 0xe4, 0x43, 0xd3, 0x94, 0xcb, 0x19,
-	0x93, 0x75, 0xaf, 0x1e, 0xb3, 0xa9, 0x7b, 0xb2, 0x50, 0x47, 0x58, 0xbe, 0x9e, 0x2c, 0xce, 0xfe,
-	0xf5, 0xc0, 0x90, 0x01, 0xe4, 0x02, 0x86, 0x15, 0x4d, 0x90, 0x11, 0x6d, 0x4e, 0x23, 0x77, 0x9f,
-	0xb6, 0x0d, 0x9f, 0x4b, 0xd8, 0xdd, 0xcc, 0x82, 0x28, 0x8d, 0x90, 0x1c, 0xd0, 0xb6, 0x71, 0xe3,
-	0x1e, 0xb6, 0xcf, 0x0c, 0xf2, 0xa9, 0x1c, 0x4f, 0x35, 0x39, 0x92, 0x13, 0xda, 0xa1, 0x6f, 0xf7,
-	0x94, 0x76, 0x6a, 0xf8, 0x1c, 0x60, 0x83, 0x1d, 0x21, 0xb4, 0x21, 0x57, 0x77, 0x44, 0x5b, 0xb8,
-	0x7c, 0x0b, 0xbb, 0xf5, 0x8e, 0x92, 0x43, 0xda, 0xca, 0xa5, 0x7b, 0x44, 0xdb, 0x5b, 0x2f, 0x6f,
-	0xde, 0x74, 0x95, 0x10, 0xda, 0xe0, 0xc0, 0x1d, 0xd1, 0x66, 0xdb, 0xe5, 0xb6, 0x4d, 0xbf, 0x08,
-	0xa1, 0x0d, 0x06, 0xdc, 0x11, 0x6d, 0x36, 0xf4, 0xca, 0xfc, 0x6c, 0xd0, 0x37, 0xe9, 0xfd, 0xbd,
-	0xa9, 0xfe, 0x61, 0x5f, 0xfd, 0x0f, 0x00, 0x00, 0xff, 0xff, 0x14, 0xbd, 0x75, 0xd8, 0x6f, 0x07,
-	0x00, 0x00,
+	// 728 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0xcb, 0x6e, 0xd3, 0x4c,
+	0x14, 0x56, 0x1c, 0x27, 0xb1, 0x4f, 0x7e, 0x55, 0xea, 0xa4, 0x4d, 0x5d, 0xa7, 0xd5, 0x1f, 0x0c,
+	0x42, 0x59, 0xcd, 0xa2, 0xa2, 0x52, 0x25, 0x16, 0x15, 0xa5, 0xa8, 0xca, 0x02, 0x09, 0x99, 0x76,
+	0xc3, 0x26, 0x9a, 0x32, 0x47, 0xc5, 0x8a, 0x63, 0x1b, 0xcf, 0x04, 0xd4, 0x67, 0xe0, 0x05, 0x78,
+	0x05, 0xd6, 0xec, 0x79, 0x12, 0x1e, 0x06, 0xcd, 0xd8, 0x71, 0xec, 0xd8, 0x98, 0x95, 0x7d, 0x2e,
+	0x73, 0xfb, 0x2e, 0x07, 0x40, 0x32, 0xb1, 0xa4, 0x49, 0x1a, 0xcb, 0xd8, 0xfb, 0x6e, 0x80, 0x75,
+	0xcb, 0xc4, 0xf2, 0x2d, 0x4a, 0x46, 0x08, 0x98, 0x11, 0x5b, 0xa1, 0xd3, 0x99, 0x1a, 0x33, 0xdb,
+	0xd7, 0xff, 0x2a, 0x27, 0x1f, 0x13, 0x74, 0x8c, 0xa9, 0x31, 0xeb, 0xf9, 0xfa, 0x5f, 0xe5, 0x78,
+	0x1c, 0xa1, 0xd3, 0x9d, 0x1a, 0x33, 0xcb, 0xd7, 0xff, 0xc4, 0x81, 0xc1, 0x43, 0x1a, 0xaf, 0x93,
+	0x39, 0x77, 0x4c, 0xdd, 0xba, 0x09, 0xc9, 0x13, 0xf8, 0x2f, 0x59, 0xdf, 0x87, 0x81, 0xf8, 0x84,
+	0xe9, 0x22, 0xe0, 0x4e, 0x4f, 0xef, 0x3e, 0x2c, 0x72, 0x73, 0x4e, 0x26, 0x60, 0x87, 0xc8, 0x78,
+	0x56, 0xef, 0x4f, 0x3b, 0x33, 0xdb, 0xb7, 0xb2, 0xc4, 0x9c, 0x93, 0x53, 0x00, 0x21, 0x59, 0x2a,
+	0x17, 0x9c, 0x49, 0x74, 0x06, 0xba, 0x6a, 0xeb, 0xcc, 0x35, 0x93, 0x48, 0x8e, 0xc1, 0xc2, 0x88,
+	0x67, 0x45, 0x4b, 0x17, 0x07, 0x18, 0x71, 0x5d, 0x72, 0xc1, 0x4a, 0x91, 0xf1, 0x38, 0x0a, 0x1f,
+	0x1d, 0x5b, 0xdf, 0xb5, 0x88, 0xc9, 0x14, 0x86, 0x1c, 0xc5, 0xc7, 0x34, 0x48, 0x64, 0x10, 0x47,
+	0x0e, 0x64, 0x97, 0x2a, 0xa5, 0xbc, 0x67, 0x40, 0x6e, 0x50, 0x6e, 0xc0, 0xf1, 0xf1, 0xf3, 0x1a,
+	0x85, 0x24, 0x7b, 0x60, 0x04, 0x5c, 0x23, 0xd4, 0xf3, 0x8d, 0x80, 0x7b, 0x2f, 0x60, 0x54, 0xe9,
+	0x12, 0x49, 0x1c, 0x09, 0x24, 0xa7, 0x60, 0xae, 0x50, 0x32, 0xdd, 0x38, 0x3c, 0xb3, 0x69, 0xd1,
+	0xa0, 0xd3, 0xde, 0x73, 0x38, 0xc8, 0x57, 0xbd, 0xc3, 0x38, 0x09, 0x51, 0xed, 0x2e, 0xb0, 0xbe,
+	0xfb, 0xef, 0x0e, 0x1c, 0xee, 0x34, 0xe6, 0x07, 0x9c, 0xc3, 0xe0, 0x6b, 0x9c, 0x2e, 0x31, 0x15,
+	0x4e, 0x67, 0xda, 0x9d, 0x0d, 0xcf, 0x26, 0xb4, 0xb1, 0x91, 0xde, 0x09, 0x4c, 0xfd, 0x4d, 0xaf,
+	0xfb, 0xad, 0x03, 0xa6, 0xca, 0x94, 0x4e, 0xb2, 0xd5, 0x49, 0x05, 0xf7, 0x46, 0x95, 0xfb, 0x1a,
+	0xcf, 0x13, 0xb0, 0xd5, 0x77, 0x21, 0x83, 0x15, 0x6a, 0xa6, 0x6d, 0xdf, 0x52, 0x89, 0xdb, 0x60,
+	0x85, 0x64, 0x0c, 0x7d, 0xf6, 0x85, 0x49, 0x96, 0x3a, 0x3d, 0xcd, 0x44, 0x1e, 0xa9, 0xfc, 0x03,
+	0x46, 0x1c, 0x53, 0x4d, 0x6e, 0xcf, 0xcf, 0x23, 0xef, 0x02, 0x26, 0x25, 0xf0, 0xae, 0x1e, 0x6f,
+	0x32, 0xc9, 0x6c, 0xb0, 0x3e, 0x06, 0x4b, 0x8b, 0x68, 0x51, 0x60, 0xb2, 0x11, 0x95, 0x77, 0x09,
+	0x27, 0xcd, 0x2b, 0x73, 0x78, 0xfe, 0x87, 0x9e, 0x02, 0x7a, 0x03, 0x4e, 0x89, 0x80, 0x2c, 0xef,
+	0xfd, 0x30, 0x60, 0xff, 0x75, 0x8a, 0x4c, 0xa2, 0xaa, 0xfc, 0xfb, 0x44, 0x55, 0x5a, 0x0b, 0xad,
+	0x50, 0xe1, 0x18, 0xd3, 0xae, 0xd2, 0x99, 0x8a, 0xe7, 0x5c, 0x14, 0xd8, 0x75, 0x1b, 0x7c, 0x63,
+	0x96, 0x7c, 0x53, 0x91, 0x79, 0xaf, 0x55, 0xe6, 0xfd, 0x36, 0x99, 0x0f, 0xaa, 0x32, 0xdf, 0x91,
+	0x72, 0x66, 0x82, 0x72, 0xaa, 0x66, 0x41, 0xbb, 0x6e, 0xc1, 0xb2, 0x57, 0xa0, 0xea, 0x15, 0xe5,
+	0x84, 0x32, 0x54, 0x39, 0xc4, 0xbb, 0x5a, 0xfd, 0xd9, 0x81, 0xc3, 0xbb, 0x84, 0xe7, 0x6d, 0x2d,
+	0x9e, 0x29, 0x69, 0xad, 0x53, 0xe0, 0x55, 0x7d, 0x7e, 0xb7, 0xed, 0xf9, 0xe6, 0xdf, 0x5d, 0xae,
+	0x40, 0x6d, 0x71, 0x79, 0xbf, 0x06, 0x8d, 0xe7, 0xc0, 0x78, 0xf7, 0xd2, 0xd9, 0xfb, 0xbc, 0xa7,
+	0xb0, 0x7f, 0x8d, 0x21, 0x56, 0x05, 0xb2, 0xfb, 0xe8, 0x03, 0x20, 0xe5, 0xa6, 0x7c, 0xe9, 0x1b,
+	0xd8, 0x57, 0x26, 0x9b, 0x47, 0xe5, 0xa5, 0x47, 0x30, 0xc8, 0x05, 0x94, 0xdb, 0xae, 0x9f, 0xe9,
+	0x47, 0x15, 0xd4, 0x44, 0x56, 0x85, 0x6c, 0xca, 0xf6, 0x55, 0x38, 0xe7, 0x0a, 0xf7, 0xf2, 0x36,
+	0x5b, 0xdc, 0xe3, 0xa5, 0xde, 0xc2, 0xf2, 0x8d, 0x78, 0x79, 0xf6, 0xab, 0x0b, 0xa6, 0x6a, 0x20,
+	0x17, 0x30, 0x2c, 0x79, 0x82, 0x8c, 0x68, 0x7d, 0x7c, 0xb9, 0x07, 0xb4, 0x69, 0x5a, 0x5d, 0xc2,
+	0xde, 0x76, 0x78, 0x84, 0x49, 0x88, 0xe4, 0x90, 0x36, 0xcd, 0x27, 0x77, 0xdc, 0x3c, 0x64, 0xc8,
+	0xfb, 0x62, 0x9e, 0x55, 0xec, 0x48, 0x4e, 0x68, 0x8b, 0xbf, 0xdd, 0x53, 0xda, 0xea, 0xe1, 0x73,
+	0x80, 0xad, 0xec, 0x08, 0xa1, 0x35, 0xbb, 0xba, 0x23, 0xda, 0xa0, 0xcb, 0x57, 0xb0, 0x57, 0x65,
+	0x94, 0x8c, 0x69, 0xa3, 0x2e, 0xdd, 0x23, 0xda, 0x4c, 0xbd, 0x3a, 0x79, 0xcb, 0x2a, 0x21, 0xb4,
+	0xa6, 0x03, 0x77, 0x44, 0xeb, 0xb4, 0xab, 0x65, 0x5b, 0xbe, 0x08, 0xa1, 0x35, 0x0d, 0xb8, 0x23,
+	0x5a, 0x27, 0xf4, 0xaa, 0xff, 0xc1, 0xa4, 0x2f, 0x93, 0xfb, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff,
+	0x63, 0x96, 0x3a, 0xc1, 0x98, 0x07, 0x00, 0x00,
 }

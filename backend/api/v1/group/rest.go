@@ -30,12 +30,12 @@ func Router(base string) *gin.Engine {
 	return router
 }
 
-func inGroup(userId string, groupId uint32) bool {
+func inGroup(userId string, groupId int32) bool {
 	resp, err := srv.UserInGroup(context.TODO(), &pb.UserInGroupRequest{
-		UserId:  userId,
-		GroupId: groupId,
+		UserId:  &userId,
+		GroupId: &groupId,
 	})
-	if err != nil || !resp.Ok {
+	if err != nil || !*resp.Ok {
 		return false
 	}
 	return true
@@ -46,13 +46,13 @@ func checkAuth(c *gin.Context) error {
 	sid := c.Query("sid")
 	res, err := authSrv.CheckAuth(context.TODO(),
 		&auth.CheckAuthRequest{
-			Openid: openid,
-			Sid:    sid,
+			Openid: &openid,
+			Sid:    &sid,
 		},
 	)
 	if err != nil {
 		return err
-	} else if !res.Ok {
+	} else if !*res.Ok {
 		return fmt.Errorf("auth check fail")
 	}
 	return nil
@@ -80,16 +80,17 @@ func (g Group) GetGroup(c *gin.Context) {
 	}
 	openid := c.Query("openid")
 	groupId, err := strconv.Atoi(c.Param("group_id"))
+	gid := int32(groupId)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	if !inGroup(openid, uint32(groupId)) {
+	if !inGroup(openid, gid) {
 		c.JSON(403, "user is not in the group")
 		return
 	}
 	resp, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
-		Id: uint32(groupId),
+		Id: &gid,
 	})
 	if err != nil {
 		c.JSON(500, err)
@@ -121,7 +122,7 @@ func (g Group) GetGroupByUser(c *gin.Context) {
 	}
 	openid := c.Query("openid")
 	resp, err := srv.GetGroupByUserId(context.TODO(), &pb.GetGroupByUserIdRequest{
-		UserId: openid,
+		UserId: &openid,
 	})
 	if err != nil {
 		c.JSON(500, err)
@@ -163,10 +164,11 @@ func (g Group) CreateGroup(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+	ty := int32(0)
 	resp, err := srv.CreateGroup(context.TODO(), &pb.CreateGroupRequest{
-		Name:      data.Name,
-		CreatorId: openid,
-		Type:      0,
+		Name:      &data.Name,
+		CreatorId: &openid,
+		Type:      &ty,
 	})
 	if err != nil {
 		c.JSON(500, err)
@@ -207,7 +209,7 @@ func (g Group) UpdateGroup(c *gin.Context) {
 	}
 	openid := c.Query("openid")
 	var data struct {
-		Id   uint32 `json:"id"`
+		Id   int32 `json:"id"`
 		Name string `json:"name"`
 	}
 	err = c.BindJSON(&data)
@@ -223,8 +225,8 @@ func (g Group) UpdateGroup(c *gin.Context) {
 	}
 
 	_, err = srv.UpdateGroup(context.TODO(), &pb.UpdateGroupRequest{
-		Id:   data.Id,
-		Name: data.Name,
+		Id:   &data.Id,
+		Name: &data.Name,
 	})
 
 	if err != nil {
@@ -257,7 +259,7 @@ func (g Group) DeleteGroup(c *gin.Context) {
 	}
 	openid := c.Query("openid")
 	var data struct {
-		Id uint32 `json:"id"`
+		Id int32 `json:"id"`
 	}
 	err = c.BindJSON(&data)
 	if err != nil {
@@ -265,18 +267,18 @@ func (g Group) DeleteGroup(c *gin.Context) {
 		return
 	}
 	r, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
-		Id: data.Id,
+		Id: &data.Id,
 	})
 	if err != nil {
 		c.JSON(403, err)
 		return
 	}
-	if r.CreatorId != openid {
+	if *r.CreatorId != openid {
 		c.JSON(403, "not allowed")
 	}
 
 	_, err = srv.DeleteGroup(context.TODO(), &pb.DeleteGroupRequest{
-		Id: data.Id,
+		Id: &data.Id,
 	})
 	if err != nil {
 		c.JSON(500, err)

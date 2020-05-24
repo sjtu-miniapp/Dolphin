@@ -34,6 +34,7 @@ func Set(c *redis.Client, ttl time.Duration, key string, value interface{}) erro
 
 func Get(c *redis.Client, key string, s interface{}) error {
 	val, err := c.Get(key).Result()
+	log.Printf("[redis]: get key %s\n", key)
 	if err != nil {
 		log.Println("[redis]: can't get the value")
 		return err
@@ -42,9 +43,4 @@ func Get(c *redis.Client, key string, s interface{}) error {
 	return err
 }
 
-func main() {
-	redis, _ := InitRedis("121.199.33.44", "610878")
-	var s string
-	Get(redis, "87198d9900b2ab7cd8fdc177a94bc9189963a72fdd928a9663a60f8475e064c4", &s)
-	print(s)
-}
+

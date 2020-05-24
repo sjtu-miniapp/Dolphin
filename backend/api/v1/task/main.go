@@ -51,8 +51,8 @@ func main() {
 		)
 		_ = service.Init()
 		srv = pb.NewTaskService("go.micro.srv.task", client.DefaultClient)
-		authSrv = auth.NewAuthService("go.micro.api.auth", client.DefaultClient)
-		groupSrv = group.NewGroupService("go.micro.api.group", client.DefaultClient)
+		authSrv = auth.NewAuthService("go.micro.srv.auth", client.DefaultClient)
+		groupSrv = group.NewGroupService("go.micro.srv.group", client.DefaultClient)
 		//base := "/api/" + cfg.Version
 		base := "/task"
 		router := Router(base)
