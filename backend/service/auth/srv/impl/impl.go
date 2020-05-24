@@ -34,11 +34,11 @@ type authVal struct {
 }
 
 type User struct {
-	Openid      string `json:"openid"`
-	Name        string `json:"name"`
-	Gender      int32   `json:"gender"`
-	Avatar      string `json:"avatar"`
-	SelfGroupId sql.NullInt32    `json:"self_group_id"`
+	Openid      string        `json:"openid"`
+	Name        string        `json:"name"`
+	Gender      int32         `json:"gender"`
+	Avatar      string        `json:"avatar"`
+	SelfGroupId sql.NullInt32 `json:"self_group_id"`
 }
 
 // openid, sid
@@ -55,8 +55,6 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 	//response.Openid = openid
 	//response.Sid = sid
 	//return nil
-
-
 	type auth2SessionResponse struct {
 		Openid     string `json:"openid"`
 		SessionKey string `json:"session_key"`
@@ -77,7 +75,12 @@ func (a Auth) OnLogin(ctx context.Context, request *pb.OnLoginRequest, response 
 		return fmt.Errorf("request for wx api failed")
 	}
 
-	defer httpResp.Body.Close()
+	defer func() {
+		if err := httpResp.Body.Close(); err != nil {
+			log.Error(err)
+		}
+	}()
+
 	if httpResp.StatusCode != http.StatusOK {
 		return fmt.Errorf("http.Status got from wx server: %s", httpResp.Status)
 	}
