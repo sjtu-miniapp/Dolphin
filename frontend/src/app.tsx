@@ -1,6 +1,6 @@
-import Taro, { Component, Config } from '@tarojs/taro'
+import Taro, { Component, Config } from '@tarojs/taro';
 
-import Index from './pages/group/index'
+import Login from './pages/login/index';
 import './app.scss';
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -28,6 +28,7 @@ class App extends Component {
    */
   config: Config = {
     pages: [
+      'pages/login/index',
       'pages/group/index',
       'pages/kanban/index',
       'pages/task/index',
@@ -64,7 +65,7 @@ class App extends Component {
   // 请勿修改此函数
   render() {
     return (
-      <Index />
+      <Login />
     )
   }
 }
