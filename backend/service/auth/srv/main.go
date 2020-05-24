@@ -64,10 +64,7 @@ func main() {
 	if err != nil {
 		return
 	}
-	//sqldb, err := database.InitDb(cfg.Mysql.User, cfg.Mysql.Pass, cfg.Mysql.Host, cfg.Mysql.Db)
-	//if err != nil {
-	//	return
-	//}
+
 	redisdb, err := database.InitRedis(cfg.Redis.Host, cfg.Redis.Pass)
 	if err != nil {
 		return

@@ -41,9 +41,11 @@ func setup() {
 }
 
 func TestOnLoginAndCheckAuth(t *testing.T) {
+	code := string(rand.Uint64())
 	resp, err := auth.OnLogin(context.TODO(), &pb.OnLoginRequest{
-		Code: string(rand.Uint64()),
+		Code: &code,
 	})
+
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -56,17 +58,20 @@ func TestOnLoginAndCheckAuth(t *testing.T) {
 		Openid: resp.Openid,
 		Sid:    resp.Sid,
 	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !r.Ok {
+	if !*r.Ok {
 		t.Errorf("check auth fail")
 	}
+	tmp := *resp.Openid + "123"
 	r, err = auth.CheckAuth(context.TODO(), &pb.CheckAuthRequest{
-		Openid: resp.Openid + "123",
+		Openid: &tmp,
 		Sid:    resp.Sid,
 	})
-	if r != nil && r.Ok {
+
+	if r != nil && *r.Ok {
 		t.Errorf("check auth fail")
 	}
 
@@ -75,7 +80,7 @@ func TestOnLoginAndCheckAuth(t *testing.T) {
 func TestPutUserAndGetUser(t *testing.T) {
 	randStr := strconv.Itoa(rand.Intn(10000))
 	resp, err := auth.OnLogin(context.TODO(), &pb.OnLoginRequest{
-		Code: randStr,
+		Code: &randStr,
 	})
 	assert.Empty(t, err)
 	assert.NotEmpty(t, resp)
@@ -83,18 +88,20 @@ func TestPutUserAndGetUser(t *testing.T) {
 		Id: resp.Openid,
 	})
 	assert.Empty(t, rs)
+	gender := int32(1)
+	avatar := "ugly boy"
 	_, err = auth.PutUser(context.Background(), &pb.PutUserRequest{
 		Openid: resp.Openid,
-		Name:   randStr,
-		Gender: 1,
-		Avatar: "ugly boy",
+		Name:   &randStr,
+		Gender: &gender,
+		Avatar: &avatar,
 	})
 	assert.Empty(t, err, err)
 	rs, err = auth.GetUser(context.Background(), &pb.GetUserRequest{
 		Id: resp.Openid,
 	})
 	assert.Empty(t, err, err)
-	assert.Equal(t, rs.Name, randStr)
+	assert.Equal(t, *rs.Name, randStr)
 	assert.NotEmpty(t, rs.SelfGroupId)
 }
 

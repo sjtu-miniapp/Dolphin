@@ -49,8 +49,9 @@ func (s *Auth) OnLogin(c *gin.Context) {
 	}
 
 	response, err := srv.OnLogin(context.TODO(), &pb.OnLoginRequest{
-		Code: code,
+		Code: &code,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 	} else {
@@ -80,8 +81,8 @@ func (s *Auth) AfterLogin(c *gin.Context) {
 	openid := c.Query("openid")
 	sid := c.Query("sid")
 	var data struct {
-		Avatar   string `json:"avatar"`
-		Gender   int    `json:"gender"`
+		Avatar   *string `json:"avatar"`
+		Gender   *int32    `json:"gender"`
 		Nickname string `json:"nickname"`
 	}
 	err := c.BindJSON(&data)
@@ -90,29 +91,29 @@ func (s *Auth) AfterLogin(c *gin.Context) {
 		return
 	}
 	res, err := srv.CheckAuth(context.TODO(), &pb.CheckAuthRequest{
-		Openid: openid,
-		Sid:    sid,
+		Openid: &openid,
+		Sid:    &sid,
 	})
 
 	if err != nil {
 		c.JSON(500, err)
 		return
 	}
-	if res.Ok != true {
+	if *res.Ok != true {
 		c.JSON(401, "check auth failed")
 		return
 	}
 
 	resp, err := srv.PutUser(context.TODO(), &pb.PutUserRequest{
-		Openid: openid,
-		Name:   data.Nickname,
-		Gender: int32(data.Gender),
+		Openid: &openid,
+		Name:   &data.Nickname,
+		Gender: data.Gender,
 		Avatar: data.Avatar,
 	})
 
 	if err != nil {
 		c.JSON(500, err)
-	} else if resp.Err == 1 {
+	} else if resp.Err != nil && *resp.Err == 1 {
 		// not created
 		c.JSON(200, resp)
 	} else {
