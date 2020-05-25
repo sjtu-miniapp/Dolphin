@@ -4,6 +4,7 @@ SHELL=/bin/bash
 ENV_FILE=.env
 DOCKER_SQL=backend/database/sql
 DOCKER_REDIS=backend/database/redis
+DOCKER_MONGO=backend/database/mongo
 SRV=backend/service
 GOOUT=backend
 GOSCP=backend/scripts
@@ -32,6 +33,8 @@ docker: build
 	@sudo docker push nihplod/mysql
 	@sudo docker build -t nihplod/redis ${DOCKER_REDIS}
 	@sudo docker push nihplod/redis
+	@sudo docker build -t nihplod/mongo ${DOCKER_MONGO}
+	@sudo docker push nihplod/mongo
 	@SRVLIST=$$(find ${SRV}/* -maxdepth 0 -type d | sed  "s/^.*\///")
 	@version=$$(cat ${API}/VERSION)
 	@for srv in $${SRVLIST}; do \

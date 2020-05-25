@@ -55,6 +55,7 @@ func main() {
 	sqldb, err := database.DbConn(cfg.Mysql.User, cfg.Mysql.Pass,
 		cfg.Mysql.Host, cfg.Mysql.Db, 3306, cfg.Debug)
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
 

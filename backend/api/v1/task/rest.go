@@ -179,13 +179,18 @@ func (t Task) GetTaskWorker(c *gin.Context) {
 
 /*
 # Get task content # tbd # advanced
-- route: /task/:taskID
+- route: /task/:taskID/content
 - method: GET
   - request params:
       - openid string
       - sid string
+	  - version int
   - response data:
-
+	  - content string
+      - modifier []string
+      - updatedAt string
+      - createdAt string
+      - diff string
   - response status:
       - 200 success
       - 401 auth check fails
@@ -198,7 +203,40 @@ func (t Task) GetTask(c *gin.Context) {
 		c.JSON(401, "auth check fail")
 		return
 	}
-	c.JSON(555, "NOT IMPLEMENTED YET!!!!")
+	openid := c.Query("openid")
+	version_, err := strconv.Atoi(c.Query("version"))
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	version := int32(version_)
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	id := int32(id_)
+	resp, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
+		UserId:               &openid,
+		TaskId:               &id,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	if !*resp.Ok {
+		c.JSON(403, "not allowed")
+		return
+	}
+	resp2, err := srv.GetTaskContent(context.TODO(), &pb.GetTaskContentRequest{
+		Id:                   &id,
+		Version:              &version,
+	})
+	if err != nil {
+		c.JSON(500 ,err)
+		return
+	}
+	c.JSON(200, resp2)
 }
 
 /*

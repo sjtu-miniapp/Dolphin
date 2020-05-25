@@ -144,8 +144,13 @@
     - request params:
         - openid string
         - sid string
+        - version int
     - response data:
-
+        - content string
+        - modifier []string
+        - updatedAt string
+        - createdAt string
+        - diff string
     - response status:
         - 200 success
         - 401 auth check fails

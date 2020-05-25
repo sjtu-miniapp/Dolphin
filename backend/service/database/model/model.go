@@ -52,3 +52,14 @@ type UserTask struct {
 	Done bool `gorm:"default:false;not null"`
 	DoneTime *time.Time
 }
+
+type TaskContent struct {
+	TaskId int32
+	Version int32
+	LastVersion int32
+	Modifier []string
+	// update doesnt create a new version until ws connection closed
+	UpdatedAt time.Time
+	CreatedAt time.Time
+	Content string
+}

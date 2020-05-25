@@ -24,6 +24,29 @@
     "DeleteTaskResponse": {
       "type": "object"
     },
+    "GetTaskContentResponse": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "modifier": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "diff": {
+          "type": "string"
+        }
+      }
+    },
     "GetTaskMetaByGroupIdResponse": {
       "type": "object",
       "properties": {

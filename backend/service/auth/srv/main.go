@@ -63,11 +63,12 @@ func main() {
 	sqldb, err := database.DbConn(cfg.Mysql.User, cfg.Mysql.Pass,
 		cfg.Mysql.Host, cfg.Mysql.Db, 3306, cfg.Debug)
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
-
 	redisdb, err := database.InitRedis(cfg.Redis.Host, cfg.Redis.Pass)
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
 	_ = pb.RegisterAuthHandler(srv.Server(), &impl.Auth{

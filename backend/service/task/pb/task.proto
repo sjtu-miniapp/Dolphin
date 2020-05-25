@@ -2,6 +2,7 @@ syntax = "proto2";
 option go_package = ".;pb";
 service Task {
   rpc GetTaskMeta(GetTaskMetaRequest) returns (GetTaskMetaResponse);
+  rpc GetTaskContent(GetTaskContentRequest) returns (GetTaskContentResponse);
   rpc GetTaskPeolple(GetTaskPeopleRequset) returns (GetTaskPeopleResponse);
   rpc GetTaskMetaByGroupId(GetTaskMetaByGroupIdRequest) returns (GetTaskMetaByGroupIdResponse);
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
@@ -22,6 +23,17 @@ message TaskMeta {
   optional string end_date = 8;
   required bool readonly = 9;
   required string description = 10;
+}
+message GetTaskContentRequest {
+  required int32 id = 1;
+  optional int32 version = 2;
+}
+message GetTaskContentResponse {
+  required string content = 1;
+  required string created_at = 2;
+  required string updated_at = 3;
+  repeated string modifier = 4;
+  optional string diff = 5;
 }
 message GetTaskMetaRequest {
   required int32 id = 1;

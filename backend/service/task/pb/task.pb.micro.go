@@ -35,6 +35,7 @@ var _ server.Option
 
 type TaskService interface {
 	GetTaskMeta(ctx context.Context, in *GetTaskMetaRequest, opts ...client.CallOption) (*GetTaskMetaResponse, error)
+	GetTaskContent(ctx context.Context, in *GetTaskContentRequest, opts ...client.CallOption) (*GetTaskContentResponse, error)
 	GetTaskPeolple(ctx context.Context, in *GetTaskPeopleRequset, opts ...client.CallOption) (*GetTaskPeopleResponse, error)
 	GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, opts ...client.CallOption) (*GetTaskMetaByGroupIdResponse, error)
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...client.CallOption) (*CreateTaskResponse, error)
@@ -64,6 +65,16 @@ func NewTaskService(name string, c client.Client) TaskService {
 func (c *taskService) GetTaskMeta(ctx context.Context, in *GetTaskMetaRequest, opts ...client.CallOption) (*GetTaskMetaResponse, error) {
 	req := c.c.NewRequest(c.name, "Task.GetTaskMeta", in)
 	out := new(GetTaskMetaResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskService) GetTaskContent(ctx context.Context, in *GetTaskContentRequest, opts ...client.CallOption) (*GetTaskContentResponse, error) {
+	req := c.c.NewRequest(c.name, "Task.GetTaskContent", in)
+	out := new(GetTaskContentResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -135,6 +146,7 @@ func (c *taskService) UserInTask(ctx context.Context, in *UserInTaskRequest, opt
 
 type TaskHandler interface {
 	GetTaskMeta(context.Context, *GetTaskMetaRequest, *GetTaskMetaResponse) error
+	GetTaskContent(context.Context, *GetTaskContentRequest, *GetTaskContentResponse) error
 	GetTaskPeolple(context.Context, *GetTaskPeopleRequset, *GetTaskPeopleResponse) error
 	GetTaskMetaByGroupId(context.Context, *GetTaskMetaByGroupIdRequest, *GetTaskMetaByGroupIdResponse) error
 	CreateTask(context.Context, *CreateTaskRequest, *CreateTaskResponse) error
@@ -146,6 +158,7 @@ type TaskHandler interface {
 func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.HandlerOption) error {
 	type task interface {
 		GetTaskMeta(ctx context.Context, in *GetTaskMetaRequest, out *GetTaskMetaResponse) error
+		GetTaskContent(ctx context.Context, in *GetTaskContentRequest, out *GetTaskContentResponse) error
 		GetTaskPeolple(ctx context.Context, in *GetTaskPeopleRequset, out *GetTaskPeopleResponse) error
 		GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, out *GetTaskMetaByGroupIdResponse) error
 		CreateTask(ctx context.Context, in *CreateTaskRequest, out *CreateTaskResponse) error
@@ -166,6 +179,10 @@ type taskHandler struct {
 
 func (h *taskHandler) GetTaskMeta(ctx context.Context, in *GetTaskMetaRequest, out *GetTaskMetaResponse) error {
 	return h.TaskHandler.GetTaskMeta(ctx, in, out)
+}
+
+func (h *taskHandler) GetTaskContent(ctx context.Context, in *GetTaskContentRequest, out *GetTaskContentResponse) error {
+	return h.TaskHandler.GetTaskContent(ctx, in, out)
 }
 
 func (h *taskHandler) GetTaskPeolple(ctx context.Context, in *GetTaskPeopleRequset, out *GetTaskPeopleResponse) error {

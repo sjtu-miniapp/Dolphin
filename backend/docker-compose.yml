@@ -58,6 +58,19 @@ services:
       always
     volumes:
       - ./database/sql/my-data:/var/lib/mysql
+  mongo:
+    image: nihplod/mongo
+    ports:
+    - "27017:27017"
+    restart:
+      always
+    volumes:
+    - ./database/mongo/my-data:/data/db
+    - ./database/mongo/config:/configdb
+    - ./database/mongo/setup:/docker-entrypoint-initdb.d/
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
   auth-api:
     image: nihplod/auth-api:latest
     depends_on:

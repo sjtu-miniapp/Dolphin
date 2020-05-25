@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	//"fmt"
 	"github.com/sjtu-miniapp/dolphin/service/database"
 	"github.com/sjtu-miniapp/dolphin/service/database/model"
@@ -39,7 +40,7 @@ func main() {
 	_ = db.Preload("SelfGroup").Find(&user).Error
 	db.Preload("Groups").Find(&user)
 	fmt.Println(user.Groups[0].Id)
-	group := model.Group{
+	group = model.Group{
 		Id:        30,
 	}
 	db.Preload("Users").Find(&group)
@@ -58,14 +59,14 @@ func main() {
 	fmt.Println(userTask.DoneTime)
 	db.Preload("Tasks").Find(&group)
 	fmt.Println(group.Tasks[0])
-	user := model.User{
+	user = model.User{
 		Id:          "217",
 	}
 	var users []*model.User
 	users = append(users, &user)
 	t := true
 	ty := int32(0)
-	task := model.Task{
+	task = model.Task{
 		GroupId:     30,
 		Name:        nil,
 		PublisherId:  "1673",
