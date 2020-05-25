@@ -56,6 +56,8 @@ services:
     - "3306:3306"
     restart:
       always
+    volumes:
+      - ./database/sql/my-data:/var/lib/mysql
   auth-api:
     image: nihplod/auth-api:latest
     depends_on:
