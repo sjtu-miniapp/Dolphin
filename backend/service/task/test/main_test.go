@@ -63,31 +63,37 @@ func TestTask(t *testing.T) {
 	openid := strconv.Itoa(rand.Intn(10000))
 	openid2 := strconv.Itoa(rand.Intn(10000))
 	openid3 := strconv.Itoa(rand.Intn(10000))
+	int0 := int32(0)
+	int1 := int32(1)
+	avatar0 := "ugly girl"
+	avatar1 := "ugly boy"
 	_, err := auth.PutUser(ctx, &pb3.PutUserRequest{
-		Openid:               openid,
-		Name:                 openid,
-		Gender:               1,
-		Avatar:               "ugly girl",
+		Openid:               &openid,
+		Name:                 &openid,
+		Gender:               &int1,
+		Avatar:               &avatar0,
 	})
 	assert.Empty(t, err)
 	_, err = auth.PutUser(ctx, &pb3.PutUserRequest{
-		Openid:               openid2,
-		Name:                 openid2,
-		Gender:               0,
-		Avatar:               "ugly boy",
+		Openid:               &openid2,
+		Name:                 &openid2,
+		Gender:               &int0,
+		Avatar:               &avatar1,
 	})
 	assert.Empty(t, err)
 	_, err = auth.PutUser(ctx, &pb3.PutUserRequest{
-		Openid:               openid3,
-		Name:                 openid3,
-		Gender:               0,
-		Avatar:               "ugly boy",
+		Openid:               &openid3,
+		Name:                 &openid3,
+		Gender:               &int0,
+		Avatar:               &avatar1,
 	})
 	assert.Empty(t, err)
+	name1 := "tfboys"
+	name2 := "tfgirls"
 	rsp3, err := group.CreateGroup(ctx, &pb2.CreateGroupRequest{
-		Name:                 "tfboys",
-		CreatorId:            openid,
-		Type:                 0,
+		Name:                 &name1,
+		CreatorId:            &openid,
+		Type:                 &int0,
 	})
 	assert.Empty(t, err)
 	_, err = group.AddUser(ctx, &pb2.AddUserRequest{
@@ -96,9 +102,9 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	rsp4, err := group.CreateGroup(ctx, &pb2.CreateGroupRequest{
-		Name:                 "tfgirls",
-		CreatorId:            openid,
-		Type:                 0,
+		Name:                 &name2,
+		CreatorId:            &openid,
+		Type:                 &int0,
 	})
 	assert.Empty(t, err)
 	_, err = group.AddUser(ctx, &pb2.AddUserRequest{
@@ -108,31 +114,37 @@ func TestTask(t *testing.T) {
 	assert.Empty(t, err)
 	gid1, gid2 := rsp3.Id, rsp4.Id
 	// group task
+	name3 := "t2"
+	name4 := "t3"
+	true_ := true
+	false_ := true
 	rsp7, err := task.CreateTask(ctx, &pb.CreateTaskRequest{
-		GroupId:              int32(gid1),
+		GroupId:              gid1,
 		UserIds:              []string{openid, openid2},
-		Name:                 "t2",
-		Type:                 0,
-		LeaderId:             "",
-		StartDate:            "",
-		EndDate:              "",
-		Description:          "",
-		PublisherId:          openid,
-		Readonly:             true,
+		Name:                 &name3,
+		Type:                 &int0,
+		LeaderId:             nil,
+		StartDate:            nil,
+		EndDate:              nil,
+		Description:          nil,
+		PublisherId:          &openid,
+		Readonly:             &true_,
 	})
 	assert.Empty(t, err)
 	task1 := rsp7.Id
+	d1 := "2020-05-20"
+	d2 := "2020-05-21"
 	rsp8, err := task.CreateTask(ctx, &pb.CreateTaskRequest{
-		GroupId:              int32(gid2),
+		GroupId:              gid2,
 		UserIds:              []string{openid3, openid2},
-		Name:                 "t3",
-		Type:                 0,
-		LeaderId:             openid3,
-		StartDate:            "2020-05-20",
-		EndDate:              "2020-05-21",
-		Description:          "",
-		PublisherId:          openid,
-		Readonly:             false,
+		Name:                 &name4,
+		Type:                 &int0,
+		LeaderId:             &openid3,
+		StartDate:            &d1,
+		EndDate:              &d2,
+		Description:          nil,
+		PublisherId:          &openid,
+		Readonly:             &false_,
 	})
 	assert.Empty(t, err)
 	task2 := rsp8.Id
@@ -141,25 +153,25 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, 1, len(rsp5.Metas))
-	assert.Equal(t, rsp5.Metas[0].Name, "t2")
+	assert.Equal(t, *rsp5.Metas[0].Name, name3)
 	rsp6, err := task.UserInTask(ctx, &pb.UserInTaskRequest{
-		UserId:               openid3,
+		UserId:               &openid3,
 		TaskId:               task1,
 	})
 	assert.Empty(t, err)
-	assert.False(t, rsp6.Ok)
+	assert.False(t, *rsp6.Ok)
 	rsp6, err = task.UserInTask(ctx, &pb.UserInTaskRequest{
-		UserId:               openid3,
+		UserId:               &openid3,
 		TaskId:               task2,
 	})
 	assert.Empty(t, err)
-	assert.True(t, rsp6.Ok)
+	assert.True(t, *rsp6.Ok)
 	rsp9, err := task.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
 		Id:                   task2,
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, len(rsp9.Workers), 2)
-	assert.False(t, rsp9.Workers[1].Done)
+	assert.False(t, *rsp9.Workers[1].Done)
 	_, err = task.DeleteTask(ctx, &pb.DeleteTaskRequest{
 		Id:                   task1,
 	})
@@ -168,31 +180,40 @@ func TestTask(t *testing.T) {
 		Id:                   task1,
 	})
 	assert.NotEmpty(t, err)
+	name5 := ""
+	d3 := "2020-05-30"
+	des1 := ""
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
 		Id:                   task2,
-		Name:                 "",
-		StartDate:            "2020-05-30",
-		EndDate:              "2020-05-20",
-		Readonly:             false,
-		Description:          "",
+		Name:                 &name5,
+		StartDate:            &d3,
+		EndDate:              &d1,
+		Readonly:             &false_,
+		Description:          &des1,
 	})
 	assert.NotEmpty(t, err)
+	name6 := "modified"
+	d4 := "2020-05-21"
+	des2 := "nothing"
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
 		Id:                   task2,
-		Name:                 "modified",
-		StartDate:            "2020-05-21",
-		EndDate:              "2020-05-21",
-		Readonly:             false,
-		Description:          "nothing",
+		Name:                 &name6,
+		StartDate:            &d4,
+		EndDate:              &d4,
+		Readonly:             &false_,
+		Description:          &des2,
 	})
 	assert.Empty(t, err)
+	name7 := "don't modified"
+	d5 := ""
+	des3 := "really nothing"
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
 		Id:                   task2,
-		Name:                 "don't modifiy",
-		StartDate:            "",
-		EndDate:              "2020-05-21",
-		Readonly:             false,
-		Description:          "really nothing",
+		Name:                 &name7,
+		StartDate:            &d5,
+		EndDate:              &d4,
+		Readonly:             &false_,
+		Description:          &des3,
 	})
 	assert.NotEmpty(t, err)
 	rsp11, err := task.GetTaskMeta(ctx, &pb.GetTaskMetaRequest{
@@ -200,7 +221,7 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	assert.NotEmpty(t, rsp11.Meta)
-	assert.Equal(t, rsp11.Meta.Name, "modified")
+	assert.Equal(t, *rsp11.Meta.Name, name6)
 	// TODO: done and donetime api
 }
 

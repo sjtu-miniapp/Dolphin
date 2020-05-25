@@ -41,40 +41,40 @@ func checkAuth(c *gin.Context) error {
 	sid := c.Query("sid")
 	res, err := authSrv.CheckAuth(context.TODO(),
 		&auth.CheckAuthRequest{
-			Openid: openid,
-			Sid:    sid,
+			Openid: &openid,
+			Sid:    &sid,
 		},
 	)
 	if err != nil {
 		return err
 	}
-	if !res.Ok {
+	if !*res.Ok {
 		return fmt.Errorf("auth check fail")
 	}
 	return nil
 }
 
-func inTask(userId string, taskId uint32) bool {
+func inTask(userId string, taskId int32) bool {
 
 	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
-		Id:                   taskId,
+		Id:                   &taskId,
 	})
 	if err != nil || resp.Meta == nil {
 		return false
 	}
-	if resp.Meta.PublisherId == userId {
+	if *resp.Meta.PublisherId == userId {
 		return true
 	}
 
 	resp2, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
-		UserId: userId,
-		TaskId: taskId,
+		UserId: &userId,
+		TaskId: &taskId,
 	})
 	if err != nil {
 		log.Error(err)
 		return false
 	}
-	return resp2.Ok
+	return *resp2.Ok
 }
 
 /*
@@ -110,23 +110,27 @@ func (t Task) GetTaskMeta(c *gin.Context) {
 	}
 
 	openid := c.Query("openid")
-	id, err := strconv.Atoi(c.Param("task_id"))
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	id := int32(id_)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	if !inTask(openid, uint32(id)) {
+	if !inTask(openid, id) {
 		c.JSON(403, "not allowed")
 	}
 
 	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
-		Id: uint32(id),
+		Id: &id,
 	})
 	if err != nil {
-		c.JSON(500, err)
+		if err.Error() == "record not found" {
+			c.JSON(200, nil)
+		} else {
+			c.JSON(500, err)
+		}
 		return
 	}
-
 	c.JSON(200, resp.Meta)
 }
 
@@ -152,17 +156,20 @@ func (t Task) GetTaskWorker(c *gin.Context) {
 		return
 	}
 	openid := c.Query("openid")
-	id, err := strconv.Atoi(c.Param("task_id"))
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	id := int32(id_)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	if !inTask(openid, uint32(id)) {
+	if !inTask(openid, id) {
 		c.JSON(403, "not allowed")
 	}
+
 	resp, err := srv.GetTaskPeolple(context.TODO(), &pb.GetTaskPeopleRequset{
-		Id: uint32(id),
+		Id: &id,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -217,27 +224,29 @@ func (t Task) GetTaskByGroup(c *gin.Context) {
 		return
 	}
 	openid := c.Query("openid")
-	groupId, err := strconv.Atoi(c.Param("task_id"))
+	groupId_, err := strconv.Atoi(c.Param("task_id"))
+	groupId := int32(groupId_)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
 	resp, err := groupSrv.UserInGroup(context.TODO(), &pb2.UserInGroupRequest{
-		UserId:  openid,
-		GroupId: uint32(groupId),
+		UserId:  &openid,
+		GroupId: &groupId,
 	})
 	if err != nil {
 		c.JSON(403, err)
 		return
 	}
 
-	if !resp.Ok {
+	if !*resp.Ok {
 		c.JSON(403, "not allowed")
 		return
 	}
 	resp2, err := srv.GetTaskMetaByGroupId(context.TODO(), &pb.GetTaskMetaByGroupIdRequest{
-		GroupId: uint32(groupId),
+		GroupId: &groupId,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -282,14 +291,14 @@ func (t Task) CreateTask(c *gin.Context) {
 		return
 	}
 	var data struct {
-		GroupId     int      `json:"group_id"`
+		GroupId     int32      `json:"group_id"`
 		UserIds     []string `json:"user_ids"`
 		Name        string   `json:"name"`
-		Type        int      `json:"type"`
-		LeaderId    string   `json:"leader_id, omitempty"`
-		StartDate   string `json:"start_date, omitempty"`
-		EndDate     string `json:"end_date, omitempty"`
-		Description string   `json:"description, omitempty"`
+		Type        int32      `json:"type"`
+		LeaderId    *string   `json:"leader_id, omitempty"`
+		StartDate   *string `json:"start_date, omitempty"`
+		EndDate     *string `json:"end_date, omitempty"`
+		Description *string   `json:"description, omitempty"`
 		Readonly    bool     `json:"readonly"`
 	}
 	err = c.BindJSON(&data)
@@ -299,14 +308,14 @@ func (t Task) CreateTask(c *gin.Context) {
 	}
 	for _, v := range data.UserIds {
 		rsp, err := groupSrv.UserInGroup(context.Background(), &pb2.UserInGroupRequest{
-			UserId:               v,
-			GroupId:              uint32(data.GroupId),
+			UserId:               &v,
+			GroupId:              &data.GroupId,
 		})
 		if err != nil {
 			c.JSON(500, err)
 			return
 		}
-		if !rsp.Ok {
+		if !*rsp.Ok {
 			c.JSON(400, "user not in group")
 			return
 		}
@@ -314,16 +323,16 @@ func (t Task) CreateTask(c *gin.Context) {
 
 	openid := c.Query("openid")
 	resp, err := srv.CreateTask(context.TODO(), &pb.CreateTaskRequest{
-		GroupId:     int32(data.GroupId),
-		Readonly:    data.Readonly,
+		GroupId:     &data.GroupId,
+		Readonly:    &data.Readonly,
 		UserIds:     data.UserIds,
-		Name:        data.Name,
-		Type:        int32(data.Type),
+		Name:        &data.Name,
+		Type:        &data.Type,
 		LeaderId:    data.LeaderId,
 		StartDate:   data.StartDate,
 		EndDate:     data.EndDate,
 		Description: data.Description,
-		PublisherId: openid,
+		PublisherId: &openid,
 	})
 
 	if err != nil {
@@ -363,19 +372,20 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		return
 	}
 	openid := c.Query("openid")
-	id, err := strconv.Atoi(c.Param("task_id"))
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	id := int32(id_)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
 
-	if !inTask(openid, uint32(id)) {
+	if !inTask(openid, id) {
 		c.JSON(403, "not allowed")
 		return
 	}
 
 	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
-		Id: uint32(id),
+		Id: &id,
 	})
 	if err != nil {
 		c.JSON(500, err)
@@ -386,7 +396,7 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		return
 	}
 
-	if resp.Meta.Readonly && resp.Meta.PublisherId != openid {
+	if *resp.Meta.Readonly && *resp.Meta.PublisherId != openid {
 		c.JSON(403, "not allowed")
 		return
 	}
@@ -405,34 +415,14 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	if data.StartDate == nil {
-		*data.StartDate = resp.Meta.StartDate
-	}
-	if data.EndDate == nil {
-		*data.EndDate = resp.Meta.EndDate
-	}
-	if data.Name == nil {
-		*data.Name = resp.Meta.Name
-	}
-	if data.StartDate == nil {
-		*data.StartDate = resp.Meta.StartDate
-	}
-	if data.EndDate == nil {
-		*data.EndDate = resp.Meta.EndDate
-	}
-	if data.Description == nil {
-		*data.Description = resp.Meta.Description
-	}
-	if data.Readonly == nil {
-		*data.Readonly = resp.Meta.Readonly
-	}
+
 	_, err = srv.UpdateTaskMeta(context.TODO(), &pb.UpdateTaskMetaRequest{
-		Id:          uint32(id),
-		Name:        *data.Name,
-		StartDate:   *data.StartDate,
-		EndDate:     *data.EndDate,
-		Readonly:    *data.Readonly,
-		Description: *data.Description,
+		Id:          &id,
+		Name:        data.Name,
+		StartDate:   data.StartDate,
+		EndDate:     data.EndDate,
+		Readonly:    data.Readonly,
+		Description: data.Description,
 	})
 	if err != nil {
 		c.JSON(500 ,err)
@@ -464,19 +454,20 @@ func (t Task) DeleteTask(c *gin.Context) {
 	}
 	openid := c.Query("openid")
 
-	id, err := strconv.Atoi(c.Param("task_id"))
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	id := int32(id_)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
 	// FIXME: MAYBE DON'T ALLOW MEMBERS TO DELETE TASK
-	if !inTask(openid, uint32(id)) {
+	if !inTask(openid, id) {
 		c.JSON(403, "not allowed")
 		return
 	}
 
 	_, err = srv.DeleteTask(context.TODO(), &pb.DeleteTaskRequest{
-		Id:                   uint32(id),
+		Id:                   &id,
 	})
 
 	if err != nil {

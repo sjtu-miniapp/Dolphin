@@ -38,6 +38,7 @@ type Task struct {
 	Type int32 `gorm:"default:0;not null"`
 	Desciption *string `gorm:"default:'';type:varchar(255)"`
 	Done bool `gorm:"default:false;not null"`
+	Users []*User `gorm:"many2many:user_task;foreign_key:task_id"`
 }
 
 type UserGroup struct {

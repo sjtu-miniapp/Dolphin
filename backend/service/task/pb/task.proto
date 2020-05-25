@@ -39,7 +39,7 @@ message GetTaskPeopleResponse {
     required string id = 1;
     required string name = 2;
     required bool done = 3;
-    required string done_time = 4;
+    optional string done_time = 4;
     optional string avatar = 5;
     optional int32 gender = 6;
   }

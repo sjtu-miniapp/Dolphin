@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/sjtu-miniapp/dolphin/service/database"
 	"github.com/sjtu-miniapp/dolphin/service/database/model"
 	"log"
@@ -36,12 +36,46 @@ func main() {
 	//_ = db.Preload("SelfGroup").Find(&user).Error
 	//db.Preload("Groups").Find(&user)
 	//fmt.Println(user.Groups[0].Id)
-	group := model.Group{
-		Id:        6,
+	//group := model.Group{
+	//	Id:        30,
+	//}
+	//db.Preload("Users").Find(&group)
+	//fmt.Println(group.Users[0].Name)
+	//task := model.Task{
+	//	Id: 1,
+	//}
+	//db.Preload("Users").Find(&task)
+	//fmt.Println(task.Users[0].Name)
+	//userTask := model.UserTask{
+	//	UserId:   "1673",
+	//	TaskId:   2,
+	//}
+	//db.First(&userTask)
+	//fmt.Println(userTask.Done)
+	//fmt.Println(userTask.DoneTime)
+	//db.Preload("Tasks").Find(&group)
+	//fmt.Println(group.Tasks[0])
+	user := model.User{
+		Id:          "217",
 	}
-	db.Preload("Users").Find(&group)
-	fmt.Println(group.Users[0].Name)
-
+	var users []*model.User
+	users = append(users, &user)
+	t := true
+	ty := int32(0)
+	task := model.Task{
+		GroupId:     30,
+		Name:        nil,
+		PublisherId:  "1673",
+		LeaderId:    nil,
+		StartDate:   nil,
+		EndDate:     nil,
+		Readonly:    t,
+		Type:        ty,
+		Desciption:  nil,
+		Done:        false,
+		Users: users,
+	}
+	db.Save(&task)
 }
 
 // get

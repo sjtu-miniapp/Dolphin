@@ -17,11 +17,20 @@ func (g Group) UserInGroup(ctx context.Context, request *pb.UserInGroupRequest, 
 		return fmt.Errorf("nil pointer")
 	}
 	db := g.SqlDb
-	err := db.Find(&model.UserGroup{
+	user := model.User{Id: *request.UserId}
+	err := db.First(&user).Error
+	if err != nil {
+		return err
+	}
+	response.Ok = new(bool)
+	if *user.SelfGroupId == *request.GroupId {
+		*response.Ok = true
+		return nil
+	}
+	err = db.First(&model.UserGroup{
 		UserId:  *request.UserId,
 		GroupId: *request.GroupId,
 	}).Error
-	response.Ok = new(bool)
 	if err == nil {
 		*response.Ok = true
 		return nil
