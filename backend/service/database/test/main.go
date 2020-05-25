@@ -5,6 +5,9 @@ import (
 	"github.com/sjtu-miniapp/dolphin/service/database"
 	"github.com/sjtu-miniapp/dolphin/service/database/model"
 	"log"
+	"math/rand"
+	"strconv"
+	"time"
 )
 
 func main() {
@@ -12,49 +15,49 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//user := model.User{Id: "andy"}
-	//err = db.Find(&user).Error
-	//fmt.Println(err)
-	//fmt.Println(user)
-	//_ = rand.New(
-	//	rand.NewSource(time.Now().UnixNano()))
-	//name := "ahelsddaaadasdfalddffdadso" + strconv.Itoa(rand.Intn(1000))
-	//// put user
-	//user = model.User{Id: name, SelfGroupId: nil}
-	//
-	//db.Create(&user)
-	//group := model.Group{
-	//	Name:      new(string),
-	//	CreatorId: name,
-	//	Type:      0,
-	//}
-	//// put group
-	//db.Create(&group)
-	//db.Model(&user).Update("SelfGroupId", group.Id)
-	////db.Find(&user).Update("SelfGroup", group)
-	////fmt.Println(*user.SelfGroup, *user.SelfGroupId)
-	//_ = db.Preload("SelfGroup").Find(&user).Error
-	//db.Preload("Groups").Find(&user)
-	//fmt.Println(user.Groups[0].Id)
-	//group := model.Group{
-	//	Id:        30,
-	//}
-	//db.Preload("Users").Find(&group)
-	//fmt.Println(group.Users[0].Name)
-	//task := model.Task{
-	//	Id: 1,
-	//}
-	//db.Preload("Users").Find(&task)
-	//fmt.Println(task.Users[0].Name)
-	//userTask := model.UserTask{
-	//	UserId:   "1673",
-	//	TaskId:   2,
-	//}
-	//db.First(&userTask)
-	//fmt.Println(userTask.Done)
-	//fmt.Println(userTask.DoneTime)
-	//db.Preload("Tasks").Find(&group)
-	//fmt.Println(group.Tasks[0])
+	user := model.User{Id: "andy"}
+	err = db.Find(&user).Error
+	fmt.Println(err)
+	fmt.Println(user)
+	_ = rand.New(
+		rand.NewSource(time.Now().UnixNano()))
+	name := "ahelsddaaadasdfalddffdadso" + strconv.Itoa(rand.Intn(1000))
+	// put user
+	user = model.User{Id: name, SelfGroupId: nil}
+
+	db.Create(&user)
+	group := model.Group{
+		Name:      new(string),
+		CreatorId: name,
+		Type:      0,
+	}
+	// put group
+	db.Create(&group)
+	db.Model(&user).Update("SelfGroupId", group.Id)
+	//db.Find(&user).Update("SelfGroup", group)
+	//fmt.Println(*user.SelfGroup, *user.SelfGroupId)
+	_ = db.Preload("SelfGroup").Find(&user).Error
+	db.Preload("Groups").Find(&user)
+	fmt.Println(user.Groups[0].Id)
+	group := model.Group{
+		Id:        30,
+	}
+	db.Preload("Users").Find(&group)
+	fmt.Println(group.Users[0].Name)
+	task := model.Task{
+		Id: 1,
+	}
+	db.Preload("Users").Find(&task)
+	fmt.Println(task.Users[0].Name)
+	userTask := model.UserTask{
+		UserId:   "1673",
+		TaskId:   2,
+	}
+	db.First(&userTask)
+	fmt.Println(userTask.Done)
+	fmt.Println(userTask.DoneTime)
+	db.Preload("Tasks").Find(&group)
+	fmt.Println(group.Tasks[0])
 	user := model.User{
 		Id:          "217",
 	}
