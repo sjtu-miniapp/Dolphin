@@ -186,45 +186,5 @@ func (g Group) GetGroup(ctx context.Context, request *pb.GetGroupRequest, respon
 		}
 		response.Users = append(response.Users, user)
 	}
-	//errChan := make(chan error)
-	//go func() {
-	//	rows, err := db.QueryContext(ctx, "SELECT `name`, `type`, `creator_id` FROM `group` WHERE `id`=?", request.Id)
-	//	if err != nil {
-	//		errChan <- err
-	//		return
-	//	}
-	//	if rows.Next() {
-	//		err = rows.Scan(&response.Name, &response.Type, &response.CreatorId)
-	//		if err != nil {
-	//			errChan <- err
-	//			return
-	//		}
-	//	}
-	//	errChan <- err
-	//}()
-	//
-	//go func() {
-	//	rows, err := db.QueryContext(ctx, "SELECT `user`.`id`, `user`.`name` FROM `user_group` JOIN `group` JOIN `user` ON `group_id` = `group`.`id` AND `user_id` = `user`.id WHERE `group_id` = ?", request.Id)
-	//	if err != nil {
-	//		errChan <- err
-	//		return
-	//	}
-	//	user := new(pb.User)
-	//	for rows.Next() {
-	//		err = rows.Scan(&user.Id, &user.Name)
-	//		if err != nil {
-	//			errChan <- err
-	//			return
-	//		}
-	//		response.Users = append(response.Users, user)
-	//	}
-	//	errChan <- err
-	//}()
-	//if <-errChan != nil {
-	//	return <-errChan
-	//}
-	//if <-errChan != nil {
-	//	return <-errChan
-	//}
 	return nil
 }
