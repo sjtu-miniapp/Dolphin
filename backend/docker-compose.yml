@@ -115,6 +115,7 @@ services:
       - etcd
       - redis
       - mysql
+      - mongo
     restart:
       always
   nginx:
