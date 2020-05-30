@@ -4,6 +4,7 @@ import { BaseEventOrig } from '@tarojs/components/types/common';
 import { AtButton } from 'taro-ui';
 
 import * as auth from '../apis/auth';
+
 import './login-button.scss';
 
 interface LoginButtonProps {
@@ -16,6 +17,12 @@ const loginHandler = async (code: string, userInfo: auth.VerifyLoginData): Promi
   console.log(222222, loginIds);
   const loginSucceed = await auth.verifyLoginByOpenID(loginIds, userInfo);
   console.log(333333, loginSucceed);
+
+  if (loginSucceed) {
+    Taro.setStorageSync('openid', loginIds.openid);
+    Taro.setStorageSync('sid', loginIds.sid);
+  }
+
   return loginSucceed;
 }
 
@@ -26,7 +33,7 @@ const LoginButton: FC<LoginButtonProps> = props => {
     setIsLogin(true);
 
     const { code } = await Taro.login();
-    console.log(3333, code);
+    console.log('login code:', code);
 
     const { avatarUrl, nickName, gender } = e.detail.userInfo;
     const loginResult = await loginHandler(code, { avatar: avatarUrl, nickname: nickName, gender });
@@ -36,7 +43,6 @@ const LoginButton: FC<LoginButtonProps> = props => {
     }
 
     Taro.atMessage({ message: '登录成功', type: 'success' });
-
 
     await props.setLoginInfo(avatarUrl, nickName);
 

@@ -42,6 +42,7 @@
 		"@tarojs/taro-tt": "2.2.3",
 		"@tarojs/taro-weapp": "2.2.3",
 		"babel-runtime": "^6.26.0",
+		"bluebird": "^3.7.2",
 		"lodash": "^4.17.15",
 		"nerv-devtools": "^1.5.6",
 		"nervjs": "^1.5.6",
@@ -51,6 +52,7 @@
 	"devDependencies": {
 		"@tarojs/mini-runner": "2.2.3",
 		"@tarojs/webpack-runner": "2.2.3",
+		"@types/bluebird": "^3.5.32",
 		"@types/lodash": "^4.14.151",
 		"@types/react": "^16.4.6",
 		"@types/webpack-env": "^1.13.6",

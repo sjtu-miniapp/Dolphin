@@ -3,20 +3,23 @@ import { View, Swiper, SwiperItem } from '@tarojs/components';
 import { BaseEventOrig } from '@tarojs/components/types/common';
 import { SwiperProps } from '@tarojs/components/types/Swiper';
 import { AtAvatar } from 'taro-ui';
+import bluebird from 'bluebird';
 
 import { Group, Task } from '../../types';
 import * as groupAPI from '../../apis/groups';
-import { getTasksByGroup } from '../../apis/tasks';
+import * as groupAPIMock from '../../apis/group';
+import * as taskAPIMock from '../../apis/task';
 import FabButton from '../../components/fab-button';
 import GroupModal from '../../components/group-modal';
 
 import FullGroupView from './full-group';
 import TaskView from './task';
 import { ViewStatus } from './interface'
+import { normalizeGroup, normalizeTask } from './utils';
 
 const GroupPage: FC = () => {
 
-  const [viewStatus, setViewStatus] = useState<ViewStatus>('Full');
+  const [viewStatus, setViewStatus] = useState<ViewStatus>('Full'); // 'Full/short' view for group page
 
   const [groups, setGroups] = useState<Group[]>([]);
 
@@ -26,13 +29,25 @@ const GroupPage: FC = () => {
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  const getGroupInfo = async () => {
+    const groups = await groupAPIMock.getGroupsByUser();
+
+    const groupDetails = await bluebird.map(
+      groups,
+      g => normalizeGroup(g)
+    );
+
+    return groupDetails;
+  }
+
   const updateGroups = async () => {
     try {
-      const newGroups = await groupAPI.getGroupsByUser();
-      setGroups(newGroups);
+      const groupDetails = await getGroupInfo();
+      console.log('Group Details:', JSON.stringify(groupDetails, null, 2));
+      setGroups(groupDetails);
     } catch (error) {
       // TODO: remote data error handling
-      console.error('Failed to update groups')
+      console.error('Failed to update groups', error)
     }
   };
 
@@ -40,11 +55,25 @@ const GroupPage: FC = () => {
     updateGroups();
   }, []);
 
+  const getTaskDetails = async (): Promise<Task[]> => {
+    if (!selectedGroup) return [];
+
+    const tasks = await taskAPIMock.getTasksByGroupID(selectedGroup.id);
+    const taskDetails = await bluebird.map(
+      tasks,
+      (t, i) => normalizeTask(t, i)
+    );
+
+    return taskDetails;
+  }
+
+  // FIX ME: do we need this wrap function?
   const updateTasks = async () => {
     try {
-      if (!selectedGroup) return;
-      const newTasks = await getTasksByGroup(selectedGroup.id);
-      setTasks(newTasks);
+      const taskDetails = await getTaskDetails();
+      console.log('Get Tasks Details:', JSON.stringify(taskDetails, null, 2));
+      setTasks(taskDetails);
+
     } catch (error) {
       // TODO: remote data error handling
       console.error('Failed to update groups')
@@ -55,7 +84,7 @@ const GroupPage: FC = () => {
     updateTasks();
   }, [selectedGroup]);
 
-  const onSelectGroup = (groupID: string) => {
+  const onSelectGroup = (groupID: number) => {
     const targetGroup = groups.find(g => g.id === groupID);
 
     if (!targetGroup) {
@@ -73,13 +102,13 @@ const GroupPage: FC = () => {
   const addGroup = async (groupName: string) => {
     closeModal();
     await groupAPI.addGroup(groupName);
+    await groupAPIMock.createGroup({ name: groupName, user_ids: [] });
     await updateGroups();
   }
 
   const handleSwipe = (e: BaseEventOrig<SwiperProps.onChangeEventDeatil>) => {
     showModal === true && closeModal();
-    const { current } = e.detail;
-    if (current === 0) setViewStatus('Full');
+    if (e.detail.current === 0) setViewStatus('Full');
     else setViewStatus('Short');
   }
 
