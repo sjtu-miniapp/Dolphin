@@ -17,3 +17,4 @@ __pycache__
 infra*
 nginx
 setup.js
+*config.json
