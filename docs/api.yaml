@@ -34,7 +34,12 @@
     - openid string
     - sid string
 - respnose data:
-    - group Group
+    - creator_id string
+    - name string
+    - type int
+    - users []User
+    - update_time string # 上次小组内容更新时间，包括任务的更新
+    - task_number int # 当前任务数，可能是针对个人的
 - response status:
     - 200 success
     - 401 auth check fails
@@ -47,7 +52,7 @@
     - openid stirng
     - sid string
 - response data
-  - group []Group
+  - group []Group # 需要完整的数据
 - response status:
     - 200 success
     - 401 auth check fails
