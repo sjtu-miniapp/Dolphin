@@ -28,7 +28,7 @@
 
   -----------------------------------------
 # Get one group
-- route: /group/:groupID
+- route: /group/:group_id
 - method: GET
 - request params:
     - openid string
@@ -45,7 +45,7 @@
     - 401 auth check fails
     - 500 failure
 
-# Get group by userID
+# Get group by userId
 - route: /group
 - method: GET
 - request params:
@@ -76,7 +76,7 @@
     - 500 failure
 
 # Update group
-- route: /group/:groupID
+- route: /group/:group_id
 - method: POST
 - request params:
     - openid string
@@ -92,7 +92,7 @@
     - 500 failure
 
 # Delete group
-- route: /group/:groupID
+- route: /group/:group_id
 - method: DELETE
 - request params:
     - openid string
@@ -107,7 +107,7 @@
 
 -----------------------------------------
 # Get one task
-- route: /task/:taskId/meta
+- route: /task/:task_id/meta
 - method: GET
 - request params:
     - openid string
@@ -130,7 +130,7 @@
     - 500 failure
 
 # Get worker of the task
-- route: /task/:taskId/workers
+- route: /task/:task_id/workers
 - method: GET
 - request params:
     - openid string
@@ -144,7 +144,7 @@
     - 500 failure
 
 # Get task content # tbd # advanced
-- route: /task/:taskId/content
+- route: /task/:task_id/content
 - method: GET
     - request params:
         - openid string
@@ -153,8 +153,8 @@
     - response data:
         - content string
         - modifier []string
-        - updatedAt string
-        - createdAt string
+        - updated_at string
+        - created_at string
         - diff string
     - response status:
         - 200 success
@@ -203,7 +203,7 @@
     - 500 failure
 
 # Update a task; only update meta value; contents update would be implemented in next sprint
-- route: /task/:taskId/meta
+- route: /task/:task_id/meta
 - method: POST
 - request params:
     - openid string
@@ -224,7 +224,7 @@
     - 500 failure
 
 # Update data content; advanced feature
-- route: /task/:taskId
+- route: /task/:task_id
 - method: POST
 - request params:
     - openid string
@@ -232,7 +232,7 @@
 ...
 
 # Delete task
-- route: /tasks/:taskID
+- route: /tasks/:task_id
 - method: DELETE
 - request params:
     - openid string
