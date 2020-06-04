@@ -1,5 +1,7 @@
 import Taro, { FC } from '@tarojs/taro';
 import { View, Text, Navigator, Image } from '@tarojs/components';
+import { AtSwipeAction } from 'taro-ui';
+import { SwipeActionOption } from 'taro-ui/types/swipe-action';
 import { CSSProperties } from 'react';
 
 import { Group } from '../../types';
@@ -17,32 +19,49 @@ const IAMGE_STYLE: CSSProperties = {
 interface FullGroupViewProps {
   groups: Group[];
   onClickGroup: (groupID: number) => void;
+  // onDeleteGroup: (groupID: number) => void;
 }
 
 const FullGroupView: FC<FullGroupViewProps> = props => {
   const { groups, onClickGroup } = props;
+
+  const onClickEvent = (item: SwipeActionOption) => {
+    console.log(JSON.stringify(item, null, 2));
+  }
+
   return (
     <View>
       {groups.map(g => (
-        <View className='item' onClick={() => onClickGroup(g.id)} >
-          <Navigator url={'/'}>
-            <View className='left'>
+
+        <View className='item'>
+          <AtSwipeAction autoClose options={[
+            {
+              text: '删除',
+              style: {
+                backgroundColor: '#FF4949'
+              }
+            }
+          ]} onClick={onClickEvent}>
+            <View className='left' onClick={() => onClickGroup(g.id)} >
               <View className='text'>
                 <Text className='name'>{g.name}</Text>
                 <Text className='count'>任务数: {g.taskNumber}</Text>
                 <Text className='update'>上次更新: {g.updateTime ? g.updateTime.toLocaleDateString() : 'N/A'}</Text>
               </View>
             </View>
-            <Image
-              className='right'
-              mode='scaleToFill'
-              src={GROUP_IAMGE_URL}
-              style={IAMGE_STYLE}
-            ></Image>
-          </Navigator>
+            <View className='right' style={{ backgroundColor: 'white' }}>
+              <Image
+                className='right'
+                mode='scaleToFill'
+                src={GROUP_IAMGE_URL}
+                style={IAMGE_STYLE}
+              />
+            </View>
+          </AtSwipeAction>
         </View>
-      ))}
-    </View>)
+      ))
+      }
+    </View >)
 }
 
 export default FullGroupView;
