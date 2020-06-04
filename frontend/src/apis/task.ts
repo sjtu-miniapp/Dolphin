@@ -29,7 +29,7 @@ export const getTasksByGroupID = async (
     response.data,
     response.errMsg
   );
-  return response.data;
+  return response.data || [];
 };
 
 export type TaskWorker = User & { done: boolean };

@@ -4,11 +4,15 @@
 Goal:
 - View Group page
 - Create a Group
+- Split group page into group & task page
 
 TODO:
 - Code cleanup
   - utils for data normatlizer
   - make ops steps clear
+
+- Extract Full Group Page
+- Extrace Group Task Page
 
 ---
 # 2020-05-18
