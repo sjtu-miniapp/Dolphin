@@ -1,5 +1,5 @@
 import Taro, { FC } from '@tarojs/taro';
-import { View, Text, Navigator, Image } from '@tarojs/components';
+import { View, Text, Image } from '@tarojs/components';
 import { AtSwipeAction } from 'taro-ui';
 import { SwipeActionOption } from 'taro-ui/types/swipe-action';
 import { CSSProperties } from 'react';
