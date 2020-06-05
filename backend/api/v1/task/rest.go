@@ -284,7 +284,6 @@ func (t Task) GetTaskByGroup(c *gin.Context) {
 	resp2, err := srv.GetTaskMetaByGroupId(context.TODO(), &pb.GetTaskMetaByGroupIdRequest{
 		GroupId: &groupId,
 	})
-
 	if err != nil {
 		c.JSON(500, err)
 		return

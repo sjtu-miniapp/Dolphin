@@ -5,4 +5,3 @@ export GIN_MODE=release
 
 #export GOPATH=$(pwd)/..
 #export GOBIN=$(GOPATH)/bin
-# micro api --registry consul --registry_address localhost:8500

@@ -145,7 +145,7 @@
         - openid string
         - sid string
         - version int
-    - response data:
+    - response data:s
         - content string
         - modifier []string
         - updatedAt string

@@ -92,6 +92,7 @@ func (g Group) GetGroup(c *gin.Context) {
 	resp, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
 		Id: &gid,
 	})
+
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -186,7 +187,7 @@ func (g Group) CreateGroup(c *gin.Context) {
 
 /*
 # Update group
-- route: /group/:groupID
+- route: /group/:group_id
 - method: POST
 - request params:
     - openid string
