@@ -19,7 +19,7 @@ services:
       -listen-peer-urls http://0.0.0.0:2380
       -initial-cluster-state new
     restart:
-      always
+      unless-stopped
   micro-api:
     command: --registry=etcd --registry_address=${REGISTRY} api --handler=http
     image: microhq/micro:latest
@@ -28,7 +28,7 @@ services:
     ports:
       - "8080:8080"
     restart:
-      always
+      unless-stopped
   micro-web:
     command: --registry=etcd --registry_address=${REGISTRY}  web
     image: microhq/micro:latest
@@ -40,14 +40,14 @@ services:
     ports:
       - "8082:8082"
     restart:
-      always
+      unless-stopped
   redis:
     image: nihplod/redis:latest
     command: redis-server
     ports:
       - "6379:6379"
     restart:
-      always
+      unless-stopped
   mysql:
     image: nihplod/mysql
     environment:
@@ -55,7 +55,7 @@ services:
     ports:
     - "3306:3306"
     restart:
-      always
+      unless-stopped
     volumes:
       - ./database/sql/my-data:/var/lib/mysql
   mongo:
@@ -63,7 +63,7 @@ services:
     ports:
     - "27017:27017"
     restart:
-      always
+      unless-stopped
     volumes:
     - ./database/mongo/my-data:/data/db
     - ./database/mongo/config:/configdb
@@ -76,7 +76,7 @@ services:
     depends_on:
       - auth-srv
     restart:
-      always
+      unless-stopped
   auth-srv:
     image: nihplod/auth-srv:latest
     depends_on:
@@ -85,14 +85,14 @@ services:
       - mysql
       - nginx
     restart:
-      always
+      unless-stopped
   group-api:
     image: nihplod/group-api:latest
     depends_on:
       - auth-srv
       - group-srv
     restart:
-      always
+      unless-stopped
   group-srv:
     image: nihplod/group-srv:latest
     depends_on:
@@ -100,7 +100,7 @@ services:
       - redis
       - mysql
     restart:
-      always
+      unless-stopped
   task-api:
     image: nihplod/task-api:latest
     depends_on:
@@ -108,15 +108,16 @@ services:
       - group-srv
       - task-srv
     restart:
-      always
+      unless-stopped
   task-srv:
     image: nihplod/task-srv:latest
     depends_on:
       - etcd
       - redis
       - mysql
+      - mongo
     restart:
-      always
+      unless-stopped
   nginx:
     image: nginx:latest
     volumes:
@@ -129,4 +130,4 @@ services:
     - "9999:9999"
     - "443:443"
     restart:
-      always
+      unless-stopped
