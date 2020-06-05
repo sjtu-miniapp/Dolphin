@@ -192,10 +192,16 @@ func (g Group) UpdateGroup(ctx context.Context, request *pb.UpdateGroupRequest, 
 		return fmt.Errorf("nil pointer")
 	}
 	db := g.SqlDb
-
-	err := db.Model(&model.Group{
-		Id: *request.Id,
-	}).Updates(map[string]interface{}{"name": *request.Name}).Error
+	var err error
+	if *request.Name != "" {
+		err = db.Model(&model.Group{
+			Id: *request.Id,
+		}).Updates(map[string]interface{}{"name": *request.Name}).Error
+	} else {
+		err = db.Model(&model.Group{
+			Id: *request.Id,
+		}).Update("updated_at", 0).Error
+	}
 	return err
 }
 

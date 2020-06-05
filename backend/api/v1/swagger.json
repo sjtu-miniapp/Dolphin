@@ -145,6 +145,9 @@
         }
       }
     },
+    "UpdateTaskContentResponse": {
+      "type": "object"
+    },
     "UpdateTaskMetaResponse": {
       "type": "object"
     },

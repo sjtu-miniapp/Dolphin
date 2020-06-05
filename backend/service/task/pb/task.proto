@@ -7,6 +7,7 @@ service Task {
   rpc GetTaskMetaByGroupId(GetTaskMetaByGroupIdRequest) returns (GetTaskMetaByGroupIdResponse);
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
   rpc UpdateTaskMeta(UpdateTaskMetaRequest) returns (UpdateTaskMetaResponse);
+  rpc UpdateTaskContent(UpdateTaskContentRequest) returns (UpdateTaskContentResponse);
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
   rpc UserInTask(UserInTaskRequest) returns (UserInTaskResponse);
 }
@@ -25,17 +26,7 @@ message TaskMeta {
   required bool readonly = 10;
   required string description = 11;
 }
-message GetTaskContentRequest {
-  required int32 id = 1;
-  optional int32 version = 2;
-}
-message GetTaskContentResponse {
-  required string content = 1;
-  required string created_at = 2;
-  required string updated_at = 3;
-  repeated string modifier = 4;
-  optional string diff = 5;
-}
+
 message GetTaskMetaRequest {
   required int32 id = 1;
 }
@@ -106,4 +97,27 @@ message UserInTaskRequest {
 }
 message UserInTaskResponse {
   required bool ok = 1;
+}
+
+
+message GetTaskContentRequest {
+  required int32 id = 1;
+  required int32 version = 2;
+}
+
+message GetTaskContentResponse {
+  required string content = 1;
+  required string created_at = 2;
+  required string updated_at = 3;
+  repeated string modifier = 4;
+  optional string diff = 5;
+}
+
+message UpdateTaskContentRequest {
+  required int32 id = 1;
+  required int32 version = 2;
+  required string content = 3;
+}
+
+message UpdateTaskContentResponse {
 }

@@ -154,6 +154,12 @@ func TestTask(t *testing.T) {
 	assert.Empty(t, err)
 	assert.Equal(t, 1, len(rsp5.Metas))
 	assert.Equal(t, *rsp5.Metas[0].Name, name3)
+	rsp12, err := group.GetGroup(ctx, &pb2.GetGroupRequest{
+		Id:                   gid1,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, int32(1), *rsp12.TaskNum)
+	assert.NotEmpty(t, *rsp12.UpdatedAt)
 	rsp6, err := task.UserInTask(ctx, &pb.UserInTaskRequest{
 		UserId:               &openid3,
 		TaskId:               task1,
@@ -222,6 +228,8 @@ func TestTask(t *testing.T) {
 	assert.Empty(t, err)
 	assert.NotEmpty(t, rsp11.Meta)
 	assert.Equal(t, *rsp11.Meta.Name, name6)
+
+	// TODO content api
 	// TODO: done and donetime api
 }
 

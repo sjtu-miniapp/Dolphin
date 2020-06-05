@@ -40,16 +40,20 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 		return err
 	}
 	response.Meta = &pb.TaskMeta{
-		Name:        task.Name,
-		Type:        &task.Type,
-		Done:        &task.Done,
-		GroupId:     &task.GroupId,
-		PublisherId: &task.PublisherId,
-		LeaderId:    task.LeaderId,
-		StartDate:   nil,
-		EndDate:     nil,
-		Readonly:    &task.Readonly,
-		Description: task.Desciption,
+		Id:                   request.Id,
+		Name:                 task.Name,
+		Type:                 &task.Type,
+		Done:                 &task.Done,
+		GroupId:              &task.GroupId,
+		PublisherId:          &task.PublisherId,
+		LeaderId:             task.LeaderId,
+		StartDate:            nil,
+		EndDate:              nil,
+		Readonly:             &task.Readonly,
+		Description:          task.Desciption,
+		XXX_NoUnkeyedLiteral: struct{}{},
+		XXX_unrecognized:     nil,
+		XXX_sizecache:        0,
 	}
 	if task.EndDate != nil && task.StartDate != nil {
 		ed := time2string(*task.EndDate)
@@ -112,16 +116,20 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 	}
 	for _, v := range group.Tasks {
 		task := pb.TaskMeta{
-			Name:        v.Name,
-			Type:        &v.Type,
-			Done:        &v.Done,
-			GroupId:     &v.GroupId,
-			PublisherId: &v.PublisherId,
-			LeaderId:    v.LeaderId,
-			StartDate:   nil,
-			EndDate:     nil,
-			Readonly:    &v.Readonly,
-			Description: v.Desciption,
+			Id:                   &v.Id,
+			Name:                 v.Name,
+			Type:                 &v.Type,
+			Done:                 &v.Done,
+			GroupId:              &v.GroupId,
+			PublisherId:          &v.PublisherId,
+			LeaderId:             v.LeaderId,
+			StartDate:            nil,
+			EndDate:              nil,
+			Readonly:             &v.Readonly,
+			Description:          v.Desciption,
+			XXX_NoUnkeyedLiteral: struct{}{},
+			XXX_unrecognized:     nil,
+			XXX_sizecache:        0,
 		}
 		if v.StartDate != nil {
 			s := time2string(*v.StartDate)
@@ -190,10 +198,8 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 		return err
 	}
 	response.Id = &task.Id
-	go func() {
-		createContent(task.Id)
-	}()
-	return nil
+	err := createContent(g, task.Id)
+	return err
 }
 
 func (g Task) UpdateTaskMeta(ctx context.Context, request *pb.UpdateTaskMetaRequest, response *pb.UpdateTaskMetaResponse) error {
@@ -234,9 +240,13 @@ func (g Task) UpdateTaskMeta(ctx context.Context, request *pb.UpdateTaskMetaRequ
 	if request.Name != nil {
 		task.Name = request.Name
 	}
-	if err := db.Save(&task).Error; err != nil {
+
+	tx := db.Begin()
+	if err := tx.Save(&task).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
+	tx.Commit()
 	return nil
 }
 
@@ -273,18 +283,29 @@ func (g Task) UserInTask(ctx context.Context, request *pb.UserInTaskRequest, res
 	return nil
 }
 
-
-// TODO
-// TODO: TEST
 func (g Task) GetTaskContent(ctx context.Context, request *pb.GetTaskContentRequest, response *pb.GetTaskContentResponse) error {
 	coll := g.MongoDb.Collection(collection)
-
+	var content model.TaskContent
+	err := coll.FindOne(context.TODO(),
+		bson.M{"task_id": *request.Id, "version": *request.Version}).Decode(&content)
+	return err
 }
 
-func createContent(taskId int32) {
-	a, err := collection.InsertOne(context.Background(), bson.E{"hah", "al"})
+func createContent(g Task, taskId int32) error {
+	coll := g.MongoDb.Collection(collection)
+	_, err := coll.InsertOne(context.TODO(),
+		bson.M{"task_id": taskId, "version": "1", "content": "",
+			"modifier": bson.A{}, "updated_at": "", "created_at": "", "diff": ""})
+	return err
 
 }
 
 //func (g Task) update
-// commit update
+func (g Task) UpdateTaskContent(ctx context.Context, request *pb.UpdateTaskContentRequest, response *pb.UpdateTaskContentResponse) error {
+	coll := g.MongoDb.Collection(collection)
+	_, err := coll.UpdateOne(context.TODO(),
+		bson.M{"task_id": *request.Id, "version": *request.Version},
+		bson.M{"$set": bson.M{"content": *request.Content}})
+	return err
+
+}

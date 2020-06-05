@@ -105,7 +105,7 @@
     - 403 not allowed
     - 500 failure
 
------------------------------------------
+  -----------------------------------------
 # Get one task
 - route: /task/:task_id/meta
 - method: GET
@@ -143,24 +143,6 @@
     - 403 not allowed
     - 500 failure
 
-# Get task content # tbd # advanced
-- route: /task/:task_id/content
-- method: GET
-    - request params:
-        - openid string
-        - sid string
-        - version int
-    - response data:s
-        - content string
-        - modifier []string
-        - updated_at string
-        - created_at string
-        - diff string
-    - response status:
-        - 200 success
-        - 401 auth check fails
-        - 403 not allowed
-        - 500 failure
 
 # Get tasks by groupID; the route is actually a compromise on gin router
 - route: /task/:group_id/group
@@ -223,14 +205,6 @@
     - 403 not allowed
     - 500 failure
 
-# Update data content; advanced feature
-- route: /task/:task_id
-- method: POST
-- request params:
-    - openid string
-    - sid string
-...
-
 # Delete task
 - route: /tasks/:task_id
 - method: DELETE
@@ -243,4 +217,39 @@
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
+
+# Update data content; advanced feature
+- route: /task/:task_id/content
+- method: POST
+- request params:
+    - openid string
+    - sid string
+    - content string # basic; tbd
+    - version int # 0 for the latest version
+- response status:
+    - 201 success updated
+    - 400 wrong request format
+    - 401 auth check fails
+    - 403 not allowed
+    - 500 failure
+
+# Get task content # tbd # advanced
+- route: /task/:task_id/content
+- method: GET
+- request params:
+    - openid string
+    - sid string
+    - version int # 0 for the latest version
+- response data:
+    - content string
+    - modifier []string
+    - updated_at string
+    - created_at string
+    - diff string
+- response status:
+    - 200 success
+    - 401 auth check fails
+    - 403 not allowed
+    - 500 failure
+
 

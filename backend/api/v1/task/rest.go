@@ -27,10 +27,10 @@ func Router(base string) *gin.Engine {
 
 	g.GET("/:task_id/meta", task.GetTaskMeta)
 	g.GET("/:task_id/workers", task.GetTaskWorker)
-	g.GET("/:task_id/content", task.GetTask)
+	g.GET("/:task_id/content", task.GetTaskContent)
 	g.PUT("", task.CreateTask)
 	g.POST("/:task_id/meta", task.UpdateTaskMeta)
-	g.POST("/:task_id", task.UpdateTask)
+	g.POST("/:task_id/content", task.UpdateTaskContent)
 	g.DELETE("/:task_id", task.DeleteTask)
 	router.Use(cors.Default())
 	return router
@@ -177,67 +177,6 @@ func (t Task) GetTaskWorker(c *gin.Context) {
 	c.JSON(200, resp)
 }
 
-/*
-# Get task content # tbd # advanced
-- route: /task/:taskID/content
-- method: GET
-  - request params:
-      - openid string
-      - sid string
-	  - version int
-  - response data:
-	  - content string
-      - modifier []string
-      - updatedAt string
-      - createdAt string
-      - diff string
-  - response status:
-      - 200 success
-      - 401 auth check fails
-      - 403 not allowed
-      - 500 failure
-*/
-func (t Task) GetTask(c *gin.Context) {
-	err := checkAuth(c)
-	if err != nil {
-		c.JSON(401, "auth check fail")
-		return
-	}
-	openid := c.Query("openid")
-	version_, err := strconv.Atoi(c.Query("version"))
-	if err != nil {
-		c.JSON(500, err)
-		return
-	}
-	version := int32(version_)
-	id_, err := strconv.Atoi(c.Param("task_id"))
-	if err != nil {
-		c.JSON(500, err)
-		return
-	}
-	id := int32(id_)
-	resp, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
-		UserId:               &openid,
-		TaskId:               &id,
-	})
-	if err != nil {
-		c.JSON(500, err)
-		return
-	}
-	if !*resp.Ok {
-		c.JSON(403, "not allowed")
-		return
-	}
-	resp2, err := srv.GetTaskContent(context.TODO(), &pb.GetTaskContentRequest{
-		Id:                   &id,
-		Version:              &version,
-	})
-	if err != nil {
-		c.JSON(500 ,err)
-		return
-	}
-	c.JSON(200, resp2)
-}
 
 /*
 # Get tasks by groupID
@@ -376,7 +315,15 @@ func (t Task) CreateTask(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
-
+	name := ""
+	_, err = groupSrv.UpdateGroup(context.TODO(), &pb2.UpdateGroupRequest{
+		Id:                   &data.GroupId,
+		Name:                 &name,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
 	c.JSON(201, resp.Id)
 }
 
@@ -439,7 +386,7 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 	}
 
 	var data struct {
-		GroupId     int      `json:"group_id"`
+		GroupId     int32      `json:"group_id"`
 		Name        *string   `json:"name"`
 		StartDate   *string `json:"start_date, omitempty"`
 		EndDate     *string `json:"end_date, omitempty"`
@@ -463,6 +410,15 @@ func (t Task) UpdateTaskMeta(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(500 ,err)
+		return
+	}
+	name := ""
+	_, err = groupSrv.UpdateGroup(context.TODO(), &pb2.UpdateGroupRequest{
+		Id:                   &data.GroupId,
+		Name:                 &name,
+	})
+	if err != nil {
+		c.JSON(500, err)
 		return
 	}
 	c.JSON(201, "updated")
@@ -497,10 +453,15 @@ func (t Task) DeleteTask(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	// FIXME: MAYBE DON'T ALLOW MEMBERS TO DELETE TASK
-	if !inTask(openid, id) {
-		c.JSON(403, "not allowed")
+	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
+		Id: &id,
+	})
+	if err != nil {
+		c.JSON(500, err)
 		return
+	}
+	if *resp.Meta.PublisherId != openid {
+		c.JSON(403, "not allowed")
 	}
 
 	_, err = srv.DeleteTask(context.TODO(), &pb.DeleteTaskRequest{
@@ -511,24 +472,152 @@ func (t Task) DeleteTask(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
+
+	name := ""
+	_, err = groupSrv.UpdateGroup(context.TODO(), &pb2.UpdateGroupRequest{
+		Id:                   resp.Meta.GroupId,
+		Name:                 &name,
+	})
+
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
 	c.JSON(201, "deleted")
 }
 
 /*
-# Update data content; advanced feature
-- route: /task/:taskId
-- method: POST
-- request params:
+ # Update data content; advanced feature
+ - route: /task/:task_id/content
+ - method: POST
+ - request params:
     - openid string
     - sid string
-...
-*/
-func (t Task) UpdateTask(c *gin.Context) {
+    - content string # basic; tbd
+ - response status:
+    - 201 success updated
+    - 400 wrong request format
+    - 401 auth check fails
+    - 403 not allowed
+    - 500 failure
+ */
+func (t Task) UpdateTaskContent(c *gin.Context) {
 	err := checkAuth(c)
 	if err != nil {
 		c.JSON(401, "auth check fail")
 		return
 	}
-	//openid := c.Query("openid")
-	c.JSON(555, "NOT IMPLMENTED YET!")
+	openid := c.Query("openid")
+	content := c.Query("content")
+	version_, err := strconv.Atoi(c.Query("version"))
+	if err != nil {
+		c.JSON(400, "wrong format")
+	}
+
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	if err != nil {
+		c.JSON(400, "wrong format")
+	}
+
+	id := int32(id_)
+	version := int32(version_)
+	resp, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
+		Id: &id,
+	})
+
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+
+	if *resp.Meta.Readonly && openid != *resp.Meta.PublisherId && openid != *resp.Meta.LeaderId {
+		c.JSON(400, "not allowed")
+		return
+	}
+
+	_, err = srv.UpdateTaskContent(context.TODO(), &pb.UpdateTaskContentRequest{
+		Id:                   &id,
+		Version:              &version,
+		Content:              &content,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	// updated at
+	name := ""
+	_, err = groupSrv.UpdateGroup(context.TODO(), &pb2.UpdateGroupRequest{
+		Id:                   resp.Meta.GroupId,
+		Name:                 &name,
+	})
+
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+
+	c.JSON(201, err)
+}
+
+
+/*
+# Get task content # tbd # advanced
+- route: /task/:taskID/content
+- method: GET
+  - request params:
+      - openid string
+      - sid string
+	  - version int
+  - response data:
+	  - content string
+      - modifier []string
+      - updatedAt string
+      - createdAt string
+      - diff string
+  - response status:
+      - 200 success
+      - 401 auth check fails
+      - 403 not allowed
+      - 500 failure
+*/
+func (t Task) GetTaskContent(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, "auth check fail")
+		return
+	}
+	openid := c.Query("openid")
+	version_, err := strconv.Atoi(c.Query("version"))
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	version := int32(version_)
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	id := int32(id_)
+	resp, err := srv.UserInTask(context.TODO(), &pb.UserInTaskRequest{
+		UserId:               &openid,
+		TaskId:               &id,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	if !*resp.Ok {
+		c.JSON(403, "not allowed")
+		return
+	}
+	resp2, err := srv.GetTaskContent(context.TODO(), &pb.GetTaskContentRequest{
+		Id:                   &id,
+		Version:              &version,
+	})
+	if err != nil {
+		c.JSON(500 ,err)
+		return
+	}
+	c.JSON(200, resp2)
 }

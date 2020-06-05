@@ -40,6 +40,7 @@ type TaskService interface {
 	GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, opts ...client.CallOption) (*GetTaskMetaByGroupIdResponse, error)
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...client.CallOption) (*CreateTaskResponse, error)
 	UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, opts ...client.CallOption) (*UpdateTaskMetaResponse, error)
+	UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, opts ...client.CallOption) (*UpdateTaskContentResponse, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...client.CallOption) (*DeleteTaskResponse, error)
 	UserInTask(ctx context.Context, in *UserInTaskRequest, opts ...client.CallOption) (*UserInTaskResponse, error)
 }
@@ -122,6 +123,16 @@ func (c *taskService) UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequ
 	return out, nil
 }
 
+func (c *taskService) UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, opts ...client.CallOption) (*UpdateTaskContentResponse, error) {
+	req := c.c.NewRequest(c.name, "Task.UpdateTaskContent", in)
+	out := new(UpdateTaskContentResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *taskService) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...client.CallOption) (*DeleteTaskResponse, error) {
 	req := c.c.NewRequest(c.name, "Task.DeleteTask", in)
 	out := new(DeleteTaskResponse)
@@ -151,6 +162,7 @@ type TaskHandler interface {
 	GetTaskMetaByGroupId(context.Context, *GetTaskMetaByGroupIdRequest, *GetTaskMetaByGroupIdResponse) error
 	CreateTask(context.Context, *CreateTaskRequest, *CreateTaskResponse) error
 	UpdateTaskMeta(context.Context, *UpdateTaskMetaRequest, *UpdateTaskMetaResponse) error
+	UpdateTaskContent(context.Context, *UpdateTaskContentRequest, *UpdateTaskContentResponse) error
 	DeleteTask(context.Context, *DeleteTaskRequest, *DeleteTaskResponse) error
 	UserInTask(context.Context, *UserInTaskRequest, *UserInTaskResponse) error
 }
@@ -163,6 +175,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, out *GetTaskMetaByGroupIdResponse) error
 		CreateTask(ctx context.Context, in *CreateTaskRequest, out *CreateTaskResponse) error
 		UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, out *UpdateTaskMetaResponse) error
+		UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, out *UpdateTaskContentResponse) error
 		DeleteTask(ctx context.Context, in *DeleteTaskRequest, out *DeleteTaskResponse) error
 		UserInTask(ctx context.Context, in *UserInTaskRequest, out *UserInTaskResponse) error
 	}
@@ -199,6 +212,10 @@ func (h *taskHandler) CreateTask(ctx context.Context, in *CreateTaskRequest, out
 
 func (h *taskHandler) UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, out *UpdateTaskMetaResponse) error {
 	return h.TaskHandler.UpdateTaskMeta(ctx, in, out)
+}
+
+func (h *taskHandler) UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, out *UpdateTaskContentResponse) error {
+	return h.TaskHandler.UpdateTaskContent(ctx, in, out)
 }
 
 func (h *taskHandler) DeleteTask(ctx context.Context, in *DeleteTaskRequest, out *DeleteTaskResponse) error {
