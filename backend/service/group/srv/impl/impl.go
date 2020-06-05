@@ -6,6 +6,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/sjtu-miniapp/dolphin/service/database/model"
 	"github.com/sjtu-miniapp/dolphin/service/group/pb"
+	"sync"
+	"time"
 )
 
 type Group struct {
@@ -43,26 +45,74 @@ func (g Group) UserInGroup(ctx context.Context, request *pb.UserInGroupRequest, 
 	}
 }
 
+func taskNum(db *gorm.DB, gid int32) (int32, error) {
+	var count int32
+	err := db.Model(&model.Task{}).Where(
+		"group_id = ?", gid).Count(&count).Error
+	return count, err
+}
+
 func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserIdRequest, response *pb.GetGroupByUserIdResponse) error {
 	if request.UserId == nil {
 		return fmt.Errorf("nil pointer")
 	}
 	db := g.SqlDb
 	user := model.User{
-		Id:          *request.UserId,
+		Id: *request.UserId,
 	}
 	if err := db.Preload("Groups").Find(&user).Error; err != nil {
 		if err.Error() != "record not found" {
 			return err
 		}
 	}
+	mutex := &sync.Mutex{}
+	ch := make(chan int, len(user.Groups))
+	errChan := make(chan error, len(user.Groups))
 	for _, v := range user.Groups {
-		group := &pb.GetGroupByUserIdResponse_Group{
-			Id:                   &v.Id,
-			Name:                 v.Name,
-			CreatorId:            &v.CreatorId,
+		go func(gp *model.Group) {
+			t := time2string(*gp.UpdatedAt)
+			var users []*pb.User
+			for _, u := range gp.Users {
+				user_ := &pb.User{
+					Id:          &u.Id,
+					Name:        &u.Name,
+					Avatar:      u.Avatar,
+					Gender:      u.Gender,
+					SelfGroupId: u.SelfGroupId,
+				}
+				users = append(users, user_)
+			}
+			tn, err := taskNum(db, v.Id)
+			if err != nil {
+				errChan <- err
+				return
+			}
+			group := &pb.GetGroupByUserIdResponse_Group{
+				Id:        &gp.Id,
+				Name:      gp.Name,
+				CreatorId: &gp.CreatorId,
+				Type:      &gp.Type,
+				UpdatedAt: &t,
+				TaskNum:   &tn,
+				Users:     users,
+			}
+
+			mutex.Lock()
+			response.Groups = append(response.Groups, group)
+			mutex.Unlock()
+			ch <- 1
+			errChan <- nil
+		}(v)
+
+		go func() {
+			<-ch
+		}()
+	}
+
+	for _, _ = range user.Groups {
+		if err := <-errChan; err != nil {
+			return err
 		}
-		response.Groups = append(response.Groups, group)
 	}
 	return nil
 }
@@ -89,14 +139,16 @@ func (g Group) CreateGroup(ctx context.Context, request *pb.CreateGroupRequest, 
 	response.Id = &group.Id
 
 	err := g.AddUser(ctx, &pb.AddUserRequest{
-		GroupId:              response.Id,
-		UserIds:              []string{*request.CreatorId},
+		GroupId: response.Id,
+		UserIds: []string{*request.CreatorId},
 	}, nil)
 	if err != nil {
 		return err
 	}
-
-	return nil
+	err = db.Model(&model.Group{
+		Id: group.Id,
+	}).Update("name", request.Name).Error
+	return err
 }
 
 func (g Group) AddUser(ctx context.Context, request *pb.AddUserRequest, response *pb.AddUserResponse) error {
@@ -110,7 +162,7 @@ func (g Group) AddUser(ctx context.Context, request *pb.AddUserRequest, response
 	}
 	pg := new(pb.GetGroupResponse)
 	err := g.GetGroup(ctx, &pb.GetGroupRequest{
-		Id:                   request.GroupId,
+		Id: request.GroupId,
 	}, pg)
 	if err != nil {
 		// record not found
@@ -136,13 +188,14 @@ func (g Group) AddUser(ctx context.Context, request *pb.AddUserRequest, response
 
 // all values are prepared in api
 func (g Group) UpdateGroup(ctx context.Context, request *pb.UpdateGroupRequest, response *pb.UpdateGroupResponse) error {
-	if request.Id == nil || request.Name == nil{
+	if request.Id == nil || request.Name == nil {
 		return fmt.Errorf("nil pointer")
 	}
 	db := g.SqlDb
+
 	err := db.Model(&model.Group{
-		Id:        *request.Id,
-	}).Update("name", *request.Name).Error
+		Id: *request.Id,
+	}).Updates(map[string]interface{}{"name": *request.Name}).Error
 	return err
 }
 
@@ -153,7 +206,7 @@ func (g Group) DeleteGroup(ctx context.Context, request *pb.DeleteGroupRequest, 
 	db := g.SqlDb
 	pg := new(pb.GetGroupResponse)
 	err := g.GetGroup(ctx, &pb.GetGroupRequest{
-		Id:                   request.Id,
+		Id: request.Id,
 	}, pg)
 	if err != nil {
 		return err
@@ -162,12 +215,20 @@ func (g Group) DeleteGroup(ctx context.Context, request *pb.DeleteGroupRequest, 
 		return fmt.Errorf("can't delete an individual group")
 	}
 	err = db.Delete(&model.Group{
-		Id:        *request.Id,
+		Id: *request.Id,
 	}).Error
 	if err != nil {
 		return err
 	}
 	return err
+}
+
+func string2time(str string) (time.Time, error) {
+	return time.Parse("2006-01-02T15:04:05", str)
+}
+
+func time2string(time time.Time) string {
+	return time.String()
 }
 
 func (g Group) GetGroup(ctx context.Context, request *pb.GetGroupRequest, response *pb.GetGroupResponse) error {
@@ -176,7 +237,7 @@ func (g Group) GetGroup(ctx context.Context, request *pb.GetGroupRequest, respon
 	}
 	db := g.SqlDb
 	group := model.Group{
-		Id:        *request.Id,
+		Id: *request.Id,
 	}
 	if err := db.Preload("Users").Find(&group).Error; err != nil {
 		return err
@@ -184,14 +245,20 @@ func (g Group) GetGroup(ctx context.Context, request *pb.GetGroupRequest, respon
 	response.Name = group.Name
 	response.Type = &group.Type
 	response.CreatorId = &group.CreatorId
-
+	ua := time2string(*group.UpdatedAt)
+	response.UpdatedAt = &ua
+	tn, err := taskNum(db, group.Id)
+	if err != nil {
+		return err
+	}
+	response.TaskNum = &tn
 	for _, v := range group.Users {
 		user := &pb.User{
-			Id:                   &v.Id,
-			Name:                 &v.Name,
-			Avatar:               v.Avatar,
-			Gender:               v.Gender,
-			SelfGroupId:          v.SelfGroupId,
+			Id:          &v.Id,
+			Name:        &v.Name,
+			Avatar:      v.Avatar,
+			Gender:      v.Gender,
+			SelfGroupId: v.SelfGroupId,
 		}
 		response.Users = append(response.Users, user)
 	}

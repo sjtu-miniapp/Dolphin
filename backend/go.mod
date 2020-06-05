@@ -19,6 +19,7 @@ require (
 	github.com/gorilla/websocket v1.4.1
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4 // indirect
 	github.com/jinzhu/gorm v1.9.12
+	github.com/julienschmidt/httprouter v1.2.0
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lib/pq v1.3.0 // indirect
 	github.com/lucas-clemente/quic-go v0.14.1 // indirect

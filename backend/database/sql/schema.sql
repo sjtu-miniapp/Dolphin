@@ -35,6 +35,7 @@ CREATE TABLE `group` (
     `creator_id` VARCHAR(30) NOT NULL,
     # 0: GROUP, 1: INIDVIDUAL
     `type` TINYINT(1) DEFAULT 0 NOT NULL,
+    `updated_at` DATETIME NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE (`name`, `creator_id`),
     FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE

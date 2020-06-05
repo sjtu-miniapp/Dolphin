@@ -22,6 +22,7 @@ type Group struct {
 	// associated
 	CreatorId string `gorm:"foreign_key:id;unique_index:idx_name_creatorid;not null;type:varchar(30)"`
 	Type int32 `gorm:"default:0;not null"`
+	UpdatedAt *time.Time
 	Users []*User `gorm:"many2many:user_group;foreign_key:group_id"`
  	Tasks []*Task `gorm:"foreign_key:group_id"`
 }

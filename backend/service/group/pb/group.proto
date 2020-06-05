@@ -26,17 +26,24 @@ message GetGroupResponse {
   required string name = 1;
   required string creator_id = 2;
   required int32 type = 3;
-  repeated User users = 4;
+  required string updated_at = 4;
+  required int32 task_num = 5;
+  repeated User users = 6;
 }
 
 message GetGroupByUserIdRequest {
   required string user_id = 1;
 }
+
 message GetGroupByUserIdResponse {
   message Group {
     required int32 id = 1;
     required string name = 2;
     required string creator_id = 3;
+    required int32 type = 4;
+    required string updated_at = 5;
+    required int32 task_num = 6;
+    repeated User users = 7;
   }
   repeated Group groups = 3;
 }

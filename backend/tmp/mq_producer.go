@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/broker"
 	"github.com/micro/go-plugins/broker/kafka"
@@ -23,24 +22,24 @@ func createService() micro.Service {
 	return service
 }
 
-func main() {
-	srv := createService()
-	router := httprouter.New()
-	srv.Server().Handle(srv.Server().NewHandler(router))
-	broker.Publish("Topic主题", &broker.Message{
-		Header: map[string]string{
-			"AAA": "BBBBB",
-			"CCCCC": "DDDDDD",
-		},
-		Body: []byte("消息内容"),
-	})
-	broker.Subscribe("Topic主题", func(p broker.Publication) error {
-		brokerHeader := p.Message().Header
-		aaa := brokerHeader["AAA"]
-		bbb := string(p.Message().Body)
-	})
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-}
+//func main() {
+//	srv := createService()
+//	router := httprouter.New()
+//	srv.Server().Handle(srv.Server().NewHandler(router))
+//	broker.Publish("Topic主题", &broker.Message{
+//		Header: map[string]string{
+//			"AAA": "BBBBB",
+//			"CCCCC": "DDDDDD",
+//		},
+//		Body: []byte("消息内容"),
+//	})
+//	broker.Subscribe("Topic主题", func(p broker.Publication) error {
+//		brokerHeader := p.Message().Header
+//		aaa := brokerHeader["AAA"]
+//		bbb := string(p.Message().Body)
+//	})
+//	if err != nil {
+//		log.Fatal(err.Error())
+//	}
+//
+//}
