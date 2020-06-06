@@ -39,6 +39,7 @@ const GroupModal: FC<GroupModalProps> = props => {
           value={inputValue}
           onChange={updateInputValue}
           required
+          focus={props.isOpened}
         />
       </AtModalContent>
       <AtModalAction> <Button onClick={props.handleCancel}>取消</Button> <Button onClick={onTriggerConfirm}>确定</Button> </AtModalAction>
