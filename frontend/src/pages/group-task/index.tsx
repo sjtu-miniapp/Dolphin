@@ -5,23 +5,27 @@ import bluebird from 'bluebird';
 
 import { Group, Task } from '../../types';
 import * as taskAPI from '../../apis/task';
+import FabButton from '../../components/fab-button';
 
 import TaskView from './task';
 import { normalizeTask } from './utils';
+import TaskModal from './task-modal';
 
 const GroupTaskPage: FC = () => {
   const groups: Group[] = Taro.getStorageSync('groups') || [];
-  console.log('gggggggg', groups);
 
   const [selectedGroupID, setSelectedGroupID] = useState<number | null>(() => {
     const { groupID } = useRouter().params;
-    console.log('giiiiiiiiiid', groupID);
     if (!isNaN(groupID as any)) return parseInt(groupID, 10);
     if (groups && groups.length > 0) return groups[0].id;
     return null;
   })
 
   const [tasks, setTasks] = useState<Task[]>([]);
+
+  const [isAddTaskLayoutOpened, setIsAddTaskLayoutOpened] = useState<boolean>(false);
+  const openLayOut = () => setIsAddTaskLayoutOpened(true);
+  const closeLayOut = () => setIsAddTaskLayoutOpened(false);
 
   const getTaskDetails = async (): Promise<Task[]> => {
     if (!selectedGroupID) return [];
@@ -68,6 +72,14 @@ const GroupTaskPage: FC = () => {
 
   const selectedGroup = groups.find(g => g.id === selectedGroupID);
 
+  const addTask = () => {
+    console.log(`Should add task`);
+  }
+
+  const onClickFabbutton = () => {
+    openLayOut();
+  }
+
   return (
     <View className='at-row' >
       <View className='at-col-2'>
@@ -91,6 +103,8 @@ const GroupTaskPage: FC = () => {
           selectedGroupName={selectedGroup ? selectedGroup.name : undefined}
         />
       </View>
+      <FabButton onClick={onClickFabbutton} />
+      <TaskModal isOpened={isAddTaskLayoutOpened} handleClose={closeLayOut} handleAdd={addTask} />
     </View>
   )
 }
