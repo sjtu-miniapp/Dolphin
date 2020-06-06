@@ -1,7 +1,6 @@
 import Taro, { FC } from '@tarojs/taro';
 import { View, Text, Image } from '@tarojs/components';
 import { AtSwipeAction } from 'taro-ui';
-import { SwipeActionOption } from 'taro-ui/types/swipe-action';
 import { CSSProperties } from 'react';
 
 import { Group } from '../../types';
@@ -19,20 +18,19 @@ const IAMGE_STYLE: CSSProperties = {
 interface FullGroupViewProps {
   groups: Group[];
   onClickGroup: (groupID: number) => void;
-  // onDeleteGroup: (groupID: number) => void;
+  onDeleteGroup: (groupID: number) => void;
 }
 
 const FullGroupView: FC<FullGroupViewProps> = props => {
   const { groups, onClickGroup } = props;
 
-  const onClickEvent = (item: SwipeActionOption) => {
-    console.log(JSON.stringify(item, null, 2));
+  const onClickDelete = async (groupID: number) => {
+    await props.onDeleteGroup(groupID);
   }
 
   return (
     <View>
       {groups.map(g => (
-
         <View className='item'>
           <AtSwipeAction autoClose options={[
             {
@@ -41,7 +39,7 @@ const FullGroupView: FC<FullGroupViewProps> = props => {
                 backgroundColor: '#FF4949'
               }
             }
-          ]} onClick={onClickEvent}>
+          ]} onClick={() => onClickDelete(g.id)}>
             <View className='left' onClick={() => onClickGroup(g.id)} >
               <View className='text'>
                 <Text className='name'>{g.name}</Text>

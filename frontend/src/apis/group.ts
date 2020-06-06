@@ -69,3 +69,27 @@ export const createGroup = async (params: CreateGroupParams): Promise<void> => {
     response.errMsg
   );
 };
+
+export const deleteGroupByID = async (groupID: number): Promise<void> => {
+  const url = `${HOST}${BASE_URL}/${groupID}?${utils.getSessionQuery()}`;
+
+  const response = await Taro.request({
+    url,
+    method: "DELETE",
+    data: { id: groupID }
+  });
+
+  console.log(
+    "Delete Group By ID Result:",
+    response.statusCode,
+    response.data,
+    response.errMsg
+  );
+
+  if (response.statusCode >= 300)
+    throw new Error(
+      `Failed to delete group, ${response.statusCode}, ${response.data}, ${response.errMsg}`
+    );
+
+  return response.data;
+};

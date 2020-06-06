@@ -1,4 +1,17 @@
 ---
+# 2020-06-06
+
+Goal:
+- Delete Group
+- Whole task page
+- Kanban page
+
+TODO:
+- delete group api
+- delete group component
+- integrate to group view
+
+---
 # 2020-06-04
 
 Goal:

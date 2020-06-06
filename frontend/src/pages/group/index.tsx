@@ -62,9 +62,21 @@ const GroupPage: FC = () => {
     Taro.navigateTo({ url: `/pages/group-task/index?groupID=${groupID}` });
   }
 
+  const onDeleteGroup = async (groupID: number) => {
+    try {
+      await groupAPI.deleteGroupByID(groupID);
+      Taro.atMessage({ message: '成功删除小组!', type: 'success' });
+    } catch (error) {
+      Taro.atMessage({ message: '删除小组失败!', type: 'error' });
+      console.error(error);
+    }
+
+    await updateGroups();
+  }
+
   return (
     <View>
-      <FullGroupView groups={groups} onClickGroup={onSelectGroup} />
+      <FullGroupView groups={groups} onClickGroup={onSelectGroup} onDeleteGroup={onDeleteGroup} />
       <FabButton onClick={openModal} />
       <GroupModal isOpened={showModal} handleCancel={closeModal} handleClose={closeModal} handleConfirm={addGroup} />
     </View>
