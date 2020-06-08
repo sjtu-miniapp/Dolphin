@@ -104,7 +104,7 @@ const GroupTaskPage: FC = () => {
         />
       </View>
       <FabButton onClick={onClickFabbutton} />
-      <TaskModal isOpened={isAddTaskLayoutOpened} handleClose={closeLayOut} handleAdd={addTask} />
+      <TaskModal groupID={selectedGroupID} isOpened={isAddTaskLayoutOpened} handleClose={closeLayOut} handleAdd={addTask} />
     </View>
   )
 }

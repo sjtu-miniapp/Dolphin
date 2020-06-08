@@ -79,3 +79,39 @@ export const updateTaskMeta = async (
     response.errMsg
   );
 };
+
+/*
+		GroupId     int32      `json:"group_id"`
+		UserIds     []string `json:"user_ids"`
+		Name        string   `json:"name"`
+		Type        int32      `json:"type"`
+		LeaderId    *string   `json:"leader_id, omitempty"`
+		StartDate   *string `json:"start_date, omitempty"`
+		EndDate     *string `json:"end_date, omitempty"`
+		Description *string   `json:"description, omitempty"`
+		Readonly    bool     `json:"readonly"`
+*/
+export interface CreateTaskParams {
+  group_id: number;
+  user_ids: string[];
+  name: string;
+  type: number;
+  end_date: string;
+  description: string;
+  readonly: boolean;
+}
+
+export const createTask = async (p: CreateTaskParams) => {
+  const url = `${PREFIX}?${utils.getSessionQuery()}`;
+  const response = await Taro.request<TaskWorker[]>({
+    url,
+    method: "PUT",
+    data: p
+  });
+  console.log(
+    "Create Task Result:",
+    response.statusCode,
+    response.data,
+    response.errMsg
+  );
+};
