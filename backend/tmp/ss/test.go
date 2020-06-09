@@ -1,17 +1,12 @@
 package main
 
 import (
-	"github.com/sjtu-miniapp/dolphin/service/database"
-	"github.com/sjtu-miniapp/dolphin/service/database/model"
+	"fmt"
+	"time"
 )
 
 func main() {
-	sqldb, _ := database.DbConn("root", "610878",
-		"localhost", "test", 3306, 1)
-	var count int32
-
-	_ = sqldb.Model(&model.Group{
-		Id: 1,
-	}).Update("updated_at", 0).Error
-	println(count)
+	//now := time.Now()
+	s, _ := time.Parse("2006-01-02T15:04:05", "2016-01-02T12:12:12")
+	fmt.Print(s)
 }

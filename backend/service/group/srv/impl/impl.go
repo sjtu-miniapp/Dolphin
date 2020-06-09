@@ -21,6 +21,11 @@ func (g Group) UserInGroup(ctx context.Context, request *pb.UserInGroupRequest, 
 	db := g.SqlDb
 	user := model.User{Id: *request.UserId}
 	err := db.First(&user).Error
+	if err != nil && err.Error() == "record not found" {
+		response.Ok = new(bool)
+		*response.Ok = false
+		return nil
+	}
 	if err != nil {
 		return err
 	}

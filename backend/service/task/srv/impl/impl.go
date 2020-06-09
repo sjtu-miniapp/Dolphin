@@ -19,13 +19,13 @@ type Task struct {
 const collection = "task"
 
 func time2string(time time.Time) string {
-	s := fmt.Sprintf("%d-%d-%d", time.Year(),
-		time.Month(), time.Day())
+	s := fmt.Sprintf("%d-%d-%d %d:%d:%d", time.Year(),
+		time.Month(), time.Day(), time.Hour(), time.Minute(), time.Second())
 	return s
 }
 
 func string2time(str string) (time.Time, error) {
-	return time.Parse("2006-01-02", str)
+	return time.Parse("2006-01-02T15:04:05", str)
 }
 
 func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, response *pb.GetTaskMetaResponse) error {
@@ -55,10 +55,12 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 		XXX_unrecognized:     nil,
 		XXX_sizecache:        0,
 	}
-	if task.EndDate != nil && task.StartDate != nil {
+	if task.EndDate != nil  {
 		ed := time2string(*task.EndDate)
-		sd := time2string(*task.StartDate)
 		response.Meta.EndDate = &ed
+	}
+	if task.StartDate != nil {
+		sd := time2string(*task.StartDate)
 		response.Meta.StartDate = &sd
 	}
 
@@ -164,22 +166,25 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 		Done:        false,
 		Users:       nil,
 	}
-	if (request.EndDate != nil) != (request.StartDate != nil) {
-		return fmt.Errorf("wrong date format")
-	} else if request.EndDate != nil {
+	if request.EndDate != nil {
 		ed, err := string2time(*request.EndDate)
 		if err != nil {
 			return fmt.Errorf("wrong date format: %v", err)
 		}
+		task.EndDate = &ed
+	}
+	if request.StartDate != nil {
 		sd, err := string2time(*request.StartDate)
 		if err != nil {
 			return fmt.Errorf("wrong date format: %v", err)
 		}
-		if sd.After(ed) {
-			return fmt.Errorf("start date after end date")
-		}
-		task.EndDate = &ed
 		task.StartDate = &sd
+	} else {
+		now := time.Now()
+		task.StartDate =  &now
+	}
+	if task.StartDate != nil && task.EndDate != nil && task.StartDate.After(*task.EndDate) {
+		return fmt.Errorf("start date after end date")
 	}
 
 	for _, v := range request.UserIds {

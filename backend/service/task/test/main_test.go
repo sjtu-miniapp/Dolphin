@@ -132,8 +132,8 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	task1 := rsp7.Id
-	d1 := "2020-05-20"
-	d2 := "2020-05-21"
+	d1 := "2020-05-20T00:00:00"
+	d2 := "2020-05-21T00:00:00"
 	rsp8, err := task.CreateTask(ctx, &pb.CreateTaskRequest{
 		GroupId:              gid2,
 		UserIds:              []string{openid3, openid2},
@@ -188,7 +188,7 @@ func TestTask(t *testing.T) {
 	})
 	assert.NotEmpty(t, err)
 	name5 := ""
-	d3 := "2020-05-30"
+	d3 := "2020-05-30T00:00:00"
 	des1 := ""
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
 		Id:                   &task2,
@@ -200,7 +200,7 @@ func TestTask(t *testing.T) {
 	})
 	assert.NotEmpty(t, err)
 	name6 := "modified"
-	d4 := "2020-05-21"
+	d4 := "2020-05-21T00:00:00"
 	des2 := "nothing"
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
 		Id:                   &task2,
