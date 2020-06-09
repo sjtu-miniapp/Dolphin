@@ -55,8 +55,8 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
 
 
     const newTask: Task = {
-      id: new Date().toString(),
-      groupID: '2',
+      id: Date.now(),
+      groupID: 2,
       name: inputVal,
       description: '',
       startDate: new Date(),

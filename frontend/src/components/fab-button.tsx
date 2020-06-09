@@ -1,26 +1,27 @@
 import Taro, { FC } from '@tarojs/taro';
-import { View } from '@tarojs/components'
-import { AtFab, AtIcon } from 'taro-ui'
+import { View } from '@tarojs/components';
+import { AtFab, AtIcon } from 'taro-ui';
+
 import './fab-button.scss';
 
 interface AtFabProps {
   onClick?: () => void;
 }
 
-const FabButton: FC<AtFabProps> = props => {
-  const onClick = props.onClick || (() => { });
+const voidFunc = () => { };
 
+const FabButton: FC<AtFabProps> = props => {
   return (
-    <View className='button'>
-      <AtFab onClick={onClick} size='small'>
-        <AtIcon className='at-fab__icon at-icon at-icon-add' value='add' ></AtIcon>
+    <View className='floating'>
+      <AtFab onClick={props.onClick || voidFunc} size='small'>
+        <AtIcon value='add'></AtIcon>
       </AtFab>
     </View>
   )
 }
 
 FabButton.defaultProps = {
-  onClick: () => { }
+  onClick: voidFunc
 }
 
 export default FabButton;

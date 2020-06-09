@@ -1,5 +1,6 @@
-.button {
+.floating {
   position: fixed;
+  z-index: 99;
   right: 60px;
   bottom: 80px;
 }

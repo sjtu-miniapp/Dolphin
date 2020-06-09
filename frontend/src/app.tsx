@@ -30,6 +30,7 @@ class App extends Component {
     pages: [
       'pages/login/index',
       'pages/group/index',
+      'pages/group-task/index',
       'pages/kanban/index',
       'pages/task/index',
     ],

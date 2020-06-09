@@ -1,7 +1,7 @@
 import Taro, { FC } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 
-import { TaskViewProps } from './interface'
+import { TaskViewProps } from '../group/interface'
 import TaskList from '../../components/task-list';
 
 const TaskView: FC<TaskViewProps> = props => {
