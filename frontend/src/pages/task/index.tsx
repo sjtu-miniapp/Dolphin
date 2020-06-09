@@ -1,7 +1,7 @@
 import Taro, { FC, useState, useEffect, useRouter } from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import { AtTextarea, AtFloatLayout, AtCalendar } from 'taro-ui';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from '../../utils';
 
 import TaskReceiverList from '../../components/task-receiver-list';
 import TaskDivider from '../../components/task-divider';
@@ -41,13 +41,13 @@ const TaskView: FC = () => {
 
 
   const onTaskNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTempTask = cloneDeep<Task>(tempTask as Task);
+    const newTempTask = cloneDeep(tempTask as Task);
     newTempTask.name = e.target.value;
     setTempTask(newTempTask);
   }
 
   const onTaskContentChange = (v: string) => {
-    const newTempTask = cloneDeep<Task>(tempTask as Task);
+    const newTempTask = cloneDeep(tempTask as Task);
     newTempTask.description = v;
     setTempTask(newTempTask);
   }
@@ -60,7 +60,7 @@ const TaskView: FC = () => {
   const closeEndTimeEdition = () => setOpenEndTimeEditing(false);
 
   const onTaskEndDateChange = (item: { value: string }) => {
-    const newTempTask = cloneDeep<Task>(tempTask as Task);
+    const newTempTask = cloneDeep(tempTask as Task);
     newTempTask.endDate = new Date(item.value);
     setTempTask(newTempTask);
   }

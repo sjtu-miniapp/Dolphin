@@ -4,8 +4,8 @@ export interface UserTaskStatus {
 }
 
 export interface Task {
-  id: string;
-  groupID: string;
+  id: number;
+  groupID: number;
   name: string;
   description: string;
   publisher?: string;
@@ -18,7 +18,7 @@ export interface Task {
   type?: string;
 }
 export interface Group {
-  id: string;
+  id: number;
   name: string;
   taskNumber: number;
   updateTime: Date;
