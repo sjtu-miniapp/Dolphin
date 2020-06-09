@@ -127,9 +127,6 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 			EndDate:              nil,
 			Readonly:             &v.Readonly,
 			Description:          v.Desciption,
-			XXX_NoUnkeyedLiteral: struct{}{},
-			XXX_unrecognized:     nil,
-			XXX_sizecache:        0,
 		}
 		if v.StartDate != nil {
 			s := time2string(*v.StartDate)

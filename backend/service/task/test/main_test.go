@@ -147,13 +147,14 @@ func TestTask(t *testing.T) {
 		Readonly:             &false_,
 	})
 	assert.Empty(t, err)
-	task2 := rsp8.Id
+	task2 := *rsp8.Id
 	rsp5, err := task.GetTaskMetaByGroupId(ctx, &pb.GetTaskMetaByGroupIdRequest{
 		GroupId:              gid1,
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, 1, len(rsp5.Metas))
 	assert.Equal(t, *rsp5.Metas[0].Name, name3)
+	assert.Equal(t, *rsp5.Metas[0].Id, *task1)
 	rsp12, err := group.GetGroup(ctx, &pb2.GetGroupRequest{
 		Id:                   gid1,
 	})
@@ -168,12 +169,12 @@ func TestTask(t *testing.T) {
 	assert.False(t, *rsp6.Ok)
 	rsp6, err = task.UserInTask(ctx, &pb.UserInTaskRequest{
 		UserId:               &openid3,
-		TaskId:               task2,
+		TaskId:               &task2,
 	})
 	assert.Empty(t, err)
 	assert.True(t, *rsp6.Ok)
 	rsp9, err := task.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
-		Id:                   task2,
+		Id:                   &task2,
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, len(rsp9.Workers), 2)
@@ -190,7 +191,7 @@ func TestTask(t *testing.T) {
 	d3 := "2020-05-30"
 	des1 := ""
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
-		Id:                   task2,
+		Id:                   &task2,
 		Name:                 &name5,
 		StartDate:            &d3,
 		EndDate:              &d1,
@@ -202,7 +203,7 @@ func TestTask(t *testing.T) {
 	d4 := "2020-05-21"
 	des2 := "nothing"
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
-		Id:                   task2,
+		Id:                   &task2,
 		Name:                 &name6,
 		StartDate:            &d4,
 		EndDate:              &d4,
@@ -214,7 +215,7 @@ func TestTask(t *testing.T) {
 	d5 := ""
 	des3 := "really nothing"
 	_, err = task.UpdateTaskMeta(ctx, &pb.UpdateTaskMetaRequest{
-		Id:                   task2,
+		Id:                   &task2,
 		Name:                 &name7,
 		StartDate:            &d5,
 		EndDate:              &d4,
@@ -223,7 +224,7 @@ func TestTask(t *testing.T) {
 	})
 	assert.NotEmpty(t, err)
 	rsp11, err := task.GetTaskMeta(ctx, &pb.GetTaskMetaRequest{
-		Id:                   task2,
+		Id:                   &task2,
 	})
 	assert.Empty(t, err)
 	assert.NotEmpty(t, rsp11.Meta)
