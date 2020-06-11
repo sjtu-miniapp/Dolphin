@@ -8,6 +8,7 @@ import (
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"sort"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type Task struct {
 const collection = "task"
 
 func time2string(time time.Time) string {
-	s := fmt.Sprintf("%d-%d-%d %d:%d:%d", time.Year(),
+	s := fmt.Sprintf("%04d-%02d-%02dT%02d:%02d:%02d", time.Year(),
 		time.Month(), time.Day(), time.Hour(), time.Minute(), time.Second())
 	return s
 }
@@ -55,7 +56,7 @@ func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, r
 		XXX_unrecognized:     nil,
 		XXX_sizecache:        0,
 	}
-	if task.EndDate != nil  {
+	if task.EndDate != nil {
 		ed := time2string(*task.EndDate)
 		response.Meta.EndDate = &ed
 	}
@@ -118,17 +119,61 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 	}
 	for _, v := range group.Tasks {
 		task := pb.TaskMeta{
-			Id:                   &v.Id,
-			Name:                 v.Name,
-			Type:                 &v.Type,
-			Done:                 &v.Done,
-			GroupId:              &v.GroupId,
-			PublisherId:          &v.PublisherId,
-			LeaderId:             v.LeaderId,
-			StartDate:            nil,
-			EndDate:              nil,
-			Readonly:             &v.Readonly,
-			Description:          v.Desciption,
+			Id:          &v.Id,
+			Name:        v.Name,
+			Type:        &v.Type,
+			Done:        &v.Done,
+			GroupId:     &v.GroupId,
+			PublisherId: &v.PublisherId,
+			LeaderId:    v.LeaderId,
+			StartDate:   nil,
+			EndDate:     nil,
+			Readonly:    &v.Readonly,
+			Description: v.Desciption,
+		}
+		if v.StartDate != nil {
+			s := time2string(*v.StartDate)
+			task.StartDate = &s
+		}
+		if v.EndDate != nil {
+			s := time2string(*v.EndDate)
+			task.EndDate = &s
+		}
+		response.Metas = append(response.Metas, &task)
+	}
+	return nil
+}
+
+func (g Task) GetTaskMetaByUserId(ctx context.Context, request *pb.GetTaskMetaByUserIdRequest, response *pb.GetTaskMetaByUserIdResponse) error {
+	if request.UserId == nil {
+		return fmt.Errorf("nil pointer")
+	}
+	db := g.SqlDb
+	user := model.User{
+		Id: *request.UserId,
+	}
+
+	if err := db.Preload("Tasks").Find(&user).Error; err != nil {
+		return err
+	}
+	sort.Slice(user.Tasks,
+		func(i, j int) bool {
+			return user.Tasks[i].EndDate.Before(*user.Tasks[j].EndDate)
+		})
+
+	for _, v := range user.Tasks {
+		task := pb.TaskMeta{
+			Id:          &v.Id,
+			Name:        v.Name,
+			Type:        &v.Type,
+			Done:        &v.Done,
+			GroupId:     &v.GroupId,
+			PublisherId: &v.PublisherId,
+			LeaderId:    v.LeaderId,
+			StartDate:   nil,
+			EndDate:     nil,
+			Readonly:    &v.Readonly,
+			Description: v.Desciption,
 		}
 		if v.StartDate != nil {
 			s := time2string(*v.StartDate)
@@ -181,7 +226,7 @@ func (g Task) CreateTask(ctx context.Context, request *pb.CreateTaskRequest, res
 		task.StartDate = &sd
 	} else {
 		now := time.Now()
-		task.StartDate =  &now
+		task.StartDate = &now
 	}
 	if task.StartDate != nil && task.EndDate != nil && task.StartDate.After(*task.EndDate) {
 		return fmt.Errorf("start date after end date")

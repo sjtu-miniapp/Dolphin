@@ -27,6 +27,7 @@ func DbConn(User, Password, Host, Db string, Port int, Debug int) (*gorm.DB, err
 }
 
 func DbSetup(db *gorm.DB) {
+	/* not necessary */
 	if !db.HasTable(&model.User{}) {
 		db.CreateTable(&model.User{})
 	}
@@ -42,6 +43,7 @@ func DbSetup(db *gorm.DB) {
 	if !db.HasTable(&model.UserGroup{}) {
 		db.CreateTable(&model.UserGroup{})
 	}
+
 	db.AutoMigrate(&model.User{}, &model.Task{},
 		&model.Group{}, &model.UserTask{}, &model.UserGroup{})
 	db.Model(&model.User{}).AddForeignKey("`self_group_id`",

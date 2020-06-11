@@ -58,6 +58,17 @@
         }
       }
     },
+    "GetTaskMetaByUserIdResponse": {
+      "type": "object",
+      "properties": {
+        "metas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TaskMeta"
+          }
+        }
+      }
+    },
     "GetTaskMetaResponse": {
       "type": "object",
       "properties": {

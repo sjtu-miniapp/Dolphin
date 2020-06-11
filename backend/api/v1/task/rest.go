@@ -24,7 +24,7 @@ func Router(base string) *gin.Engine {
 	// add task_id only to avoid stupid conflicts from gin routers
 	// it could be group_id
 	g.GET("/:task_id/group", task.GetTaskByGroup)
-
+	g.GET("/:task_id/user", task.GetTaskByUserId)
 	g.GET("/:task_id/meta", task.GetTaskMeta)
 	g.GET("/:task_id/workers", task.GetTaskWorker)
 	g.GET("/:task_id/content", task.GetTaskContent)
@@ -620,4 +620,36 @@ func (t Task) GetTaskContent(c *gin.Context) {
 		return
 	}
 	c.JSON(200, resp2)
+}
+/*
+# Get tasks by userId; the route is actually a compromise on gin router
+- route: /task/:any/user
+- method: GET
+- request params:
+    - openid string
+    - sid string
+- response data:
+    - task []Task # meta
+- response status:
+    - 200 success
+    - 401 auth check fails
+    - 403 not allowed
+    - 500 failure
+ */
+func (t Task) GetTaskByUserId(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, err)
+		return
+	}
+	openid := c.Query("openid")
+	resp2, err := srv.GetTaskMetaByUserId(context.TODO(), &pb.GetTaskMetaByUserIdRequest{
+		UserId:               &openid,
+	})
+
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	c.JSON(200, resp2.Metas)
 }

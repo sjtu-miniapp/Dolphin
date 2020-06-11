@@ -38,6 +38,7 @@ type TaskService interface {
 	GetTaskContent(ctx context.Context, in *GetTaskContentRequest, opts ...client.CallOption) (*GetTaskContentResponse, error)
 	GetTaskPeolple(ctx context.Context, in *GetTaskPeopleRequset, opts ...client.CallOption) (*GetTaskPeopleResponse, error)
 	GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, opts ...client.CallOption) (*GetTaskMetaByGroupIdResponse, error)
+	GetTaskMetaByUserId(ctx context.Context, in *GetTaskMetaByUserIdRequest, opts ...client.CallOption) (*GetTaskMetaByUserIdResponse, error)
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...client.CallOption) (*CreateTaskResponse, error)
 	UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, opts ...client.CallOption) (*UpdateTaskMetaResponse, error)
 	UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, opts ...client.CallOption) (*UpdateTaskContentResponse, error)
@@ -103,6 +104,16 @@ func (c *taskService) GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaB
 	return out, nil
 }
 
+func (c *taskService) GetTaskMetaByUserId(ctx context.Context, in *GetTaskMetaByUserIdRequest, opts ...client.CallOption) (*GetTaskMetaByUserIdResponse, error) {
+	req := c.c.NewRequest(c.name, "Task.GetTaskMetaByUserId", in)
+	out := new(GetTaskMetaByUserIdResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *taskService) CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...client.CallOption) (*CreateTaskResponse, error) {
 	req := c.c.NewRequest(c.name, "Task.CreateTask", in)
 	out := new(CreateTaskResponse)
@@ -160,6 +171,7 @@ type TaskHandler interface {
 	GetTaskContent(context.Context, *GetTaskContentRequest, *GetTaskContentResponse) error
 	GetTaskPeolple(context.Context, *GetTaskPeopleRequset, *GetTaskPeopleResponse) error
 	GetTaskMetaByGroupId(context.Context, *GetTaskMetaByGroupIdRequest, *GetTaskMetaByGroupIdResponse) error
+	GetTaskMetaByUserId(context.Context, *GetTaskMetaByUserIdRequest, *GetTaskMetaByUserIdResponse) error
 	CreateTask(context.Context, *CreateTaskRequest, *CreateTaskResponse) error
 	UpdateTaskMeta(context.Context, *UpdateTaskMetaRequest, *UpdateTaskMetaResponse) error
 	UpdateTaskContent(context.Context, *UpdateTaskContentRequest, *UpdateTaskContentResponse) error
@@ -173,6 +185,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		GetTaskContent(ctx context.Context, in *GetTaskContentRequest, out *GetTaskContentResponse) error
 		GetTaskPeolple(ctx context.Context, in *GetTaskPeopleRequset, out *GetTaskPeopleResponse) error
 		GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, out *GetTaskMetaByGroupIdResponse) error
+		GetTaskMetaByUserId(ctx context.Context, in *GetTaskMetaByUserIdRequest, out *GetTaskMetaByUserIdResponse) error
 		CreateTask(ctx context.Context, in *CreateTaskRequest, out *CreateTaskResponse) error
 		UpdateTaskMeta(ctx context.Context, in *UpdateTaskMetaRequest, out *UpdateTaskMetaResponse) error
 		UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, out *UpdateTaskContentResponse) error
@@ -204,6 +217,10 @@ func (h *taskHandler) GetTaskPeolple(ctx context.Context, in *GetTaskPeopleRequs
 
 func (h *taskHandler) GetTaskMetaByGroupId(ctx context.Context, in *GetTaskMetaByGroupIdRequest, out *GetTaskMetaByGroupIdResponse) error {
 	return h.TaskHandler.GetTaskMetaByGroupId(ctx, in, out)
+}
+
+func (h *taskHandler) GetTaskMetaByUserId(ctx context.Context, in *GetTaskMetaByUserIdRequest, out *GetTaskMetaByUserIdResponse) error {
+	return h.TaskHandler.GetTaskMetaByUserId(ctx, in, out)
 }
 
 func (h *taskHandler) CreateTask(ctx context.Context, in *CreateTaskRequest, out *CreateTaskResponse) error {

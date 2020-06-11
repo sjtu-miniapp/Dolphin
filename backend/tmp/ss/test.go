@@ -1,12 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"sort"
 )
 
 func main() {
-	//now := time.Now()
-	s, _ := time.Parse("2006-01-02T15:04:05", "2016-01-02T12:12:12")
-	fmt.Print(s)
+	type a struct {
+		v int
+	}
+	b := []*a{&a{1}, &a{2}}
+	sort.Slice(b,
+		func(i, j int) bool {
+			return b[i].v > b[j].v
+		})
+	print(b[0].v)
 }

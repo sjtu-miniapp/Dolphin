@@ -158,6 +158,18 @@
     - 403 not allowed
     - 500 failure
 
+# Get tasks by userId; the route is actually a compromise on gin router
+- route: /task/:any/user
+- method: GET
+- request params:
+    - openid string
+    - sid string
+- response data:
+    - task []Task # meta
+- response status:
+    - 200 success
+    - 401 auth check fails
+    - 500 failure
 
 # Create task
 - route: /task
@@ -171,7 +183,7 @@
     - name string
     - type int
     - leader_id # tbd
-    - start_date string: # format: 2020-02-02
+    - start_date string: # format: 2020-02-02T00:00:00
     - end_date string
     - description string
 - response data:
@@ -251,5 +263,3 @@
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
-
-

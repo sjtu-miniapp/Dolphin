@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/micro/cli"
 	micro "github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
@@ -118,22 +119,24 @@ func TestTask(t *testing.T) {
 	name4 := "t3"
 	true_ := true
 	false_ := true
+	d1 := "2020-05-20T00:00:00"
+	d2 := "2020-05-21T00:00:00"
+	d6 := "2020-05-23T00:00:00"
 	rsp7, err := task.CreateTask(ctx, &pb.CreateTaskRequest{
 		GroupId:              gid1,
 		UserIds:              []string{openid, openid2},
 		Name:                 &name3,
 		Type:                 &int0,
 		LeaderId:             nil,
-		StartDate:            nil,
-		EndDate:              nil,
+		StartDate:            &d1,
+		EndDate:             &d6,
 		Description:          nil,
 		PublisherId:          &openid,
 		Readonly:             &true_,
 	})
 	assert.Empty(t, err)
 	task1 := rsp7.Id
-	d1 := "2020-05-20T00:00:00"
-	d2 := "2020-05-21T00:00:00"
+
 	rsp8, err := task.CreateTask(ctx, &pb.CreateTaskRequest{
 		GroupId:              gid2,
 		UserIds:              []string{openid3, openid2},
@@ -155,6 +158,16 @@ func TestTask(t *testing.T) {
 	assert.Equal(t, 1, len(rsp5.Metas))
 	assert.Equal(t, *rsp5.Metas[0].Name, name3)
 	assert.Equal(t, *rsp5.Metas[0].Id, *task1)
+	rsp13, err := task.GetTaskMetaByUserId(ctx, &pb.GetTaskMetaByUserIdRequest{
+		UserId:               &openid2,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, 2, len(rsp13.Metas))
+	t1, err := time.Parse("2006-01-02T15:04:05", *rsp13.Metas[0].EndDate)
+	t2, err := time.Parse("2006-01-02T15:04:05", *rsp13.Metas[1].EndDate)
+	fmt.Println( *rsp13.Metas[0].EndDate)
+	fmt.Println(t2)
+	assert.True(t, t1.Before(t2))
 	rsp12, err := group.GetGroup(ctx, &pb2.GetGroupRequest{
 		Id:                   gid1,
 	})

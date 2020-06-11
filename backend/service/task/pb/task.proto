@@ -5,6 +5,7 @@ service Task {
   rpc GetTaskContent(GetTaskContentRequest) returns (GetTaskContentResponse);
   rpc GetTaskPeolple(GetTaskPeopleRequset) returns (GetTaskPeopleResponse);
   rpc GetTaskMetaByGroupId(GetTaskMetaByGroupIdRequest) returns (GetTaskMetaByGroupIdResponse);
+  rpc GetTaskMetaByUserId(GetTaskMetaByUserIdRequest) returns (GetTaskMetaByUserIdResponse);
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
   rpc UpdateTaskMeta(UpdateTaskMetaRequest) returns (UpdateTaskMetaResponse);
   rpc UpdateTaskContent(UpdateTaskContentRequest) returns (UpdateTaskContentResponse);
@@ -120,4 +121,12 @@ message UpdateTaskContentRequest {
 }
 
 message UpdateTaskContentResponse {
+}
+
+message GetTaskMetaByUserIdRequest {
+  required string user_id = 1;
+}
+
+message GetTaskMetaByUserIdResponse {
+  repeated TaskMeta metas = 1;
 }
