@@ -9,11 +9,13 @@ const BASE_URL = "/api/v1/task";
 const PREFIX = `${HOST}${BASE_URL}`;
 
 export interface TaskMeta {
+  id: number;
   name: string;
   type: number;
   done: boolean;
-  groupId: number;
-  publisher_id: string;
+  group_id: number;
+  start_date: string;
+  end_date: string;
   readonly: boolean;
   description: string;
 }
@@ -54,6 +56,21 @@ export const getTaskWorker = async (taskID: number): Promise<TaskWorker[]> => {
   return response.data;
 };
 
+export const getTaskMeta = async (taskID: string): Promise<TaskMeta> => {
+  const url = `${PREFIX}/${taskID}/meta?${utils.getSessionQuery()}`;
+  const response = await Taro.request<TaskMeta>({
+    url,
+    method: "GET"
+  });
+  console.log(
+    "Get Task Meta By ID Result:",
+    response.statusCode,
+    response.data,
+    response.errMsg
+  );
+  return response.data;
+};
+
 interface UpdateTaskMeta {
   name: string;
   end_date: string;
@@ -80,22 +97,12 @@ export const updateTaskMeta = async (
   );
 };
 
-/*
-		GroupId     int32      `json:"group_id"`
-		UserIds     []string `json:"user_ids"`
-		Name        string   `json:"name"`
-		Type        int32      `json:"type"`
-		LeaderId    *string   `json:"leader_id, omitempty"`
-		StartDate   *string `json:"start_date, omitempty"`
-		EndDate     *string `json:"end_date, omitempty"`
-		Description *string   `json:"description, omitempty"`
-		Readonly    bool     `json:"readonly"`
-*/
 export interface CreateTaskParams {
   group_id: number;
   user_ids: string[];
   name: string;
   type: number;
+  start_date: string;
   end_date: string;
   description: string;
   readonly: boolean;
@@ -110,6 +117,26 @@ export const createTask = async (p: CreateTaskParams) => {
   });
   console.log(
     "Create Task Result:",
+    response.statusCode,
+    response.data,
+    response.errMsg
+  );
+
+  if (response.statusCode >= 300) {
+    throw new Error(
+      `Failed to create task: ${response.statusCode} ${response.data} ${response.errMsg}`
+    );
+  }
+};
+
+export const deleteTask = async (taskID: string): Promise<void> => {
+  const url = `${PREFIX}/${taskID}?${utils.getSessionQuery()}`;
+  const response = await Taro.request<TaskMeta>({
+    url,
+    method: "DELETE"
+  });
+  console.log(
+    "Delete Task Meta By ID Result:",
     response.statusCode,
     response.data,
     response.errMsg
