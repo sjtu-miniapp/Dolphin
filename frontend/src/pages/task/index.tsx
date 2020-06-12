@@ -5,7 +5,8 @@ import { cloneDeep } from '../../utils';
 
 import TaskReceiverList from '../../components/task-receiver-list';
 import TaskDivider from '../../components/task-divider';
-import { getTaskByID } from '../../apis/tasks';
+import * as taskAPI from '../../apis/task';
+import { normalizeTask } from '../group/utils';
 import { Task } from '../../types';
 import './index.scss';
 
@@ -20,7 +21,8 @@ const TaskView: FC = () => {
   const taskID = router.params.id;
 
   const updateTask = async (id: string) => {
-    const task = await getTaskByID(id);
+    const rawTask = await taskAPI.getTaskMeta(id);
+    const task = await normalizeTask(rawTask);
     setTaskDetail(task || 'Error');
   };
 

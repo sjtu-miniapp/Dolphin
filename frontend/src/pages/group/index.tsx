@@ -1,4 +1,4 @@
-import Taro, { FC, useState, useEffect } from '@tarojs/taro'
+import Taro, { FC, useState, useDidShow } from '@tarojs/taro'
 import { View } from '@tarojs/components';
 import bluebird from 'bluebird';
 
@@ -13,6 +13,9 @@ import { normalizeGroup } from './utils';
 const GroupPage: FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   const getGroupInfo = async () => {
     const groups = await groupAPI.getGroupsByUser();
@@ -37,12 +40,7 @@ const GroupPage: FC = () => {
     }
   };
 
-  useEffect(() => {
-    updateGroups();
-  }, []);
-
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  useDidShow(updateGroups);
 
   const addGroup = async (groupName: string) => {
     closeModal();

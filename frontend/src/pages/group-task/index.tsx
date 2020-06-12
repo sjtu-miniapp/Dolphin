@@ -5,9 +5,9 @@ import bluebird from 'bluebird';
 
 import { Group, Task } from '../../types';
 import * as taskAPI from '../../apis/task';
+import TaskList from '../../components/task-list';
 import FabButton from '../../components/fab-button';
 
-import TaskView from './task';
 import { normalizeTask } from './utils';
 import TaskModal from './task-modal';
 
@@ -33,7 +33,7 @@ const GroupTaskPage: FC = () => {
     const tasks = await taskAPI.getTasksByGroupID(selectedGroupID);
     const taskDetails = await bluebird.map(
       tasks,
-      (t, i) => normalizeTask(t, i)
+      t => normalizeTask(t)
     );
 
     return taskDetails;
@@ -72,12 +72,28 @@ const GroupTaskPage: FC = () => {
 
   const selectedGroup = groups.find(g => g.id === selectedGroupID);
 
-  const addTask = () => {
-    console.log(`Should add task`);
+  const addTask = async (params: taskAPI.CreateTaskParams) => {
+    try {
+      await taskAPI.createTask(params);
+      closeLayOut();
+      await updateTasks();
+    } catch (error) {
+      Taro.atMessage({ message: error, type: 'error' })
+    }
   }
 
   const onClickFabbutton = () => {
     openLayOut();
+  }
+
+  const onDeleteTask = async id => {
+    console.log('delete task', id);
+    try {
+      await taskAPI.deleteTask(id);
+      await updateTasks();
+    } catch (error) {
+      Taro.atMessage({ message: error, type: 'error' })
+    }
   }
 
   return (
@@ -98,10 +114,8 @@ const GroupTaskPage: FC = () => {
         })}
       </View>
       <View className='at-col'>
-        <TaskView
-          tasks={tasks}
-          selectedGroupName={selectedGroup ? selectedGroup.name : undefined}
-        />
+        {selectedGroup ? selectedGroup.name : ''}
+        <TaskList tasks={tasks} onClickDelete={onDeleteTask} />
       </View>
       <FabButton onClick={onClickFabbutton} />
       <TaskModal groupID={selectedGroupID} isOpened={isAddTaskLayoutOpened} handleClose={closeLayOut} handleAdd={addTask} />
