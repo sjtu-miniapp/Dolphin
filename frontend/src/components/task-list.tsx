@@ -17,7 +17,7 @@ const TaskList: FC<TaskListProps> = props => {
     {
       text: '删除',
       style: {
-        backgroundColor: '#6190E8'
+        backgroundColor: '#FF4949'
       }
     }
   ];
