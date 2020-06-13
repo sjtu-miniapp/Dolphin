@@ -25,7 +25,7 @@ const GroupPage: FC = () => {
       g => normalizeGroup(g)
     );
 
-    return groupDetails;
+    return groupDetails.sort((prev, next) => next.updateTime.getTime() - prev.updateTime.getTime());
   }
 
   const updateGroups = async () => {

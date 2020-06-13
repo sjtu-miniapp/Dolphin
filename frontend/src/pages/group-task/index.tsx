@@ -36,7 +36,7 @@ const GroupTaskPage: FC = () => {
       t => normalizeTask(t)
     );
 
-    return taskDetails;
+    return taskDetails.sort((prev, next) => next.endDate.getTime() - prev.endDate.getTime());
   }
 
   const updateTasks = async () => {
