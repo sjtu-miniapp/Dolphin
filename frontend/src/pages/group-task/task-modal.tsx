@@ -4,7 +4,7 @@ import { AtFloatLayout, AtInput, AtSwitch, AtAccordion, AtCalendar, AtTextarea, 
 import moment from 'moment';
 
 import { CreateTaskParams } from '../../apis/task';
-import * as utils from './utils';
+import * as utils from '../../utils';
 import './task-modal.scss';
 
 interface TaskModalProps {

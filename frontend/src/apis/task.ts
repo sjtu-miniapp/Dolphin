@@ -73,6 +73,7 @@ export const getTaskMeta = async (taskID: string): Promise<TaskMeta> => {
 
 interface UpdateTaskMeta {
   name: string;
+  start_date: string;
   end_date: string;
   readonly: boolean;
   description: string;

@@ -38,13 +38,8 @@ export const loginHandler = async (
   userInfo: VerifyLoginData
 ): Promise<boolean> => {
   const { code } = await Taro.login();
-  console.log("login code:", code);
-
-  console.log(111111);
   const loginIds = await getOpenIDByCode(code);
-  console.log(222222, loginIds);
   const loginSucceed = await verifyLoginByOpenID(loginIds, userInfo);
-  console.log(333333, loginSucceed);
 
   if (loginSucceed) {
     Taro.setStorageSync("openid", loginIds.openid);

@@ -4,7 +4,6 @@ import { AtCalendar } from 'taro-ui';
 
 import TaskList from '../../components/task-list';
 import { Task } from '../../types';
-import { SAMPLE_TASKS } from '../../apis/tasks'
 import './index.scss'
 
 interface KanbanProps { }
@@ -20,7 +19,7 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
     super(props);
 
     this.state = {
-      list: SAMPLE_TASKS,
+      list: [],
       inputVal: ''
     };
   }
@@ -77,14 +76,8 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
     });
   }
 
-  deleteTodo = e => {
-    const idx = parseInt(e.target.value, 10);
-
-    const list = [...this.state.list];
-    list.splice(idx, 1)
-
-    this.setState({ list });
-
+  deleteTodo = async (id: number) => {
+    console.log(`TODO: delete task ${id}`);
   }
 
   render() {
@@ -95,7 +88,7 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
         <AtCalendar />
         <Input className='input' type='text' value={inputVal} onInput={this.inputHandler} />
         <Text className='add' onClick={this.addTodo}>添加</Text>
-        <TaskList tasks={list} />
+        <TaskList tasks={list} onClickDelete={this.deleteTodo} />
       </View>
     )
   }

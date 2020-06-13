@@ -1,4 +1,4 @@
-import Taro, { FC, useState, useEffect, useRouter } from '@tarojs/taro'
+import Taro, { FC, useState, useEffect, useRouter, useDidShow } from '@tarojs/taro'
 import { View } from '@tarojs/components';
 import { AtAvatar } from 'taro-ui';
 import bluebird from 'bluebird';
@@ -49,6 +49,8 @@ const GroupTaskPage: FC = () => {
       console.error('Failed to update groups')
     }
   };
+
+  useDidShow(updateTasks);
 
   useEffect(() => {
     if (!selectedGroupID) {

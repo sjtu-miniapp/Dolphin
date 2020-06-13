@@ -1,11 +1,9 @@
 import Taro, { FC } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
 import { AtList, AtListItem, AtSwipeAction } from 'taro-ui'
-import { Task } from 'src/types';
 
-const formateDate = (date: Date): string => {
-  return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-}
+import { Task } from '../types';
+import * as utils from '../utils';
 
 interface TaskListProps {
   tasks: Task[],
@@ -36,7 +34,7 @@ const TaskList: FC<TaskListProps> = props => {
               >
                 <AtListItem
                   title={item.name}
-                  note={formateDate(item.endDate)}
+                  note={utils.formateDate(item.endDate)}
                   arrow='right'
                   iconInfo={{ size: 25, color: '#78A4FA', value: 'bookmark' }}
                   onClick={() => { Taro.navigateTo({ url: `/pages/task/index?id=${item.id}` }) }}

@@ -3,9 +3,15 @@
 }
 
 .title {
-  margin: 10px;
-  font-size: 50px;
+  font-size: 40px;
+  margin: 0 10px;
   color: #667894;
+  display: flex;
+  justify-content: space-between;
+}
+
+.taskname {
+  padding-top: 15px;
 }
 
 .tag {
