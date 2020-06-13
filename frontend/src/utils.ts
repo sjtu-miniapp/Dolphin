@@ -21,3 +21,13 @@ export function cloneDeep(obj: any, hash = new WeakMap()): any {
     ...Object.keys(obj).map(key => ({ [key]: cloneDeep(obj[key], hash) }))
   );
 }
+
+export const formateDate = (date: Date): string => {
+  return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+};
+
+export const normalizeDate = (dateStr?: string): string => {
+  if (!dateStr) return new Date().toISOString().slice(0, -5);
+
+  return new Date(dateStr).toISOString().slice(0, -5);
+};

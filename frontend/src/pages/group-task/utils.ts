@@ -34,9 +34,3 @@ export const normalizeTaskWorker = (
     status: taskWorker.done ? "completed" : "in-progress"
   };
 };
-
-export const normalizeDate = (dateStr?: string): string => {
-  if (!dateStr) return new Date().toISOString().slice(0, -5);
-
-  return new Date(dateStr).toISOString().slice(0, -5);
-};
