@@ -20,7 +20,7 @@ export const getOpenIDByCode = async (code: string): Promise<OnLogin> => {
 
 export interface VerifyLoginData {
   avatar: string;
-  gender: number;
+  gender: 0 | 1 | 2;
   nickname: string;
 }
 
@@ -32,4 +32,26 @@ export const verifyLoginByOpenID = async (
   const response = await Taro.request({ url, method: "PUT", data: userData });
   if (response.statusCode >= 200 && response.statusCode < 300) return true;
   return false;
+};
+
+export const loginHandler = async (
+  userInfo: VerifyLoginData
+): Promise<boolean> => {
+  const { code } = await Taro.login();
+  console.log("login code:", code);
+
+  console.log(111111);
+  const loginIds = await getOpenIDByCode(code);
+  console.log(222222, loginIds);
+  const loginSucceed = await verifyLoginByOpenID(loginIds, userInfo);
+  console.log(333333, loginSucceed);
+
+  if (loginSucceed) {
+    Taro.setStorageSync("openid", loginIds.openid);
+    Taro.setStorageSync("sid", loginIds.sid);
+    Taro.setStorageSync("last_login", Date.now());
+    Taro.setStorageSync("userInfo", { ...userInfo });
+  }
+
+  return loginSucceed;
 };

@@ -1,79 +1,93 @@
-import Taro, { FC, useState, useEffect } from '@tarojs/taro'
+import Taro, { FC, useState, useEffect, useDidShow } from '@tarojs/taro'
 import { View } from '@tarojs/components';
 
 import LoginHeader from '../../components/login-header';
 import LoginFooter from '../../components/login-footer';
 
+import * as auth from '../../apis/auth';
+
 import './index.scss';
 
-interface UserInfo {
-  avatar: string;
-  nickName: string;
-}
+const LOGIN_EXPIRE_RANGE = 30 * 60 * 1000; // 30 mins
 
-const DEFAULT_USER: UserInfo = {
-  avatar: '',
-  nickName: ''
-}
+type UserInfo = auth.VerifyLoginData;
 
 const Login: FC = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | undefined>(undefined)
-  const [isLogout, setIsLogout] = useState(false);
+  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [isLogout, setIsLogout] = useState<boolean>(false);
 
   const isLogged = !!userInfo;
 
-  const setUserInfoFromStorage = async () => {
-    try {
-      const { data } = await Taro.getStorage({ key: 'userInfo' });
-      if (!data || !data.nickName) return;
+  useDidShow(async () => {
+    const lastLogin: number = Taro.getStorageSync('last_login');
+    const userInfo: auth.VerifyLoginData = Taro.getStorageSync('userInfo');
 
-      const { nickName, avatar } = data;
-      setUserInfo({ nickName, avatar });
-    } catch (error) {
-      console.error('getStorage ERR:', error);
-
+    // Nothing was set in storage, probably haven't logged in before
+    if (!userInfo || !lastLogin || isNaN(lastLogin)) {
+      setUserInfo(undefined);
+      return;
     }
-  }
 
-  useEffect(() => { setUserInfoFromStorage() }, []);
+    const { avatar, nickname, gender } = userInfo;
+    if (!avatar || !nickname || !gender) {
+      Taro.removeStorageSync('userInfo');
+      setUserInfo(undefined);
+      return;
+    }
+
+    // last_login is set in storage, but too far, automatically reload
+    if (Date.now() - lastLogin >= LOGIN_EXPIRE_RANGE) {
+      await handleLogin(avatar, nickname, gender);
+    }
+
+    // last_login is under 30 minutes
+    else {
+      setUserInfo({ avatar, nickname, gender });
+    }
+  })
 
   useEffect(() => {
-    if (!userInfo || !userInfo.nickName) return;
+    if (!userInfo) {
+      console.log(22222222, 'no user info in state');
+      return;
+    }
+
     console.log(11111111, userInfo);
     Taro.switchTab({ url: '/pages/group/index' });
   }, [userInfo]);
 
-  const setLoginInfo = async (avatar: string, nickName: string) => {
-    try {
-      await Taro.setStorage({
-        key: 'userInfo',
-        data: { avatar, nickName }
-      });
+  const handleLogin = async (avatar: string, nickname: string, gender: 0 | 1 | 2) => {
+    setIsLogin(true);
 
-      await setUserInfoFromStorage();
+    const loginUserInfo = { avatar, nickname, gender };
+    const loginResult = await auth.loginHandler(loginUserInfo);
 
-    } catch (error) {
-      console.error('setStorage ERR:', error);
+    setIsLogin(false);
+    if (!loginResult) {
+      setUserInfo(undefined);
+    } else {
+      setUserInfo(loginUserInfo);
     }
   }
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setIsLogout(true);
 
-    try {
-      await Taro.removeStorage({ key: 'userInfo' });
-      setUserInfo(undefined);
-    } catch (error) {
-      console.error('removeStorage ERR:', error);
-    }
+    Taro.removeStorageSync('userInfo');
+    Taro.removeStorageSync('last_login');
+
+    setIsLogout(false);
+    setUserInfo(undefined);
   }
 
   return (
     <View className='practice'>
       <LoginHeader
         isLogged={isLogged}
-        userInfo={userInfo || DEFAULT_USER}
-        setLoginInfo={setLoginInfo}
+        isLogin={isLogin}
+        userInfo={userInfo}
+        onLogin={handleLogin}
       />
       <LoginFooter
         isLogged={isLogged}
