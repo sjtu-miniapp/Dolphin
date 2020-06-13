@@ -12,7 +12,6 @@ interface LoginFooterProps {
 }
 
 const LoginFooter: FC<LoginFooterProps> = props => {
-
   return (
     <View className='login-footer'>
       {props.isLogged && (
