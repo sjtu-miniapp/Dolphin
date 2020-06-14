@@ -7,8 +7,8 @@ import { Group, Task } from '../../types';
 import * as taskAPI from '../../apis/task';
 import TaskList from '../../components/task-list';
 import FabButton from '../../components/fab-button';
+import * as utils from '../../utils';
 
-import { normalizeTask } from './utils';
 import TaskModal from './task-modal';
 
 const GroupTaskPage: FC = () => {
@@ -33,7 +33,7 @@ const GroupTaskPage: FC = () => {
     const tasks = await taskAPI.getTasksByGroupID(selectedGroupID);
     const taskDetails = await bluebird.map(
       tasks,
-      t => normalizeTask(t)
+      t => utils.normalizeTask(t)
     );
 
     return taskDetails.sort((prev, next) => next.endDate.getTime() - prev.endDate.getTime());

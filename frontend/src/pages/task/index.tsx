@@ -7,7 +7,6 @@ import { InputProps } from '@tarojs/components/types/Input';
 import TaskReceiverList from '../../components/task-receiver-list';
 import TaskDivider from '../../components/task-divider';
 import * as taskAPI from '../../apis/task';
-import { normalizeTask } from '../group/utils';
 import { Task } from '../../types';
 import * as utils from '../../utils';
 import './index.scss';
@@ -21,28 +20,27 @@ const TaskView: FC = () => {
 
   const taskID = useRouter().params.id;
 
-  const updateTask = async (id: string): Promise<void> => {
+  const updateTaskDetail = async (id: string): Promise<void> => {
     setTaskDetail('Loading');
 
     const rawTask = await taskAPI.getTaskMeta(id);
-    const task = await normalizeTask(rawTask);
+    const task = await utils.normalizeTask(rawTask);
 
     setTaskDetail(task || 'Error');
   };
 
   useDidShow(async () => {
     if (!taskID) {
-      setTaskDetail('Error');
+      setTaskDetail('Not Started');
       return;
     }
 
-    await updateTask(taskID);
+    await updateTaskDetail(taskID);
   })
 
   useEffect(() => {
     setTempTask(utils.cloneDeep(taskDetail));
   }, [taskDetail]);
-
 
   const onTaskNameChange = (e: BaseEventOrig<InputProps.inputEventDetail>) => {
     const newTempTask = utils.cloneDeep(tempTask as Task);
@@ -56,10 +54,6 @@ const TaskView: FC = () => {
     setTempTask(newTempTask);
   }
 
-  if (tempTask === 'Not Started') return <View>{tempTask}</View>;
-  if (tempTask === 'Loading') return <View>{tempTask}</View>;
-  if (tempTask === 'Error') return <View>{tempTask}</View>;
-
   const openEndTimeEdition = () => setOpenEndTimeEditing(true);
   const closeEndTimeEdition = () => setOpenEndTimeEditing(false);
 
@@ -72,6 +66,8 @@ const TaskView: FC = () => {
   const onTaskUpdate = async () => {
     if (JSON.stringify(tempTask) === JSON.stringify(taskDetail)) return;
 
+    if (tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error') return;
+
     await taskAPI.updateTaskMeta(taskID, {
       name: tempTask.name,
       start_date: utils.normalizeDate(tempTask.startDate.toISOString()),
@@ -81,41 +77,44 @@ const TaskView: FC = () => {
       done: tempTask.status === 'done'
     });
 
-    await updateTask(taskID);
+    await updateTaskDetail(taskID);
   }
 
-  return (
-    <View className='task'>
-      <View className='title'>
-        <View className='taskname'>
-          <Input name='taskname' onInput={onTaskNameChange} value={tempTask.name} onBlur={onTaskUpdate} />
-        </View>
-        <AtTag
-          name='status'
-          type='primary'
-          size='normal'
-          circle
-          customStyle={{ color: '#78a4f4', borderColor: '#78a4f4', backgroundColor: '#fff' }}>
-          {(taskDetail as Task).status === 'Undone' ? '未完成' : '完成'}
-        </AtTag>
-      </View>
-      <View className='at-row at-row--wrap'>
-        <View className='at-col at-col-4'><View className='tag'>发布人: {tempTask.publisher || 'N/A'}</View></View>
-        <View className='at-col at-col-8'><View className='tag'>发布时间: {utils.formateDate(tempTask.startDate)}</View></View>
-        <View className='at-col at-col-4'><View className='tag'>类型: {tempTask.type || 'N/A'}</View></View>
-        <View className='at-col at-col-8'><View className='tag' onClick={openEndTimeEdition}>截止时间: {utils.formateDate(tempTask.endDate)}</View></View>
-      </View>
-      <TaskDivider content='任务详情' />
-      <View className='description'>
-        <AtTextarea height={500} count={false} maxLength={500} onChange={onTaskContentChange} value={tempTask.description} onBlur={onTaskUpdate} />
-      </View>
-      <TaskDivider content='任务进度' />
-      <TaskReceiverList receivers={tempTask.receivers} />
-      <AtFloatLayout isOpened={openEndTimeEditing} onClose={closeEndTimeEdition}>
-        <AtCalendar currentDate={tempTask.endDate} onDayClick={onTaskEndDateChange} />
-      </AtFloatLayout>
-    </View>
-  )
+  return tempTask === 'Not Started' ? (<View>{tempTask}</View>) :
+    tempTask === 'Loading' ? (<View>{tempTask}</View>) :
+      tempTask === 'Error' ? (<View>{tempTask}</View>) :
+        (
+          <View className='task'>
+            <View className='title'>
+              <View className='taskname'>
+                <Input name='taskname' onInput={onTaskNameChange} value={tempTask.name} onBlur={onTaskUpdate} />
+              </View>
+              <AtTag
+                name='status'
+                type='primary'
+                size='normal'
+                circle
+                customStyle={{ color: '#78a4f4', borderColor: '#78a4f4', backgroundColor: '#fff' }}>
+                {(taskDetail as Task).status === 'Undone' ? '未完成' : '完成'}
+              </AtTag>
+            </View>
+            <View className='at-row at-row--wrap'>
+              <View className='at-col at-col-4'><View className='tag'>发布人: {tempTask.publisher || 'N/A'}</View></View>
+              <View className='at-col at-col-8'><View className='tag'>发布时间: {utils.formateDate(tempTask.startDate)}</View></View>
+              <View className='at-col at-col-4'><View className='tag'>类型: {tempTask.type || 'N/A'}</View></View>
+              <View className='at-col at-col-8'><View className='tag' onClick={openEndTimeEdition}>截止时间: {utils.formateDate(tempTask.endDate)}</View></View>
+            </View>
+            <TaskDivider content='任务详情' />
+            <View className='description'>
+              <AtTextarea height={500} count={false} maxLength={500} onChange={onTaskContentChange} value={tempTask.description} onBlur={onTaskUpdate} />
+            </View>
+            <TaskDivider content='任务进度' />
+            <TaskReceiverList receivers={tempTask.receivers} />
+            <AtFloatLayout isOpened={openEndTimeEditing} onClose={closeEndTimeEdition}>
+              <AtCalendar currentDate={tempTask.endDate} onDayClick={onTaskEndDateChange} />
+            </AtFloatLayout>
+          </View>
+        )
 }
 
 TaskView.config = {
