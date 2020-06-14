@@ -1,17 +1,14 @@
 package main
 
 import (
-	"sort"
+	"github.com/sjtu-miniapp/dolphin/service/database"
 )
-
+type authVal struct {
+	Openid string `json:"openid"`
+	Sid    string `json:"sid"`
+}
 func main() {
-	type a struct {
-		v int
-	}
-	b := []*a{&a{1}, &a{2}}
-	sort.Slice(b,
-		func(i, j int) bool {
-			return b[i].v > b[j].v
-		})
-	print(b[0].v)
+	redisdb, _ := database.InitRedis("121.199.33.44", "610878")
+	database.Set(redisdb, 0, "test", authVal{Openid: "test", Sid: "test"})
+
 }

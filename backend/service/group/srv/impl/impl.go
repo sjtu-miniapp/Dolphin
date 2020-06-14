@@ -68,11 +68,15 @@ func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserI
 	if err := db.Preload("Groups").Find(&user).Error; err != nil {
 		if err.Error() != "record not found" {
 			return err
+		} else {
+			return nil
 		}
 	}
 	mutex := &sync.Mutex{}
 	ch := make(chan int, len(user.Groups))
 	errChan := make(chan error, len(user.Groups))
+	fmt.Println(len(user.Groups))
+	fmt.Println(user.Groups[0])
 	for _, v := range user.Groups {
 		go func(gp *model.Group) {
 			t := time2string(*gp.UpdatedAt)
