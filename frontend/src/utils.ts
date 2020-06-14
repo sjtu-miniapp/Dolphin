@@ -1,3 +1,4 @@
+import moment from "moment";
 import * as taskAPI from "./apis/task";
 import { Task, UserTaskStatus } from "./types";
 
@@ -26,6 +27,7 @@ export function cloneDeep(obj: any, hash = new WeakMap()): any {
 }
 
 export const formateDate = (date: Date): string => {
+  console.log(888888888, date);
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 };
 
@@ -38,32 +40,43 @@ export const normalizeDate = (dateStr?: string): string => {
 export const normalizeTask = async (
   taskMeta: taskAPI.TaskMeta
 ): Promise<Task> => {
-  const receivers: taskAPI.TaskWorker[] = [];
+  const rawReceivers: taskAPI.TaskWorker[] = [];
 
   try {
     const receiversFromRemoteCall = await taskAPI.getTaskWorker(taskMeta.id);
-    receivers.push(...receiversFromRemoteCall);
+    rawReceivers.push(...receiversFromRemoteCall);
   } catch (error) {
     console.error(`Failed to get task workers on: ${error}`);
   }
+
+  const receivers = rawReceivers.map(r => normalizeTaskWorker(r));
+  const publisher = receivers.find(r => r.id === taskMeta.publisher_id);
 
   return {
     id: taskMeta.id,
     groupID: taskMeta.group_id,
     name: taskMeta.name,
     description: taskMeta.description,
-    startDate: new Date(taskMeta.start_date),
-    endDate: new Date(taskMeta.end_date),
+    startDate: convertOddStrToDate(taskMeta.start_date),
+    endDate: convertOddStrToDate(taskMeta.end_date),
     readOnly: taskMeta.readonly,
     status: taskMeta.done ? "Done" : "Undone",
-    receivers: receivers.map(r => normalizeTaskWorker(r))
+    receivers,
+    type:
+      taskMeta.type === 0 ? "个人" : taskMeta.type === 1 ? "团队" : undefined,
+    publisher: publisher ? publisher.userName : ""
   };
+};
+
+export const convertOddStrToDate = (str: string): Date => {
+  return moment(str, "YYYY-M-D H:m:s").toDate();
 };
 
 export const normalizeTaskWorker = (
   taskWorker: taskAPI.TaskWorker
 ): UserTaskStatus => {
   return {
+    id: taskWorker.id,
     userName: taskWorker.name,
     status: taskWorker.done ? "completed" : "in-progress"
   };
