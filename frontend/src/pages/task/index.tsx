@@ -1,6 +1,6 @@
 import Taro, { FC, useState, useEffect, useRouter, useDidShow } from '@tarojs/taro';
 import { View } from '@tarojs/components';
-import { AtTextarea/*, AtFloatLayout, AtCalendar*/ } from 'taro-ui';
+import { AtTextarea } from 'taro-ui';
 import { BaseEventOrig } from '@tarojs/components/types/common';
 import { InputProps } from '@tarojs/components/types/Input';
 import { TagInfo } from 'taro-ui/types/tag';
@@ -96,12 +96,32 @@ const TaskView: FC = () => {
   const metaInfoStatus: TaskStatus<RawMeta> =
     tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? tempTask
       : { publisher: tempTask.publisher || '', type: tempTask.type || '', startDate: tempTask.startDate, endDate: tempTask.endDate };
-  console.log('66666666666666', JSON.stringify(metaInfoStatus, null, 2));
+
+  const onUpdateEndDate = async (d: Date) => {
+    const newTempTask = utils.cloneDeep(tempTask as Task);
+    newTempTask.endDate = d;
+
+    if (tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error') return;
+
+    const start_date = utils.normalizeDate(newTempTask.startDate.toISOString());
+    const end_date = utils.normalizeDate(newTempTask.endDate.toISOString());
+
+    await taskAPI.updateTaskMeta(taskID, {
+      name: newTempTask.name,
+      start_date,
+      end_date,
+      readonly: newTempTask.readOnly,
+      description: newTempTask.description,
+      done: newTempTask.status === 'done'
+    });
+
+    await updateTaskDetail(taskID);
+  }
 
   return (
     <View className='task'>
       <TaskTitle taskStatus={titleStatus} onUpdateName={onTaskNameChange} onBlurNameInput={onTaskUpdate} onUpdateStatus={onUpdateStatus} />
-      <TaskMetaInfo taskStatus={metaInfoStatus} onUpdateEndDate={() => console.log('TODO: update end date')} />
+      <TaskMetaInfo taskStatus={metaInfoStatus} onUpdateEndDate={onUpdateEndDate} />
       <TaskDivider content='任务详情' />
       <View className='description'>
         <AtTextarea
@@ -115,9 +135,6 @@ const TaskView: FC = () => {
       </View>
       <TaskDivider content='任务进度' />
       <TaskReceiverList receivers={tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? [] : tempTask.receivers} />
-      {/* <AtFloatLayout isOpened={openEndTimeEditing} onClose={closeEndTimeEdition}>
-        <AtCalendar currentDate={tempTask.endDate} onDayClick={onTaskEndDateChange} />
-      </AtFloatLayout> */}
     </View>
   )
 }

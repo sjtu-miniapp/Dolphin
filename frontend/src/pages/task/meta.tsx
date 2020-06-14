@@ -1,5 +1,5 @@
 import Taro, { FC, useState, useEffect } from '@tarojs/taro';
-import { View } from '@tarojs/components';
+import { View, Text, Picker } from '@tarojs/components';
 import { AtActivityIndicator } from 'taro-ui';
 
 import * as utils from '../../utils';
@@ -16,7 +16,7 @@ export interface RawMeta {
 
 export interface TaskMetaProps {
   taskStatus: TaskStatus<RawMeta>;
-  onUpdateEndDate: (v: Date) => void;
+  onUpdateEndDate: (v: Date) => Promise<void>;
 }
 
 const TaskMetaInfo: FC<TaskMetaProps> = props => {
@@ -38,6 +38,25 @@ const TaskMetaInfo: FC<TaskMetaProps> = props => {
     }
   }, [taskStatus])
 
+  const [ddlDate = '', ddlTime = ''] = endDate.split(' ');
+
+  const updateEndDate = async (replacePattern: { [Symbol.replace](string: string, replaceValue: string): string; }, replaceValue: string) => {
+    if (taskStatus === 'Error' || taskStatus === 'Loading' || taskStatus === 'Not Started') return;
+
+    const newDateStr = utils.formateDate(taskStatus.endDate).replace(replacePattern, replaceValue);
+    const newEndDate = new Date(newDateStr);
+
+    await props.onUpdateEndDate(newEndDate);
+  }
+
+  const onDateChange = async e => {
+    await updateEndDate(/\d{4}-\d{2}-\d{2}/, e.detail.value)
+  }
+
+  const onTimeChange = async e => {
+    await updateEndDate(/\d{2}:\d{2}/, e.detail.value);
+  }
+
   return (
     <View className='taskmeta'>
       <View className='publisher'>
@@ -56,7 +75,8 @@ const TaskMetaInfo: FC<TaskMetaProps> = props => {
             taskStatus === 'Loading' ? <AtActivityIndicator /> :
               taskStatus === 'Error' ? 'Error' :
                 <View className='tag'>
-                  发布时间: {startDate}
+                  <Text space='ensp'>发布时间: </Text>
+                  <View>{startDate}</View>
                 </View>
         }
       </View>
@@ -75,14 +95,20 @@ const TaskMetaInfo: FC<TaskMetaProps> = props => {
           taskStatus === 'Not Started' ? 'Not Started' :
             taskStatus === 'Loading' ? <AtActivityIndicator /> :
               taskStatus === 'Error' ? 'Error' :
-                <View className='tag' onClick={() => console.log('TODO: open date editor')}>
-                  截止时间: {endDate}
+                <View className='tag'>
+                  <Text space='ensp'>截止时间: </Text>
+                  <Picker mode='date' onChange={onDateChange} value={ddlDate}>
+                    <View >{ddlDate}</View>
+                  </Picker>
+                  <View className='split'>|</View>
+                  <Picker mode='time' onChange={onTimeChange} value={ddlTime}>
+                    <View>{ddlTime}</View>
+                  </Picker>
                 </View>
         }
       </View>
     </View>
   )
-
 }
 
 export default TaskMetaInfo;
