@@ -48,12 +48,8 @@ const Login: FC = () => {
   })
 
   useEffect(() => {
-    if (!userInfo) {
-      console.log(22222222, 'no user info in state');
-      return;
-    }
+    if (!userInfo) return;
 
-    console.log(11111111, userInfo);
     Taro.switchTab({ url: '/pages/group/index' });
   }, [userInfo]);
 
