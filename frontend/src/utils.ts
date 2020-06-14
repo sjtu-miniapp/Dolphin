@@ -27,8 +27,7 @@ export function cloneDeep(obj: any, hash = new WeakMap()): any {
 }
 
 export const formateDate = (date: Date): string => {
-  console.log(888888888, date);
-  return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  return moment(date).format("YYYY-MM-DD HH:mm:ss");
 };
 
 export const normalizeDate = (dateStr?: string): string => {
@@ -69,7 +68,7 @@ export const normalizeTask = async (
 };
 
 export const convertOddStrToDate = (str: string): Date => {
-  return moment(str, "YYYY-M-D H:m:s").toDate();
+  return moment.utc(str, "YYYY-M-D H:m:s").toDate();
 };
 
 export const normalizeTaskWorker = (
