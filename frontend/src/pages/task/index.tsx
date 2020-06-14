@@ -1,22 +1,27 @@
 import Taro, { FC, useState, useEffect, useRouter, useDidShow } from '@tarojs/taro';
-import { View, Input } from '@tarojs/components';
-import { AtTextarea, AtFloatLayout, AtCalendar, AtTag } from 'taro-ui';
+import { View } from '@tarojs/components';
+import { AtTextarea/*, AtFloatLayout, AtCalendar*/ } from 'taro-ui';
 import { BaseEventOrig } from '@tarojs/components/types/common';
 import { InputProps } from '@tarojs/components/types/Input';
+import { TagInfo } from 'taro-ui/types/tag';
 
 import TaskReceiverList from '../../components/task-receiver-list';
 import TaskDivider from '../../components/task-divider';
 import * as taskAPI from '../../apis/task';
 import { Task } from '../../types';
 import * as utils from '../../utils';
+
+import TaskTitle from './title';
+import TaskMetaInfo, { RawMeta } from './meta';
 import './index.scss';
 
 type RemoteTask = Task | 'Not Started' | 'Loading' | 'Error';
 
+export type TaskStatus<T> = 'Not Started' | 'Loading' | 'Error' | T;
+
 const TaskView: FC = () => {
   const [taskDetail, setTaskDetail] = useState<RemoteTask>('Not Started');
   const [tempTask, setTempTask] = useState<RemoteTask>('Not Started');
-  const [openEndTimeEditing, setOpenEndTimeEditing] = useState<boolean>(false);
 
   const taskID = useRouter().params.id;
 
@@ -54,14 +59,14 @@ const TaskView: FC = () => {
     setTempTask(newTempTask);
   }
 
-  const openEndTimeEdition = () => setOpenEndTimeEditing(true);
-  const closeEndTimeEdition = () => setOpenEndTimeEditing(false);
+  // const openEndTimeEdition = () => setOpenEndTimeEditing(true);
+  // const closeEndTimeEdition = () => setOpenEndTimeEditing(false);
 
-  const onTaskEndDateChange = (item: { value: string }) => {
-    const newTempTask = utils.cloneDeep(tempTask as Task);
-    newTempTask.endDate = new Date(item.value);
-    setTempTask(newTempTask);
-  }
+  // const onTaskEndDateChange = (item: { value: string }) => {
+  //   const newTempTask = utils.cloneDeep(tempTask as Task);
+  //   newTempTask.endDate = new Date(item.value);
+  //   setTempTask(newTempTask);
+  // }
 
   const onTaskUpdate = async () => {
     if (JSON.stringify(tempTask) === JSON.stringify(taskDetail)) return;
@@ -80,41 +85,41 @@ const TaskView: FC = () => {
     await updateTaskDetail(taskID);
   }
 
-  return tempTask === 'Not Started' ? (<View>{tempTask}</View>) :
-    tempTask === 'Loading' ? (<View>{tempTask}</View>) :
-      tempTask === 'Error' ? (<View>{tempTask}</View>) :
-        (
-          <View className='task'>
-            <View className='title'>
-              <View className='taskname'>
-                <Input name='taskname' onInput={onTaskNameChange} value={tempTask.name} onBlur={onTaskUpdate} />
-              </View>
-              <AtTag
-                name='status'
-                type='primary'
-                size='normal'
-                circle
-                customStyle={{ color: '#78a4f4', borderColor: '#78a4f4', backgroundColor: '#fff' }}>
-                {(taskDetail as Task).status === 'Undone' ? '未完成' : '完成'}
-              </AtTag>
-            </View>
-            <View className='at-row at-row--wrap'>
-              <View className='at-col at-col-4'><View className='tag'>发布人: {tempTask.publisher || 'N/A'}</View></View>
-              <View className='at-col at-col-8'><View className='tag'>发布时间: {utils.formateDate(tempTask.startDate)}</View></View>
-              <View className='at-col at-col-4'><View className='tag'>类型: {tempTask.type || 'N/A'}</View></View>
-              <View className='at-col at-col-8'><View className='tag' onClick={openEndTimeEdition}>截止时间: {utils.formateDate(tempTask.endDate)}</View></View>
-            </View>
-            <TaskDivider content='任务详情' />
-            <View className='description'>
-              <AtTextarea height={500} count={false} maxLength={500} onChange={onTaskContentChange} value={tempTask.description} onBlur={onTaskUpdate} />
-            </View>
-            <TaskDivider content='任务进度' />
-            <TaskReceiverList receivers={tempTask.receivers} />
-            <AtFloatLayout isOpened={openEndTimeEditing} onClose={closeEndTimeEdition}>
-              <AtCalendar currentDate={tempTask.endDate} onDayClick={onTaskEndDateChange} />
-            </AtFloatLayout>
-          </View>
-        )
+  const titleStatus: TaskStatus<{ name: string; status: string }> =
+    tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? tempTask
+      : { name: tempTask.name, status: tempTask.status };
+
+  const onUpdateStatus = async (v: TagInfo) => {
+    console.log(JSON.stringify(v, null, 2));
+  }
+
+  const metaInfoStatus: TaskStatus<RawMeta> =
+    tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? tempTask
+      : { publisher: tempTask.publisher || '', type: tempTask.type || '', startDate: tempTask.startDate, endDate: tempTask.endDate };
+  console.log('66666666666666', JSON.stringify(metaInfoStatus, null, 2));
+
+  return (
+    <View className='task'>
+      <TaskTitle taskStatus={titleStatus} onUpdateName={onTaskNameChange} onBlurNameInput={onTaskUpdate} onUpdateStatus={onUpdateStatus} />
+      <TaskMetaInfo taskStatus={metaInfoStatus} onUpdateEndDate={() => console.log('TODO: update end date')} />
+      <TaskDivider content='任务详情' />
+      <View className='description'>
+        <AtTextarea
+          height={500}
+          count={false}
+          maxLength={500}
+          onChange={onTaskContentChange}
+          onBlur={onTaskUpdate}
+          value={tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? '' : tempTask.description}
+        />
+      </View>
+      <TaskDivider content='任务进度' />
+      <TaskReceiverList receivers={tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? [] : tempTask.receivers} />
+      {/* <AtFloatLayout isOpened={openEndTimeEditing} onClose={closeEndTimeEdition}>
+        <AtCalendar currentDate={tempTask.endDate} onDayClick={onTaskEndDateChange} />
+      </AtFloatLayout> */}
+    </View>
+  )
 }
 
 TaskView.config = {

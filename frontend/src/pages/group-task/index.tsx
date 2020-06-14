@@ -46,7 +46,7 @@ const GroupTaskPage: FC = () => {
       setTasks(taskDetails);
     } catch (error) {
       // TODO: remote data error handling
-      console.error('Failed to update groups')
+      console.error('Failed to update tasks', error)
     }
   };
 

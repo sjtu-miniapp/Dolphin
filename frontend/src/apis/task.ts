@@ -18,6 +18,7 @@ export interface TaskMeta {
   end_date: string;
   readonly: boolean;
   description: string;
+  publisher_id: string;
 }
 
 export const getTasksByGroupID = async (
@@ -38,7 +39,10 @@ export type TaskWorker = User & { done: boolean };
 
 export const getTaskWorker = async (taskID: number): Promise<TaskWorker[]> => {
   const url = `${PREFIX}/${taskID}/workers?${utils.getSessionQuery()}`;
-  const response = await Taro.request<TaskWorker[]>({ url, method: "GET" });
+  const response = await Taro.request<{ workers: TaskWorker[] }>({
+    url,
+    method: "GET"
+  });
   console.log(
     "Get Task Workers By Task ID Result:",
     response.statusCode,
@@ -53,7 +57,7 @@ export const getTaskWorker = async (taskID: number): Promise<TaskWorker[]> => {
     return [];
   }
 
-  return response.data;
+  return response.data.workers;
 };
 
 export const getTaskMeta = async (taskID: string): Promise<TaskMeta> => {
