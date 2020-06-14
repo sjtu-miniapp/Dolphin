@@ -45,7 +45,6 @@ const TaskView: FC = () => {
 
 
   const onTaskNameChange = (e: BaseEventOrig<InputProps.inputEventDetail>) => {
-    // const onTaskNameChange = (v: string) => {
     const newTempTask = utils.cloneDeep(tempTask as Task);
     newTempTask.name = e.detail.value;
     setTempTask(newTempTask);
