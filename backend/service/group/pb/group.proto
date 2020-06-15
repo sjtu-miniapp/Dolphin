@@ -89,9 +89,11 @@ message UserInGroupResponse {
 }
 
 message AddGroupMembersRequest {
-
+  required int32 id = 1;
+  repeated string members = 2;
+  required int32 action = 3;
 }
 
 message AddGroupMembersResponse {
-
+  repeated string members = 1;
 }

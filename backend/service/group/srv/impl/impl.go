@@ -15,6 +15,8 @@ type Group struct {
 	SqlDb *gorm.DB
 }
 
+
+
 func (g Group) UserInGroup(ctx context.Context, request *pb.UserInGroupRequest, response *pb.UserInGroupResponse) error {
 	if request.GroupId == nil || request.UserId == nil {
 		return fmt.Errorf("nil pointer")
@@ -56,6 +58,44 @@ func taskNum(db *gorm.DB, gid int32) (int32, error) {
 	err := db.Model(&model.Task{}).Where(
 		"group_id = ?", gid).Count(&count).Error
 	return count, err
+}
+
+func (g Group) AddGroupMembers(ctx context.Context, request *pb.AddGroupMembersRequest, response *pb.AddGroupMembersResponse) error {
+	if request.Id == nil || request.Action == nil {
+		return fmt.Errorf("nil pointer")
+	}
+	if *request.Action < int32(0) || *request.Action > int32(1) {
+		return fmt.Errorf("not implemented action")
+	}
+	db := g.SqlDb
+	tx := db.Begin()
+	for _, v := range request.Members {
+		userGroup := model.UserGroup{
+			UserId:  v,
+			GroupId: *request.Id,
+		}
+		if *request.Action == 0 {
+			tx.Create(&userGroup)
+		} else {
+			tx.Delete(&userGroup)
+		}
+	}
+
+	tx.Commit()
+	var resp pb.GetGroupResponse
+	err := g.GetGroup(ctx, &pb.GetGroupRequest{
+		Id:                   request.Id,
+	}, &resp)
+
+	if err != nil {
+		return fmt.Errorf("members added but get members failed: %v", err)
+	}
+	for _, v := range resp.Users {
+		response.Members = append(response.Members, *v.Id)
+	}
+
+	return nil
+
 }
 
 func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserIdRequest, response *pb.GetGroupByUserIdResponse) error {

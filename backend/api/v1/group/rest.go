@@ -25,7 +25,7 @@ func Router(base string) *gin.Engine {
 	g.PUT("", group.CreateGroup)
 	g.POST("/:group_id", group.UpdateGroup)
 	g.DELETE("/:group_id", group.DeleteGroup)
-
+	g.PUT("/:group_id/member", group.AddGroupMember)
 	router.Use(cors.Default())
 	return router
 }
@@ -92,7 +92,6 @@ func (g Group) GetGroup(c *gin.Context) {
 	resp, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
 		Id: &gid,
 	})
-
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -127,6 +126,7 @@ func (g Group) GetGroupByUser(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(500, err)
+		return
 	}
 	c.JSON(200, resp.Groups)
 }
@@ -173,6 +173,7 @@ func (g Group) CreateGroup(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(500, err)
+		return
 	}
 	_, err = srv.AddUser(context.TODO(), &pb.AddUserRequest{
 		GroupId: resp.Id,
@@ -283,6 +284,52 @@ func (g Group) DeleteGroup(c *gin.Context) {
 	})
 	if err != nil {
 		c.JSON(500, err)
+		return
 	}
 	c.JSON(201, "deleted")
+}
+
+func (g Group) AddGroupMember(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, err)
+		return
+	}
+	openid := c.Query("openid")
+	id_, err := strconv.Atoi(c.Param("group_id"))
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	id := int32(id_)
+	var data struct {
+		Action int32 `json:"add"`
+		Members []string `json:"members"`
+	}
+	err = c.BindJSON(&data)
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	r, err := srv.GetGroup(context.TODO(), &pb.GetGroupRequest{
+		Id:  &id,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	if *r.CreatorId != openid {
+		c.JSON(403, "not allowed")
+		return
+	}
+	_, err = srv.AddGroupMembers(context.TODO(), &pb.AddGroupMembersRequest{
+		Id:                   &id,
+		Members:              data.Members,
+		Action:               &data.Action,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	c.JSON(201, "added")
 }

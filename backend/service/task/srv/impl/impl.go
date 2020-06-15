@@ -52,21 +52,19 @@ func (g Task) AddTaskWorkers(ctx context.Context, request *pb.AddTaskWorkersRequ
 			tx.Delete(&userTask)
 		}
 	}
+	tx.Commit()
 
 	var resp pb.GetTaskPeopleResponse
 	err := g.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
 		Id: request.Id,
 	}, &resp)
-
 	if err != nil {
-		tx.Rollback()
-		return err
+		return fmt.Errorf("workers added but get workers failed: %v", err)
 	}
 	for _, v := range resp.Workers {
 		response.Workers = append(response.Workers, *v.Id)
 	}
 
-	tx.Commit()
 	return nil
 }
 
