@@ -17,7 +17,6 @@ type Task struct {
 	MongoDb *mongo.Database
 }
 
-
 const collection = "task"
 
 func time2string(time time.Time) string {
@@ -39,24 +38,24 @@ func (g Task) AddTaskWorkers(ctx context.Context, request *pb.AddTaskWorkersRequ
 	}
 	db := g.SqlDb
 	tx := db.Begin()
-	if *request.Action == 0 {
-		for _, v := range request.Workers {
-			userTask := model.UserTask{
-				UserId:   v,
-				TaskId:   *request.Id,
-				Done:     false,
-				DoneTime: nil,
-			}
-			if *request.Action == 0 {
-				tx.Save(&userTask)
-			} else {
-				tx.Delete(&userTask)
-			}
+
+	for _, v := range request.Workers {
+		userTask := model.UserTask{
+			UserId:   v,
+			TaskId:   *request.Id,
+			Done:     false,
+			DoneTime: nil,
+		}
+		if *request.Action == 0 {
+			tx.Create(&userTask)
+		} else {
+			tx.Delete(&userTask)
 		}
 	}
+
 	var resp pb.GetTaskPeopleResponse
 	err := g.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
-		Id:                   request.Id,
+		Id: request.Id,
 	}, &resp)
 
 	if err != nil {
@@ -64,7 +63,7 @@ func (g Task) AddTaskWorkers(ctx context.Context, request *pb.AddTaskWorkersRequ
 		return err
 	}
 	for _, v := range resp.Workers {
-		response. Workers = append(response.Workers, *v.Id)
+		response.Workers = append(response.Workers, *v.Id)
 	}
 
 	tx.Commit()
