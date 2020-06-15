@@ -674,6 +674,10 @@ func (t Task) AddTaskWorker(c *gin.Context) {
 	resp2, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
 		Id:                  &id,
 	})
+	if err !=nil && err.Error() == "record not found" {
+		c.JSON(404, err)
+		return
+	}
 	if err != nil {
 		c.JSON(500, err)
 		return
