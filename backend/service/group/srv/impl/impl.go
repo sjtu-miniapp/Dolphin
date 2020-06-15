@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/sjtu-miniapp/dolphin/service/database/model"
 	"github.com/sjtu-miniapp/dolphin/service/group/pb"
-	"sort"
 	"sync"
 	"time"
 )
@@ -134,10 +133,13 @@ func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserI
 	ch := make(chan int, len(user.Groups))
 	errChan := make(chan error, len(user.Groups))
 
-	sort.Slice(user.Groups,
-		func(i, j int) bool {
-			return user.Groups[i].UpdatedAt.After(*user.Groups[j].UpdatedAt)
-		})
+	for i := 0; i < len(user.Groups); i++ {
+		for j := i + 1; j < len(user.Groups); j++ {
+			if user.Groups[i].UpdatedAt.After(*user.Groups[j].UpdatedAt) {
+				user.Groups[i], user.Groups[j] = user.Groups[j], user.Groups[i]
+			}
+		}
+	}
 
 	for _, v := range user.Groups {
 		go func(gp *model.Group) {

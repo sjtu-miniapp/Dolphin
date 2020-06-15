@@ -8,7 +8,6 @@ import (
 	"github.com/sjtu-miniapp/dolphin/service/task/pb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"sort"
 	"time"
 )
 
@@ -161,6 +160,14 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 	if err := db.Preload("Tasks").Find(&group).Error; err != nil {
 		return err
 	}
+	for i := 0; i < len(group.Tasks); i++ {
+		for j := i + 1; j < len(group.Tasks); j++ {
+			if group.Tasks[i].EndDate.After(*group.Tasks[j].EndDate) {
+				group.Tasks[i], group.Tasks[j] = group.Tasks[j], group.Tasks[i]
+			}
+		}
+	}
+
 	for _, v := range group.Tasks {
 		task := pb.TaskMeta{
 			Id:          &v.Id,
@@ -200,10 +207,13 @@ func (g Task) GetTaskMetaByUserId(ctx context.Context, request *pb.GetTaskMetaBy
 	if err := db.Preload("Tasks").Find(&user).Error; err != nil {
 		return err
 	}
-	sort.Slice(user.Tasks,
-		func(i, j int) bool {
-			return user.Tasks[i].EndDate.Before(*user.Tasks[j].EndDate)
-		})
+	for i := 0; i < len(user.Tasks); i++ {
+		for j := i + 1; j < len(user.Tasks); j++ {
+			if user.Tasks[i].EndDate.After(*user.Tasks[j].EndDate) {
+				user.Tasks[i], user.Tasks[j] = user.Tasks[j], user.Tasks[i]
+			}
+		}
+	}
 
 	for _, v := range user.Tasks {
 		task := pb.TaskMeta{
