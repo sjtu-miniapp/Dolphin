@@ -59,15 +59,6 @@ const TaskView: FC = () => {
     setTempTask(newTempTask);
   }
 
-  // const openEndTimeEdition = () => setOpenEndTimeEditing(true);
-  // const closeEndTimeEdition = () => setOpenEndTimeEditing(false);
-
-  // const onTaskEndDateChange = (item: { value: string }) => {
-  //   const newTempTask = utils.cloneDeep(tempTask as Task);
-  //   newTempTask.endDate = new Date(item.value);
-  //   setTempTask(newTempTask);
-  // }
-
   const onTaskUpdate = async () => {
     if (JSON.stringify(tempTask) === JSON.stringify(taskDetail)) return;
 
@@ -140,7 +131,7 @@ const TaskView: FC = () => {
 }
 
 TaskView.config = {
-  navigationBarTitleText: '看板'
+  navigationBarTitleText: '任务详情'
 };
 
 export default TaskView;
