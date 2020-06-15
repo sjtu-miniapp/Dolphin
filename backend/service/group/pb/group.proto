@@ -9,6 +9,7 @@ service Group {
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse);
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse);
   rpc UserInGroup(UserInGroupRequest) returns(UserInGroupResponse);
+  rpc AddGroupMembers(AddGroupMembersRequest) returns (AddGroupMembersResponse);
 }
 message User {
   required string id = 1;
@@ -85,4 +86,12 @@ message UserInGroupRequest {
 
 message UserInGroupResponse {
   required bool ok = 1;
+}
+
+message AddGroupMembersRequest {
+
+}
+
+message AddGroupMembersResponse {
+
 }

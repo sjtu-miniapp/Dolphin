@@ -43,7 +43,6 @@ func DbSetup(db *gorm.DB) {
 	if !db.HasTable(&model.UserGroup{}) {
 		db.CreateTable(&model.UserGroup{})
 	}
-
 	db.AutoMigrate(&model.User{}, &model.Task{},
 		&model.Group{}, &model.UserTask{}, &model.UserGroup{})
 	db.Model(&model.User{}).AddForeignKey("`self_group_id`",
