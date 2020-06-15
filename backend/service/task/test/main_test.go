@@ -151,6 +151,9 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	task2 := *rsp8.Id
+
+
+
 	rsp5, err := task.GetTaskMetaByGroupId(ctx, &pb.GetTaskMetaByGroupIdRequest{
 		GroupId:              gid1,
 	})
@@ -186,12 +189,34 @@ func TestTask(t *testing.T) {
 	})
 	assert.Empty(t, err)
 	assert.True(t, *rsp6.Ok)
+
+	_, err = task.AddTaskWorkers(ctx, &pb.AddTaskWorkersRequest{
+		Id:                   &task2,
+		Workers:              []string{openid},
+		Action:               &int0,
+	})
+	assert.Empty(t, err)
+
 	rsp9, err := task.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
 		Id:                   &task2,
 	})
 	assert.Empty(t, err)
-	assert.Equal(t, len(rsp9.Workers), 2)
+	assert.Equal(t, len(rsp9.Workers), 3)
 	assert.False(t, *rsp9.Workers[1].Done)
+
+	_, err = task.AddTaskWorkers(ctx, &pb.AddTaskWorkersRequest{
+		Id:                   &task2,
+		Workers:              []string{openid},
+		Action:               &int1,
+	})
+	assert.Empty(t, err)
+
+	rsp9, err = task.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
+		Id:                   &task2,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, len(rsp9.Workers), 2)
+
 	_, err = task.DeleteTask(ctx, &pb.DeleteTaskRequest{
 		Id:                   task1,
 	})
