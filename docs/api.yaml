@@ -263,3 +263,21 @@
     - 401 auth check fails
     - 403 not allowed
     - 500 failure
+
+# Update Task Workers
+- route: /task/:task_id/worker
+- method: PUT
+- request params:
+  - openid string
+  - sid string
+- request data:
+  - action: string # "add" | "remove": either add or remove workers
+  - workers: []string # workers' openids to add
+- response data:
+  - taskid string
+  - workers []string
+- response status:
+  - 200 success
+  - 403 permission denied
+  - 404 task id or open id not found
+  - 400 wrong request data
