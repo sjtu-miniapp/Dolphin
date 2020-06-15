@@ -1,11 +1,9 @@
 import * as Koa from 'koa';
 
+import router from './router';
+
 const app = new Koa();
 
-app.use(
-  async (ctx: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>): Promise<void> => {
-    ctx.body = 'Hello World';
-  },
-);
+app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(3000);
