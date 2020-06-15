@@ -56,6 +56,7 @@ func TestGroup(t *testing.T) {
 	gender2 := int32(0)
 	avatar1 := "ugly girl"
 	avatar2 := "ugly boy"
+	int0 := int32(0)
 	_, err := auth.PutUser(ctx, &pb2.PutUserRequest{
 		Openid:               &openid,
 		Name:                 &openid,
@@ -83,9 +84,10 @@ func TestGroup(t *testing.T) {
 	assert.NotEmpty(t, rsp2)
 	assert.Equal(t, *rsp2.Type, int32(1))
 	assert.Equal(t, *rsp2.CreatorId, openid)
-	_, err = group.AddUser(ctx, &pb.AddUserRequest{
-		GroupId:              groupid,
-		UserIds:              []string{strconv.Itoa(rand.Intn(10000)), openid2},
+	_, err = group.AddGroupMembers(ctx, &pb.AddGroupMembersRequest{
+		Id:              groupid,
+		Members:              []string{strconv.Itoa(rand.Intn(10000)), openid2},
+		Action: &int0,
 	})
 	assert.NotEmpty(t, err)
 	_, err = group.DeleteGroup(ctx, &pb.DeleteGroupRequest{
@@ -108,14 +110,16 @@ func TestGroup(t *testing.T) {
 	assert.Equal(t, *rsp4.Name, "tfboys")
 	assert.Equal(t, *rsp4.CreatorId, openid)
 	assert.Equal(t, len(rsp4.Users), 1)
-	_, err = group.AddUser(ctx, &pb.AddUserRequest{
-		GroupId:              rsp3.Id,
-		UserIds:              []string{strconv.Itoa(rand.Intn(10000)), openid2},
+	_, err = group.AddGroupMembers(ctx, &pb.AddGroupMembersRequest{
+		Id:              rsp3.Id,
+		Members:              []string{strconv.Itoa(rand.Intn(10000)), openid2},
+		Action: &int0,
 	})
 	assert.NotEmpty(t, err)
-	_, err = group.AddUser(ctx, &pb.AddUserRequest{
-		GroupId:              rsp3.Id,
-		UserIds:              []string{openid2},
+	_, err = group.AddGroupMembers(ctx, &pb.AddGroupMembersRequest{
+		Id:              rsp3.Id,
+		Members:              []string{openid2},
+		Action: &int0,
 	})
 	assert.Empty(t, err)
 	rsp4, err = group.GetGroup(ctx, &pb.GetGroupRequest{

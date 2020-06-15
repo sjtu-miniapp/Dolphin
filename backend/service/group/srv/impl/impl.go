@@ -209,11 +209,12 @@ func (g Group) CreateGroup(ctx context.Context, request *pb.CreateGroupRequest, 
 	}
 	response.Id = &group.Id
 	int0 := int32(0)
+	var rsp pb.AddGroupMembersResponse
 	err := g.AddGroupMembers(ctx, &pb.AddGroupMembersRequest{
 		Id:                   response.Id,
 		Members:              []string{*request.CreatorId},
 		Action:               &int0,
-	}, nil)
+	}, &rsp)
 	if err != nil {
 		return err
 	}

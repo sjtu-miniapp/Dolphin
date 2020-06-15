@@ -97,9 +97,10 @@ func TestTask(t *testing.T) {
 		Type:                 &int0,
 	})
 	assert.Empty(t, err)
-	_, err = group.AddUser(ctx, &pb2.AddUserRequest{
-		GroupId:              rsp3.Id,
-		UserIds:              []string{openid2},
+	_, err = group.AddGroupMembers(ctx, &pb2.AddGroupMembersRequest{
+		Id:                   rsp3.Id,
+		Members:              []string{openid2},
+		Action:               &int0,
 	})
 	assert.Empty(t, err)
 	rsp4, err := group.CreateGroup(ctx, &pb2.CreateGroupRequest{
@@ -108,9 +109,10 @@ func TestTask(t *testing.T) {
 		Type:                 &int0,
 	})
 	assert.Empty(t, err)
-	_, err = group.AddUser(ctx, &pb2.AddUserRequest{
-		GroupId:              rsp4.Id,
-		UserIds:              []string{openid2, openid3},
+	_, err = group.AddGroupMembers(ctx, &pb2.AddGroupMembersRequest{
+		Id:                   rsp4.Id,
+		Members:              []string{openid2, openid3},
+		Action:               &int0,
 	})
 	assert.Empty(t, err)
 	gid1, gid2 := rsp3.Id, rsp4.Id
