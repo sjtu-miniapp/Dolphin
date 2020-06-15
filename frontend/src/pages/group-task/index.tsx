@@ -1,14 +1,14 @@
-import Taro, { FC, useState, useEffect, useRouter } from '@tarojs/taro'
+import Taro, { FC, useState, useEffect, useRouter, useDidShow } from '@tarojs/taro'
 import { View } from '@tarojs/components';
 import { AtAvatar } from 'taro-ui';
 import bluebird from 'bluebird';
 
 import { Group, Task } from '../../types';
 import * as taskAPI from '../../apis/task';
+import TaskList from '../../components/task-list';
 import FabButton from '../../components/fab-button';
+import * as utils from '../../utils';
 
-import TaskView from './task';
-import { normalizeTask } from './utils';
 import TaskModal from './task-modal';
 
 const GroupTaskPage: FC = () => {
@@ -33,10 +33,10 @@ const GroupTaskPage: FC = () => {
     const tasks = await taskAPI.getTasksByGroupID(selectedGroupID);
     const taskDetails = await bluebird.map(
       tasks,
-      (t, i) => normalizeTask(t, i)
+      t => utils.normalizeTask(t)
     );
 
-    return taskDetails;
+    return taskDetails.sort((prev, next) => next.endDate.getTime() - prev.endDate.getTime());
   }
 
   const updateTasks = async () => {
@@ -46,9 +46,11 @@ const GroupTaskPage: FC = () => {
       setTasks(taskDetails);
     } catch (error) {
       // TODO: remote data error handling
-      console.error('Failed to update groups')
+      console.error('Failed to update tasks', error)
     }
   };
+
+  useDidShow(updateTasks);
 
   useEffect(() => {
     if (!selectedGroupID) {
@@ -72,12 +74,28 @@ const GroupTaskPage: FC = () => {
 
   const selectedGroup = groups.find(g => g.id === selectedGroupID);
 
-  const addTask = () => {
-    console.log(`Should add task`);
+  const addTask = async (params: taskAPI.CreateTaskParams) => {
+    try {
+      await taskAPI.createTask(params);
+      closeLayOut();
+      await updateTasks();
+    } catch (error) {
+      Taro.atMessage({ message: error, type: 'error' })
+    }
   }
 
   const onClickFabbutton = () => {
     openLayOut();
+  }
+
+  const onDeleteTask = async id => {
+    console.log('delete task', id);
+    try {
+      await taskAPI.deleteTask(id);
+      await updateTasks();
+    } catch (error) {
+      Taro.atMessage({ message: error, type: 'error' })
+    }
   }
 
   return (
@@ -98,10 +116,8 @@ const GroupTaskPage: FC = () => {
         })}
       </View>
       <View className='at-col'>
-        <TaskView
-          tasks={tasks}
-          selectedGroupName={selectedGroup ? selectedGroup.name : undefined}
-        />
+        {selectedGroup ? selectedGroup.name : ''}
+        <TaskList tasks={tasks} onClickDelete={onDeleteTask} />
       </View>
       <FabButton onClick={onClickFabbutton} />
       <TaskModal groupID={selectedGroupID} isOpened={isAddTaskLayoutOpened} handleClose={closeLayOut} handleAdd={addTask} />

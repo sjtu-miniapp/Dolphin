@@ -1,6 +1,7 @@
 export interface UserTaskStatus {
   userName: string;
   status: string;
+  id: string;
 }
 
 export interface Task {

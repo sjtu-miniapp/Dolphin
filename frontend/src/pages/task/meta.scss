@@ -1,0 +1,42 @@
+.taskmeta {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "a b"
+    "c d";
+}
+
+.publisher {
+  grid-area: a;
+}
+
+.start {
+  grid-area: b;
+}
+
+.type {
+  grid-area: c;
+}
+
+.end {
+  grid-area: d;
+}
+
+.tag {
+  margin: 10px;
+  font-size: 30px;
+  font-weight: 400;
+  color: lightsteelblue;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; // This is where the magic happens
+  display: flex;
+}
+
+.split {
+  height: 100%;
+  margin: 0 10px;
+  font-weight: 200;
+}

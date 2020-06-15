@@ -3,15 +3,14 @@ import { View } from '@tarojs/components';
 import { AtFloatLayout, AtInput, AtSwitch, AtAccordion, AtCalendar, AtTextarea, AtButton } from 'taro-ui';
 import moment from 'moment';
 
-// import TaskDivider from '../../components/task-divider';
 import { CreateTaskParams } from '../../apis/task';
-import * as taskAPI from '../../apis/task';
+import * as utils from '../../utils';
 import './task-modal.scss';
 
 interface TaskModalProps {
   isOpened: boolean;
   handleClose: () => void;
-  handleAdd: () => void;
+  handleAdd: (params: CreateTaskParams) => void;
   groupID: number | null;
 }
 
@@ -26,8 +25,7 @@ const TaskModal: FC<TaskModalProps> = props => {
   const [taskType, setTaskType] = useState<TaskType>('个人');
 
   const [openCalendar, setOpenCalendar] = useState<boolean>(false);
-  const [taskDeadlineDate, setTaskDeadlineDate] = useState<string>(moment().format('YYYY/MM/DD'));
-  // const [taskDeadlineTime, setTaskDeadlineTime] = useState<string>(moment().format('hh:mm'));
+  const [taskDeadlineDate, setTaskDeadlineDate] = useState<string>(moment().format('YYYY-MM-DD'));
 
   const [taskContent, setTaskContent] = useState<string>('');
 
@@ -57,21 +55,28 @@ const TaskModal: FC<TaskModalProps> = props => {
     if (!props.groupID) return;
 
     const user_ids = [Taro.getStorageSync('openid')];
+    const start_date = utils.normalizeDate();
+    const end_date = utils.normalizeDate(taskDeadlineDate);
 
-    const param: CreateTaskParams = {
+    await props.handleAdd({
       group_id: props.groupID,
       user_ids,
       name: taskName,
       type: taskType === '个人' ? 0 : 1,
-      end_date: taskDeadlineDate,
+      start_date,
+      end_date,
       description: taskContent,
       readonly: false
-    };
-    await taskAPI.createTask(param);
+    });
   }
 
   return (
-    <AtFloatLayout isOpened={props.isOpened} title='创建任务' scrollY onClose={handleClose} >
+    <AtFloatLayout
+      isOpened={props.isOpened}
+      title='创建任务'
+      scrollY
+      onClose={handleClose}
+    >
       <View className='task'>
         <AtInput
           name='taskname'
@@ -90,7 +95,6 @@ const TaskModal: FC<TaskModalProps> = props => {
           icon={{ value: 'calendar', color: '#7FA6C9', size: '15' }}>
           <AtCalendar currentDate={taskDeadlineDate} onSelectDate={onSelectDeadlineDate} />
         </AtAccordion>
-        {/* <TaskDivider content='任务详情' /> */}
         <View className='description'>
           <AtTextarea placeholder='任务详情......' height={500} count={false} maxLength={500} onChange={onTaskContentChange} value={taskContent} />
         </View>

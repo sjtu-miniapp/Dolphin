@@ -1,9 +1,25 @@
 import Taro, { FC } from '@tarojs/taro';
 import { View, Text } from '@tarojs/components'
-import { AtList, AtListItem } from 'taro-ui'
-import { Task } from 'src/types';
+import { AtList, AtListItem, AtSwipeAction } from 'taro-ui'
 
-const TaskList: FC<{ tasks: Task[] }> = props => {
+import { Task } from '../types';
+import * as utils from '../utils';
+
+interface TaskListProps {
+  tasks: Task[],
+  onClickDelete: (id: number) => Promise<void>;
+}
+
+const TaskList: FC<TaskListProps> = props => {
+  const swipeActionOptions = [
+    {
+      text: '删除',
+      style: {
+        backgroundColor: '#FF4949'
+      }
+    }
+  ];
+
   return (
     <View>
       <Text>Todo List</Text>
@@ -11,13 +27,19 @@ const TaskList: FC<{ tasks: Task[] }> = props => {
         {
           props.tasks.map(item => {
             return (
-              <AtListItem
-                title={item.name}
-                note={item.endDate.toLocaleDateString() + ' ' + item.endDate.toLocaleTimeString()}
-                arrow='right'
-                iconInfo={{ size: 25, color: '#78A4FA', value: 'bookmark' }}
-                onClick={() => { Taro.navigateTo({ url: `/pages/task/index?id=${item.id}` }) }}
-              />
+              <AtSwipeAction
+                key={item.id}
+                onClick={() => props.onClickDelete(item.id)}
+                options={swipeActionOptions}
+              >
+                <AtListItem
+                  title={item.name}
+                  note={utils.formateDate(item.endDate)}
+                  arrow='right'
+                  iconInfo={{ size: 25, color: '#78A4FA', value: 'bookmark' }}
+                  onClick={() => { Taro.navigateTo({ url: `/pages/task/index?id=${item.id}` }) }}
+                />
+              </AtSwipeAction>
             )
           })
         }
