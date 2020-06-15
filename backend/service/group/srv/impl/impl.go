@@ -68,6 +68,18 @@ func (g Group) AddGroupMembers(ctx context.Context, request *pb.AddGroupMembersR
 		return fmt.Errorf("not implemented action")
 	}
 	db := g.SqlDb
+	var resp pb.GetGroupResponse
+	err := g.GetGroup(ctx, &pb.GetGroupRequest{
+		Id:                   request.Id,
+	}, &resp)
+	if err != nil {
+		return err
+	}
+
+	if *resp.Type == 1 {
+		return fmt.Errorf("can't add users to an individual group")
+	}
+
 	tx := db.Begin()
 	for _, v := range request.Members {
 		userGroup := model.UserGroup{
@@ -75,21 +87,26 @@ func (g Group) AddGroupMembers(ctx context.Context, request *pb.AddGroupMembersR
 			GroupId: *request.Id,
 		}
 		if *request.Action == 0 {
-			tx.Create(&userGroup)
+			err = tx.Create(&userGroup).Error
 		} else {
-			tx.Delete(&userGroup)
+			err = tx.Delete(&userGroup).Error
+		}
+		if err != nil {
+			tx.Rollback()
+			return err
 		}
 	}
 
 	tx.Commit()
-	var resp pb.GetGroupResponse
-	err := g.GetGroup(ctx, &pb.GetGroupRequest{
+
+	err = g.GetGroup(ctx, &pb.GetGroupRequest{
 		Id:                   request.Id,
 	}, &resp)
 
 	if err != nil {
 		return fmt.Errorf("members added but get members failed: %v", err)
 	}
+
 	for _, v := range resp.Users {
 		response.Members = append(response.Members, *v.Id)
 	}
@@ -191,10 +208,11 @@ func (g Group) CreateGroup(ctx context.Context, request *pb.CreateGroupRequest, 
 		return fmt.Errorf("created group id == 0")
 	}
 	response.Id = &group.Id
-
-	err := g.AddUser(ctx, &pb.AddUserRequest{
-		GroupId: response.Id,
-		UserIds: []string{*request.CreatorId},
+	int0 := int32(0)
+	err := g.AddGroupMembers(ctx, &pb.AddGroupMembersRequest{
+		Id:                   response.Id,
+		Members:              []string{*request.CreatorId},
+		Action:               &int0,
 	}, nil)
 	if err != nil {
 		return err
@@ -205,40 +223,7 @@ func (g Group) CreateGroup(ctx context.Context, request *pb.CreateGroupRequest, 
 	return err
 }
 
-func (g Group) AddUser(ctx context.Context, request *pb.AddUserRequest, response *pb.AddUserResponse) error {
-	if request.GroupId == nil {
-		return fmt.Errorf("nil pointer")
-	}
-	db := g.SqlDb
 
-	if len(request.UserIds) == 0 {
-		return nil
-	}
-	pg := new(pb.GetGroupResponse)
-	err := g.GetGroup(ctx, &pb.GetGroupRequest{
-		Id: request.GroupId,
-	}, pg)
-	if err != nil {
-		// record not found
-		return err
-	}
-	if *pg.Type == 1 {
-		return fmt.Errorf("can't add users to an individual group")
-	}
-	tx := db.Begin()
-	for _, v := range request.UserIds {
-		err = tx.Create(&model.UserGroup{
-			UserId:  v,
-			GroupId: *request.GroupId,
-		}).Error
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-	tx.Commit()
-	return nil
-}
 
 // all values are prepared in api
 func (g Group) UpdateGroup(ctx context.Context, request *pb.UpdateGroupRequest, response *pb.UpdateGroupResponse) error {

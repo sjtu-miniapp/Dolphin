@@ -46,10 +46,15 @@ func (g Task) AddTaskWorkers(ctx context.Context, request *pb.AddTaskWorkersRequ
 			Done:     false,
 			DoneTime: nil,
 		}
+		var err error
 		if *request.Action == 0 {
-			tx.Create(&userTask)
+			err = tx.Create(&userTask).Error
 		} else {
-			tx.Delete(&userTask)
+			err = tx.Delete(&userTask).Error
+		}
+		if err != nil {
+			tx.Rollback()
+			return err
 		}
 	}
 	tx.Commit()

@@ -175,9 +175,11 @@ func (g Group) CreateGroup(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
-	_, err = srv.AddUser(context.TODO(), &pb.AddUserRequest{
-		GroupId: resp.Id,
-		UserIds: data.UserIds,
+	int0 := int32(0)
+	_, err = srv.AddGroupMembers(context.TODO(), &pb.AddGroupMembersRequest{
+		Id:                  resp.Id,
+		Members:              data.UserIds,
+		Action:               &int0,
 	})
 	if err != nil {
 		c.JSON(500, err)

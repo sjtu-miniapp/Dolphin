@@ -5,7 +5,8 @@ service Group {
   rpc GetGroup(GetGroupRequest) returns (GetGroupResponse);
   rpc GetGroupByUserId(GetGroupByUserIdRequest) returns (GetGroupByUserIdResponse);
   rpc CreateGroup(CreateGroupRequest) returns (CreateGroupResponse);
-  rpc AddUser(AddUserRequest) returns (AddUserResponse);
+
+
   rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse);
   rpc DeleteGroup(DeleteGroupRequest) returns (DeleteGroupResponse);
   rpc UserInGroup(UserInGroupRequest) returns(UserInGroupResponse);
@@ -59,12 +60,8 @@ message CreateGroupResponse {
   required int32 id = 1;
 }
 
-message AddUserRequest {
-  required int32 group_id = 1;
-  repeated string user_ids = 2;
-}
-message AddUserResponse {
-}
+
+
 
 message UpdateGroupRequest {
   required int32 id = 1;
