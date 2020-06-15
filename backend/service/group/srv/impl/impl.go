@@ -133,13 +133,6 @@ func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserI
 	ch := make(chan int, len(user.Groups))
 	errChan := make(chan error, len(user.Groups))
 
-	for i := 0; i < len(user.Groups); i++ {
-		for j := i + 1; j < len(user.Groups); j++ {
-			if user.Groups[i].UpdatedAt.After(*user.Groups[j].UpdatedAt) {
-				user.Groups[i], user.Groups[j] = user.Groups[j], user.Groups[i]
-			}
-		}
-	}
 
 	for _, v := range user.Groups {
 		go func(gp *model.Group) {
@@ -187,6 +180,16 @@ func (g Group) GetGroupByUserId(ctx context.Context, request *pb.GetGroupByUserI
 			return err
 		}
 	}
+	for i := 0; i < len(response.Groups); i++ {
+		for j := i + 1; j < len(response.Groups); j++ {
+			t1, _ := string2time(*response.Groups[i].UpdatedAt)
+			t2, _ := string2time(*response.Groups[j].UpdatedAt)
+			if t1.After(t2) {
+				response.Groups[i], response.Groups[j] = response.Groups[j], response.Groups[i]
+			}
+		}
+	}
+
 	return nil
 }
 
