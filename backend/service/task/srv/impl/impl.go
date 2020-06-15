@@ -17,6 +17,7 @@ type Task struct {
 	MongoDb *mongo.Database
 }
 
+
 const collection = "task"
 
 func time2string(time time.Time) string {
@@ -27,6 +28,47 @@ func time2string(time time.Time) string {
 
 func string2time(str string) (time.Time, error) {
 	return time.Parse("2006-01-02T15:04:05", str)
+}
+
+func (g Task) AddTaskWorkers(ctx context.Context, request *pb.AddTaskWorkersRequest, response *pb.AddTaskWorkersResponse) error {
+	if request.Id == nil || request.Action == nil {
+		return fmt.Errorf("nil pointer")
+	}
+	if *request.Action < int32(0) || *request.Action > int32(1) {
+		return fmt.Errorf("not implemented action")
+	}
+	db := g.SqlDb
+	tx := db.Begin()
+	if *request.Action == 0 {
+		for _, v := range request.Workers {
+			userTask := model.UserTask{
+				UserId:   v,
+				TaskId:   *request.Id,
+				Done:     false,
+				DoneTime: nil,
+			}
+			if *request.Action == 0 {
+				tx.Save(&userTask)
+			} else {
+				tx.Delete(&userTask)
+			}
+		}
+	}
+	var resp pb.GetTaskPeopleResponse
+	err := g.GetTaskPeolple(ctx, &pb.GetTaskPeopleRequset{
+		Id:                   request.Id,
+	}, &resp)
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	for _, v := range resp.Workers {
+		response. Workers = append(response.Workers, *v.Id)
+	}
+
+	tx.Commit()
+	return nil
 }
 
 func (g Task) GetTaskMeta(ctx context.Context, request *pb.GetTaskMetaRequest, response *pb.GetTaskMetaResponse) error {

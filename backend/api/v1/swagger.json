@@ -12,6 +12,17 @@
   ],
   "paths": {},
   "definitions": {
+    "AddTaskWorkersResponse": {
+      "type": "object",
+      "properties": {
+        "workers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "CreateTaskResponse": {
       "type": "object",
       "properties": {

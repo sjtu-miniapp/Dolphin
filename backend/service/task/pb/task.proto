@@ -11,6 +11,7 @@ service Task {
   rpc UpdateTaskContent(UpdateTaskContentRequest) returns (UpdateTaskContentResponse);
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
   rpc UserInTask(UserInTaskRequest) returns (UserInTaskResponse);
+  rpc AddTaskWorkers(AddTaskWorkersRequest) returns (AddTaskWorkersResponse);
 }
 
 
@@ -129,4 +130,14 @@ message GetTaskMetaByUserIdRequest {
 
 message GetTaskMetaByUserIdResponse {
   repeated TaskMeta metas = 1;
+}
+
+message AddTaskWorkersRequest {
+  required int32 id = 1;
+  repeated string workers = 2;
+  required int32 action = 3;
+}
+
+message AddTaskWorkersResponse {
+  repeated string workers = 1;
 }

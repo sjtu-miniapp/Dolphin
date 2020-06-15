@@ -44,6 +44,7 @@ type TaskService interface {
 	UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, opts ...client.CallOption) (*UpdateTaskContentResponse, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...client.CallOption) (*DeleteTaskResponse, error)
 	UserInTask(ctx context.Context, in *UserInTaskRequest, opts ...client.CallOption) (*UserInTaskResponse, error)
+	AddTaskWorkers(ctx context.Context, in *AddTaskWorkersRequest, opts ...client.CallOption) (*AddTaskWorkersResponse, error)
 }
 
 type taskService struct {
@@ -164,6 +165,16 @@ func (c *taskService) UserInTask(ctx context.Context, in *UserInTaskRequest, opt
 	return out, nil
 }
 
+func (c *taskService) AddTaskWorkers(ctx context.Context, in *AddTaskWorkersRequest, opts ...client.CallOption) (*AddTaskWorkersResponse, error) {
+	req := c.c.NewRequest(c.name, "Task.AddTaskWorkers", in)
+	out := new(AddTaskWorkersResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Task service
 
 type TaskHandler interface {
@@ -177,6 +188,7 @@ type TaskHandler interface {
 	UpdateTaskContent(context.Context, *UpdateTaskContentRequest, *UpdateTaskContentResponse) error
 	DeleteTask(context.Context, *DeleteTaskRequest, *DeleteTaskResponse) error
 	UserInTask(context.Context, *UserInTaskRequest, *UserInTaskResponse) error
+	AddTaskWorkers(context.Context, *AddTaskWorkersRequest, *AddTaskWorkersResponse) error
 }
 
 func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.HandlerOption) error {
@@ -191,6 +203,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		UpdateTaskContent(ctx context.Context, in *UpdateTaskContentRequest, out *UpdateTaskContentResponse) error
 		DeleteTask(ctx context.Context, in *DeleteTaskRequest, out *DeleteTaskResponse) error
 		UserInTask(ctx context.Context, in *UserInTaskRequest, out *UserInTaskResponse) error
+		AddTaskWorkers(ctx context.Context, in *AddTaskWorkersRequest, out *AddTaskWorkersResponse) error
 	}
 	type Task struct {
 		task
@@ -241,4 +254,8 @@ func (h *taskHandler) DeleteTask(ctx context.Context, in *DeleteTaskRequest, out
 
 func (h *taskHandler) UserInTask(ctx context.Context, in *UserInTaskRequest, out *UserInTaskResponse) error {
 	return h.TaskHandler.UserInTask(ctx, in, out)
+}
+
+func (h *taskHandler) AddTaskWorkers(ctx context.Context, in *AddTaskWorkersRequest, out *AddTaskWorkersResponse) error {
+	return h.TaskHandler.AddTaskWorkers(ctx, in, out)
 }

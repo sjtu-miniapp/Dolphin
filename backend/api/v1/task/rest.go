@@ -32,6 +32,7 @@ func Router(base string) *gin.Engine {
 	g.POST("/:task_id/meta", task.UpdateTaskMeta)
 	g.POST("/:task_id/content", task.UpdateTaskContent)
 	g.DELETE("/:task_id", task.DeleteTask)
+	g.PUT("/:task_id/worker", task.AddTaskWorker)
 	router.Use(cors.Default())
 	return router
 }
@@ -652,4 +653,62 @@ func (t Task) GetTaskByUserId(c *gin.Context) {
 		return
 	}
 	c.JSON(200, resp2.Metas)
+}
+
+/*
+
+ */
+func (t Task) AddTaskWorker(c *gin.Context) {
+	err := checkAuth(c)
+	if err != nil {
+		c.JSON(401, err)
+		return
+	}
+	openid := c.Query("openid")
+	id_, err := strconv.Atoi(c.Param("task_id"))
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	id := int32(id_)
+	resp2, err := srv.GetTaskMeta(context.TODO(), &pb.GetTaskMetaRequest{
+		Id:                  &id,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	if *resp2.Meta.LeaderId != openid || *resp2.Meta.PublisherId != openid {
+		c.JSON(403, "not allowed")
+		return
+	}
+
+	var data struct {
+		Action int32 `json:"add"`
+		Workers []string `json:"workers"`
+	}
+	err = c.BindJSON(&data)
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	resp3, err := srv.AddTaskWorkers(context.TODO(), &pb.AddTaskWorkersRequest{
+		Id:                   &id,
+		Workers:              data.Workers,
+	})
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	name := ""
+	_, err = groupSrv.UpdateGroup(context.TODO(), &pb2.UpdateGroupRequest{
+		Id:                   resp2.Meta.GroupId,
+		Name:                 &name,
+	})
+
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	c.JSON(201, resp3.Workers)
 }

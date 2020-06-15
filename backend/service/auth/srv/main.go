@@ -81,4 +81,3 @@ func main() {
 		log.Fatal("fail to run the service", err)
 	}
 }
-
