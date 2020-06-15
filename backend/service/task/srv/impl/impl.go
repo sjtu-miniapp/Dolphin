@@ -160,13 +160,6 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 	if err := db.Preload("Tasks").Find(&group).Error; err != nil {
 		return err
 	}
-	for i := 0; i < len(group.Tasks); i++ {
-		for j := i + 1; j < len(group.Tasks); j++ {
-			if group.Tasks[i].EndDate.After(*group.Tasks[j].EndDate) {
-				group.Tasks[i], group.Tasks[j] = group.Tasks[j], group.Tasks[i]
-			}
-		}
-	}
 
 	for _, v := range group.Tasks {
 		task := pb.TaskMeta{
@@ -192,6 +185,15 @@ func (g Task) GetTaskMetaByGroupId(ctx context.Context, request *pb.GetTaskMetaB
 		}
 		response.Metas = append(response.Metas, &task)
 	}
+	for i := 0; i < len(response.Metas); i++ {
+		for j := i + 1; j < len(response.Metas); j++ {
+			t1, _ := string2time(*response.Metas[i].EndDate)
+			t2, _ := string2time(*response.Metas[j].EndDate)
+			if t1.After(t2) {
+				response.Metas[i], response.Metas[j] = response.Metas[j], response.Metas[i]
+			}
+		}
+	}
 	return nil
 }
 
@@ -207,13 +209,7 @@ func (g Task) GetTaskMetaByUserId(ctx context.Context, request *pb.GetTaskMetaBy
 	if err := db.Preload("Tasks").Find(&user).Error; err != nil {
 		return err
 	}
-	for i := 0; i < len(user.Tasks); i++ {
-		for j := i + 1; j < len(user.Tasks); j++ {
-			if user.Tasks[i].EndDate.After(*user.Tasks[j].EndDate) {
-				user.Tasks[i], user.Tasks[j] = user.Tasks[j], user.Tasks[i]
-			}
-		}
-	}
+
 
 	for _, v := range user.Tasks {
 		task := pb.TaskMeta{
@@ -238,6 +234,15 @@ func (g Task) GetTaskMetaByUserId(ctx context.Context, request *pb.GetTaskMetaBy
 			task.EndDate = &s
 		}
 		response.Metas = append(response.Metas, &task)
+	}
+	for i := 0; i < len(response.Metas); i++ {
+		for j := i + 1; j < len(response.Metas); j++ {
+			t1, _ := string2time(*response.Metas[i].EndDate)
+			t2, _ := string2time(*response.Metas[j].EndDate)
+			if t1.After(t2) {
+				response.Metas[i], response.Metas[j] = response.Metas[j], response.Metas[i]
+			}
+		}
 	}
 	return nil
 }
