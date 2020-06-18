@@ -12,6 +12,8 @@ export const queryParser = (query: any): ParsedQuery => {
   if (!query[OPEN_ID] || typeof query[OPEN_ID] !== 'string') throw new Error('Invalid open id');
   if (!query[SESSION_ID] || typeof query[SESSION_ID] !== 'string') throw new Error('Invalid session id');
 
+  query.openID = query[OPEN_ID];
+  query.sessionID = query[SESSION_ID];
   return query;
 };
 
@@ -21,7 +23,7 @@ export const codeGenerator = (): number => {
 };
 
 export const expirationDateGenerator = (): number => {
-  return moment().add(30, 'm').valueOf();
+  return moment().add(15, 'm').valueOf();
 };
 
 export const validateCode = (code: any): (CodeRecord & UserAuth) | null => {

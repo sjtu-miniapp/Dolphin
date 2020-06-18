@@ -9,7 +9,11 @@ export const normalizeGroup = async (
 
   const tasks = await taskAPI.getTasksByGroupID(id);
   const taskNumber = tasks ? tasks.length : 0;
-  const updateTime = new Date();
 
+  const [d, t] = (group.updated_at || "").split(" ");
+  console.log(group.updated_at, d, t);
+
+  const updateTime = new Date(`${d}T${t}.000Z`);
+  console.log("uuuuuuuuuuu", updateTime);
   return { id, name, taskNumber, updateTime };
 };

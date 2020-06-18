@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, Input } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import { AtCalendar } from 'taro-ui';
 
 import TaskList from '../../components/task-list';
@@ -19,7 +19,20 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
     super(props);
 
     this.state = {
-      list: [],
+      list: [
+        {
+          id: 12,
+          groupID: 123,
+          name: "宏观经济学 期末作业",
+          description: "",
+          endDate: new Date("2020-06-30T00:00:00.000Z"),
+          startDate: new Date(),
+          readOnly: false,
+          status: 'undone',
+          receivers: [],
+          type: '0'
+        }
+      ],
       inputVal: ''
     };
   }
@@ -45,50 +58,13 @@ export class Kanban extends Component<KanbanProps, KanbanState> {
     navigationBarTitleText: '首页'
   }
 
-  inputHandler = e => this.setState({ inputVal: e.target.value });
-
-  addTodo = () => {
-    const { list, inputVal } = this.state;
-
-    if (inputVal === '') return;
-
-
-    const newTask: Task = {
-      id: Date.now(),
-      groupID: 2,
-      name: inputVal,
-      description: '',
-      startDate: new Date(),
-      endDate: new Date(),
-      readOnly: false,
-
-      receivers: [
-        { userName: "Bobo", status: "completed" },
-        { userName: "Biubiu", status: "in-progress" },
-        { userName: "Piupiu", status: "to-start" }
-      ],
-
-      status: ''
-    };
-
-    this.setState({
-      list: list.concat(newTask), inputVal: ''
-    });
-  }
-
-  deleteTodo = async (id: number) => {
-    console.log(`TODO: delete task ${id}`);
-  }
-
   render() {
-    const { list, inputVal } = this.state;
+    const { list } = this.state;
 
     return (
       <View className='index'>
-        <AtCalendar />
-        <Input className='input' type='text' value={inputVal} onInput={this.inputHandler} />
-        <Text className='add' onClick={this.addTodo}>添加</Text>
-        <TaskList tasks={list} onClickDelete={this.deleteTodo} />
+        <AtCalendar currentDate='2020-06-30' />
+        <TaskList tasks={list} onClickDelete={async () => { }} />
       </View>
     )
   }

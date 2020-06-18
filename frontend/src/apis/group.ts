@@ -39,6 +39,7 @@ export interface GroupShort {
   creator_id: string;
   id: number;
   name: string;
+  updated_at: string;
 }
 
 export const getGroupsByUser = async (): Promise<GroupShort[]> => {

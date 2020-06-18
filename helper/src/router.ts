@@ -2,6 +2,7 @@ import * as Router from '@koa/router';
 
 import * as store from './store';
 import * as utils from './utils';
+import * as codeapi from './codeapi';
 import { CodeRecord, UserAuth } from './types';
 
 const router = new Router({
@@ -32,7 +33,7 @@ router.get('/code', (ctx) => {
   ctx.response.status = 200;
 });
 
-router.put('/code/:code', (ctx) => {
+router.put('/code/:code', async (ctx) => {
   const query = utils.queryParser(ctx.request.query);
   console.log(query, ctx.params);
 
@@ -42,11 +43,17 @@ router.put('/code/:code', (ctx) => {
   // 1. find code in the db
   const record = utils.validateCode(code);
   if (!record) throw new Error('Invalid code');
+  console.log(6666, record);
 
   // 2. send request to add user to group/task
   // No supported apis so far
-
-  // 3. return with request result;
+  await codeapi.addTo({
+    targetOpenID: query.openID,
+    id: record.id,
+    type: record.type,
+    opsOpenID: record.openID,
+    opsSessionID: record.sessionID,
+  });
 
   ctx.response.body = record;
   ctx.response.status = 200;

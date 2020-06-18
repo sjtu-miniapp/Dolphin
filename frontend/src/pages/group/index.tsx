@@ -4,8 +4,9 @@ import bluebird from 'bluebird';
 
 import { Group } from '../../types';
 import * as groupAPI from '../../apis/group';
+import * as shareAPI from '../../apis/share';
 import FabButton from '../../components/fab-button';
-import GroupModal from '../../components/group-modal';
+import GroupModal, { InputType } from '../../components/group-modal';
 
 import FullGroupView from './full-group';
 import { normalizeGroup } from './utils';
@@ -42,12 +43,6 @@ const GroupPage: FC = () => {
 
   useDidShow(updateGroups);
 
-  const addGroup = async (groupName: string) => {
-    closeModal();
-    await groupAPI.createGroup({ name: groupName, user_ids: [] });
-    await updateGroups();
-  }
-
   const onSelectGroup = (groupID: number) => {
     const targetGroup = groups.find(g => g.id === groupID);
 
@@ -70,6 +65,18 @@ const GroupPage: FC = () => {
     }
 
     await updateGroups();
+  }
+
+  const addGroup = async (inputType: InputType, value: string) => {
+    closeModal();
+    if (inputType === 'groupName') {
+      await groupAPI.createGroup({ name: value, user_ids: [] });
+      await updateGroups();
+    } else {
+      const code = parseInt(value, 10);
+      const result = await shareAPI.joinByCode(code);
+      console.log('share joined !!!!!!', result);
+    }
   }
 
   return (

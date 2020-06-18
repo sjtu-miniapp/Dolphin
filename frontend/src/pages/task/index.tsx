@@ -3,7 +3,6 @@ import { View } from '@tarojs/components';
 import { AtTextarea } from 'taro-ui';
 import { BaseEventOrig } from '@tarojs/components/types/common';
 import { InputProps } from '@tarojs/components/types/Input';
-import { TagInfo } from 'taro-ui/types/tag';
 
 import TaskReceiverList from '../../components/task-receiver-list';
 import TaskDivider from '../../components/task-divider';
@@ -80,8 +79,10 @@ const TaskView: FC = () => {
     tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error' ? tempTask
       : { name: tempTask.name, status: tempTask.status };
 
-  const onUpdateStatus = async (v: TagInfo) => {
-    console.log(JSON.stringify(v, null, 2));
+  const onUpdateStatus = async (v: 'done' | 'undone') => {
+    const newTempTask = utils.cloneDeep(tempTask as Task);
+    newTempTask.status = v;
+    await onUpdateByManual(newTempTask);
   }
 
   const metaInfoStatus: TaskStatus<RawMeta> =
@@ -91,8 +92,6 @@ const TaskView: FC = () => {
   const onUpdateEndDate = async (d: Date) => {
     const newTempTask = utils.cloneDeep(tempTask as Task);
     newTempTask.endDate = d;
-
-    if (tempTask === 'Not Started' || tempTask === 'Loading' || tempTask === 'Error') return;
 
     const start_date = utils.normalizeDate(newTempTask.startDate.toISOString());
     const end_date = utils.normalizeDate(newTempTask.endDate.toISOString());
@@ -104,6 +103,22 @@ const TaskView: FC = () => {
       readonly: newTempTask.readOnly,
       description: newTempTask.description,
       done: newTempTask.status === 'done'
+    });
+
+    await updateTaskDetail(taskID);
+  }
+
+  const onUpdateByManual = async (nTask: Task) => {
+    const start_date = utils.normalizeDate(nTask.startDate.toISOString());
+    const end_date = utils.normalizeDate(nTask.endDate.toISOString());
+
+    await taskAPI.updateTaskMeta(taskID, {
+      name: nTask.name,
+      start_date,
+      end_date,
+      readonly: nTask.readOnly,
+      description: nTask.description,
+      done: nTask.status === 'done'
     });
 
     await updateTaskDetail(taskID);

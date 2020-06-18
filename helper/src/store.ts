@@ -13,7 +13,7 @@ export const updateRecord = (p: CodeRecord & UserAuth): number => {
   // find one record, refresh whatever
   if (existRecord.length === 1) {
     const idx = CODE_RECORD.findIndex((r) => r.type === type && r.id === id);
-    if (idx <= 0 || idx >= CODE_RECORD.length) {
+    if (idx < 0 || idx >= CODE_RECORD.length) {
       throw new Error('Failed to find record with previous verified');
     }
 
@@ -21,7 +21,7 @@ export const updateRecord = (p: CodeRecord & UserAuth): number => {
     return CODE_RECORD[idx].code;
   }
 
-  // find more than one record
+  // find more than one record, delete all of them
   if (existRecord.length > 1) {
     // delete them
     for (let i = CODE_RECORD.length - 1; i >= 0; i--) {
@@ -31,7 +31,7 @@ export const updateRecord = (p: CodeRecord & UserAuth): number => {
     }
   }
 
-  // no record add new record
+  // no record, add new record
   CODE_RECORD.push({ ...p });
   return CODE_RECORD[CODE_RECORD.length - 1].code;
 };

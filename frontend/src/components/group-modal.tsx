@@ -1,20 +1,22 @@
-import Taro, { FC, useState, useEffect } from '@tarojs/taro';
-import { AtModal, AtModalHeader, AtModalAction, AtModalContent, AtInput } from 'taro-ui';
+import Taro, { FC, useState, useDidShow } from '@tarojs/taro';
+import { AtModal, AtModalAction, AtModalContent, AtInput, AtSegmentedControl } from 'taro-ui';
 import { Button } from '@tarojs/components';
+
+export type InputType = 'groupName' | 'shareCode';
 
 interface GroupModalProps {
   isOpened: boolean;
   handleClose: () => void;
   handleCancel: () => void;
-  handleConfirm: (groupName: string) => void;
+  handleConfirm: (inputType: InputType, value: string) => void;
 }
 
 const GroupModal: FC<GroupModalProps> = props => {
+  const [inputType, setInputType] = useState<InputType>('groupName');
+
   const [inputValue, setInputValue] = useState<string>('');
 
-  useEffect(() => {
-    setInputValue('');
-  }, []);
+  useDidShow(() => setInputValue(''));
 
   const updateInputValue = (v: string, _e: any) => {
     setInputValue(v);
@@ -24,16 +26,27 @@ const GroupModal: FC<GroupModalProps> = props => {
     if (!inputValue) return;
     const value = inputValue;
     setInputValue('');
-    props.handleConfirm(value);
+    props.handleConfirm(inputType, value);
+  }
+
+  const title = inputType === 'groupName' ? '组名' : '邀请码';
+
+  const switchInputType = v => {
+    if (v === 0) setInputType('groupName');
+    else setInputType('shareCode');
   }
 
   return (
     <AtModal isOpened={props.isOpened} onClose={props.handleClose}>
-      <AtModalHeader>创建小组</AtModalHeader>
       <AtModalContent>
+        <AtSegmentedControl
+          values={['创建小组', '加入小组']}
+          onClick={switchInputType}
+          current={inputType === 'groupName' ? 0 : 1}
+        />
         <AtInput
-          name='groupNameInput'
-          title='组名'
+          name='toInput'
+          title={title}
           type='text'
           maxLength={20}
           value={inputValue}
@@ -52,7 +65,7 @@ GroupModal.defaultProps = {
   isOpened: false,
   handleClose: () => { },
   handleCancel: () => { },
-  handleConfirm: (_groupName: string) => { }
+  handleConfirm: (_type: 'groupName', _groupName: string) => { }
 }
 
 export default GroupModal;

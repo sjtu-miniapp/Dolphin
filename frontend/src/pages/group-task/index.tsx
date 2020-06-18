@@ -1,15 +1,19 @@
 import Taro, { FC, useState, useEffect, useRouter, useDidShow } from '@tarojs/taro'
 import { View } from '@tarojs/components';
-import { AtAvatar } from 'taro-ui';
+import { AtAvatar, AtButton } from 'taro-ui';
 import bluebird from 'bluebird';
 
 import { Group, Task } from '../../types';
+import * as GroupAPI from '../../apis/group';
 import * as taskAPI from '../../apis/task';
+import * as shareAPI from '../../apis/share';
 import TaskList from '../../components/task-list';
 import FabButton from '../../components/fab-button';
 import * as utils from '../../utils';
 
 import TaskModal from './task-modal';
+
+import './index.scss';
 
 const GroupTaskPage: FC = () => {
   const groups: Group[] = Taro.getStorageSync('groups') || [];
@@ -27,6 +31,22 @@ const GroupTaskPage: FC = () => {
   const openLayOut = () => setIsAddTaskLayoutOpened(true);
   const closeLayOut = () => setIsAddTaskLayoutOpened(false);
 
+
+  const [openShareCode, setOpenShareCode] = useState<boolean>(false);
+
+  const [shareCode, setShareCode] = useState<string | number>('邀请码');
+
+  const getGroupShareCode = async () => {
+    if (!openShareCode || !selectedGroupID) return;
+    setShareCode('loading...');
+    const shareCode = await shareAPI.getShareCode('group', selectedGroupID)
+    setShareCode(shareCode);
+  }
+
+  useEffect(() => {
+    getGroupShareCode()
+  }, [openShareCode])
+
   const getTaskDetails = async (): Promise<Task[]> => {
     if (!selectedGroupID) return [];
 
@@ -39,8 +59,15 @@ const GroupTaskPage: FC = () => {
     return taskDetails.sort((prev, next) => next.endDate.getTime() - prev.endDate.getTime());
   }
 
+  const getGroupDetail = async () => {
+    if (!selectedGroupID) return;
+    const detail = await GroupAPI.getGroupByID(selectedGroupID);
+    console.log('deeeeeeeeeetail', detail);
+  }
+
   const updateTasks = async () => {
     try {
+      await getGroupDetail();
       const taskDetails = await getTaskDetails();
       console.log('Get Tasks Details:', JSON.stringify(taskDetails, null, 2));
       setTasks(taskDetails);
@@ -98,6 +125,11 @@ const GroupTaskPage: FC = () => {
     }
   }
 
+
+  const switchShareCodeDisplay = () => {
+    setOpenShareCode(!openShareCode);
+  }
+
   return (
     <View className='at-row' >
       <View className='at-col-2'>
@@ -116,7 +148,10 @@ const GroupTaskPage: FC = () => {
         })}
       </View>
       <View className='at-col'>
-        {selectedGroup ? selectedGroup.name : ''}
+        <View className='grouptitle'>
+          {selectedGroup ? selectedGroup.name : ''}
+          <AtButton circle size='small' loading={shareCode === 'loading'} onClick={switchShareCodeDisplay}>{shareCode}</AtButton>
+        </View>
         <TaskList tasks={tasks} onClickDelete={onDeleteTask} />
       </View>
       <FabButton onClick={onClickFabbutton} />
