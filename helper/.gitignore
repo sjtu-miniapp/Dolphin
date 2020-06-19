@@ -1,3 +1,7 @@
 node_modules
 coverage
 lib
+config.json
+!tsconfig.json
+bin/migrate
+docker-compose.yaml
