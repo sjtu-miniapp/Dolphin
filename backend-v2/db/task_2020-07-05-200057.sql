@@ -1,0 +1,1 @@
+INSERT INTO "task"("taskid", "taskname", "type", "description", "publisher", "status", "creattime", "dll") VALUES ('1                                                 ', '期末作业        ', '个人        ', '快做！！！！做不完谁也不许放假！！！！！记得给老师评教好评噢！！！', '1                                                 ', 'undone    ', '2020-07-05 00:00:00', '2020-07-06 00:00:00');

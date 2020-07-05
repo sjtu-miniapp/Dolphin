@@ -1,0 +1,1 @@
+INSERT INTO "groupMember"("userid", "groupid", "id") VALUES ('1                                                 ', '837262                                            ', '1                                                 ');

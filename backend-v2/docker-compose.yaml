@@ -1,0 +1,10 @@
+version: '3'
+services:
+  postgres:
+    image: "postgres:9.6-alpine"
+    ports:
+      - "25432:5432"
+    environment:
+      - POSTGRES_DB=dolphin
+      - POSTGRES_USER=dolphin
+      - POSTGRES_PASSWORD=dolphin

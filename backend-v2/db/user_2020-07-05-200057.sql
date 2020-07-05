@@ -1,0 +1,1 @@
+INSERT INTO "user"("id", "wechatid", "sessionid", "expiretime") VALUES ('1                                                 ', 'ylj3331                                           ', '3r9327r9237932                                                                                      ', '2020-07-05 11:14:20.102');
